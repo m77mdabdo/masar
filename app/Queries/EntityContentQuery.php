@@ -22,10 +22,10 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * separate query per type unioned in PHP — and it keeps working when reports and
  * videos are added, without touching this class.
  *
- * Ordering uses entity_mentions.created_at — the moment the entity was tagged —
- * so the sort is served by the same composite index that does the filtering.
- * For a newsroom that tags while editing, this tracks publication order closely
- * but is not identical to it; see the note in the TASK-02 report.
+ * Ordering uses entity_mentions.created_at, which PublishArticle realigns to the
+ * article's published_at at the moment of publication. The sort is therefore
+ * publication order, served by the same composite index that does the filtering
+ * — no join to the content table required.
  */
 class EntityContentQuery
 {
@@ -63,6 +63,28 @@ class EntityContentQuery
     public static function for(Model $entity): self
     {
         return new self($entity);
+    }
+
+    /**
+     * Apply the published filter and eager loads to a query that is already
+     * scoped to an entity's mentions — a Filament relation manager, typically.
+     *
+     * Sharing this with the public-facing query means the admin listing and the
+     * company page cannot drift apart, and a performance problem shows up in
+     * both at once rather than only after launch.
+     */
+    public function applyTo(Builder $query): Builder
+    {
+        return $query
+            ->whereHasMorph(
+                'mentionable',
+                self::CONTENT_TYPES,
+                fn (Builder $q) => $q->published(),
+            )
+            ->with(['mentionable' => fn (MorphTo $morphTo) => $morphTo->morphWith([
+                Article::class => ['category:id,slug,color', 'category.translations', 'author:id,name'],
+                Opportunity::class => ['industry.translations', 'country.translations'],
+            ])]);
     }
 
     /**

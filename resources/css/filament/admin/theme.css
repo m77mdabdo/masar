@@ -1,0 +1,119 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+@import '../../masar-fonts.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+@source '../../../../vendor/filament/**/*.blade.php';
+
+/*
+ * MASAR admin theme.
+ *
+ * A default Filament panel looks like every other Filament panel. These tokens
+ * come from CLAUDE.md §2 and are the same ones the public site uses, so the
+ * newsroom works inside the brand rather than beside it.
+ */
+@theme {
+    --masar-g-950: #071A10;
+    --masar-g-900: #0E2A1C;
+    --masar-g-700: #1A4531;
+    --masar-g-600: #1E5E3F;
+    --masar-mint:  #7FB69A;
+    --masar-cream: #F6F4EF;
+    --masar-line:  #E2DED4;
+    --masar-ink:   #14181A;
+
+    --font-display: 'Readex Pro', system-ui, sans-serif;
+    --font-sans: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+}
+
+:root {
+    --font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+}
+
+/*
+ * Western Arabic numerals everywhere. Arabic-Indic digits (٠-٩) are a locked
+ * "never" in the brief, and some Arabic faces default to them via font-feature
+ * settings, so this is stated rather than assumed.
+ */
+html, body, .fi {
+    font-variant-numeric: lining-nums tabular-nums;
+    font-feature-settings: 'lnum' 1, 'tnum' 1;
+}
+
+body, .fi-body {
+    font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+    background-color: var(--masar-cream);
+}
+
+/* Headings and the wordmark carry the display face. */
+.fi-header-heading,
+.fi-section-header-heading,
+.fi-modal-heading,
+.masar-wordmark {
+    font-family: 'Readex Pro', system-ui, sans-serif;
+    letter-spacing: -0.01em;
+}
+
+.fi-sidebar,
+.fi-topbar > nav {
+    background-color: var(--masar-g-900);
+}
+
+.fi-sidebar-nav-groups .fi-sidebar-group-label {
+    color: var(--masar-mint);
+    font-family: 'Readex Pro', system-ui, sans-serif;
+    letter-spacing: 0;
+}
+
+.fi-sidebar-item-label,
+.fi-topbar .fi-dropdown-trigger {
+    color: var(--masar-cream);
+}
+
+.fi-sidebar-item-active .fi-sidebar-item-button {
+    background-color: var(--masar-g-700);
+}
+
+/* The accent is an accent. It is never a button fill. */
+.fi-badge.fi-color-info {
+    color: var(--masar-g-950);
+    background-color: color-mix(in srgb, var(--masar-mint) 28%, transparent);
+}
+
+/*
+ * RTL: Filament is mostly logical-property clean, but a few of its own utilities
+ * and any custom component we add are not. These are the gaps.
+ */
+[dir='rtl'] .fi-sidebar-item-icon,
+[dir='rtl'] .fi-btn-icon {
+    transform: scaleX(1); /* icons are symmetric; do not mirror glyphs */
+}
+
+[dir='rtl'] .fi-ta-text,
+[dir='rtl'] .fi-in-text {
+    text-align: right;
+}
+
+/* Latin runs inside Arabic text — tickers, company names, URLs — must not
+   reorder the line around them. */
+[dir='rtl'] .masar-ltr,
+.masar-ltr {
+    direction: ltr;
+    unicode-bidi: isolate;
+    display: inline-block;
+}
+
+/* Arabic needs more leading than Latin at the same size. */
+.fi-ta-text-item-label,
+.fi-fo-field-wrp-helper-text {
+    line-height: 1.85;
+}
+
+/* The publish-gate panel on the article edit page. */
+.masar-gate-pass {
+    border-inline-start: 3px solid var(--masar-g-600);
+}
+
+.masar-gate-fail {
+    border-inline-start: 3px solid #B4522E;
+}

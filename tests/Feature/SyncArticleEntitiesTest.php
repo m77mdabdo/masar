@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Actions\Articles\PublishArticle;
 use App\Actions\Articles\SyncArticleEntities;
 use App\Actions\Articles\SyncArticleTopics;
 use App\Enums\ArticleStatus;
@@ -10,6 +11,7 @@ use App\Models\Article;
 use App\Models\Company;
 use App\Models\Person;
 use App\Models\Topic;
+use App\Queries\EntityContentQuery;
 
 function syncEntities(): SyncArticleEntities
 {
@@ -166,4 +168,53 @@ it('lowers a topic counter when an article is untagged', function (): void {
 
     app(SyncArticleTopics::class)($article, []);
     expect($topic->fresh()->articles_count)->toBe(0);
+});
+
+it('realigns mention timestamps to publication time', function (): void {
+    // Tagged well before the story runs, which is the normal editing order.
+    $this->travelTo(now()->subWeeks(2));
+
+    $chief = staff('editor_in_chief');
+    $article = publishableArticle(['status' => ArticleStatus::Ready]);
+    $company = Company::factory()->create();
+
+    syncEntities()($article, [['type' => 'company', 'id' => $company->id]]);
+
+    $taggedAt = $article->mentions()->value('created_at');
+
+    $this->travelBack();
+
+    app(PublishArticle::class)($article->fresh(), $chief);
+
+    $article->refresh();
+
+    expect($article->mentions()->value('created_at')->timestamp)
+        ->toBe($article->published_at->timestamp)
+        ->and($article->mentions()->value('created_at')->timestamp)
+        ->toBeGreaterThan($taggedAt->timestamp);
+});
+
+it('orders entity content by publication time not tagging time', function (): void {
+    $chief = staff('editor_in_chief');
+    $company = Company::factory()->create();
+
+    // Tagged first, published second.
+    $taggedEarly = publishableArticle(['status' => ArticleStatus::Ready]);
+    syncEntities()($taggedEarly, [['type' => 'company', 'id' => $company->id]]);
+
+    $taggedLate = publishableArticle(['status' => ArticleStatus::Ready]);
+    syncEntities()($taggedLate, [['type' => 'company', 'id' => $company->id]]);
+
+    // Publish in the opposite order to the tagging order. Both publication
+    // times must land in the past, or the published() scope hides them.
+    $this->travelTo(now()->subHour());
+    app(PublishArticle::class)($taggedLate->fresh(), $chief);
+    $this->travelBack();
+
+    app(PublishArticle::class)($taggedEarly->fresh(), $chief);
+
+    $order = EntityContentQuery::for($company)->mentions()->pluck('mentionable_id')->all();
+
+    // Newest publication first, regardless of which was tagged first.
+    expect($order)->toBe([$taggedEarly->id, $taggedLate->id]);
 });

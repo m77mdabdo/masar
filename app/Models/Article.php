@@ -18,11 +18,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Article extends Model
+class Article extends Model implements HasMedia
 {
     use HasFactory;
+    use InteractsWithMedia;
     use LogsActivity;
     use SoftDeletes;
 
@@ -33,6 +36,7 @@ class Article extends Model
         'author_id',
         'editor_id',
         'fact_checker_id',
+        'scheduled_by_id',
         'status',
         'content_type',
         'title',
@@ -115,6 +119,33 @@ class Article extends Model
     public function factChecker(): BelongsTo
     {
         return $this->belongsTo(User::class, 'fact_checker_id');
+    }
+
+    public function scheduledBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'scheduled_by_id');
+    }
+
+    /**
+     * One hero image, replaced rather than accumulated. `hero_media_id` mirrors
+     * this collection so the publish gate and every listing query can ask about
+     * the hero with a column read instead of a media lookup.
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('hero')
+            ->singleFile()
+            ->acceptsMimeTypes(config('masar.media.accepted'));
+    }
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        foreach (config('masar.media.conversions') as $name => $width) {
+            $this->addMediaConversion($name)
+                ->width($width)
+                ->format('webp')
+                ->nonQueued();
+        }
     }
 
     public function heroMedia(): BelongsTo

@@ -32,6 +32,10 @@ return [
     'publish_gate' => [
         'require_summary' => true,
         'require_source' => true,
+        // Every card, tile and listing surface renders a hero image. An article
+        // without one leaves a hole in the homepage grid, so the image itself is
+        // a gate rule, not just its alt text.
+        'require_hero_image' => true,
         'require_hero_alt' => true,
         'require_fact_check' => true,
 
@@ -67,6 +71,20 @@ return [
         'lists' => 600,
         'entity' => 3600,
         'navigation' => 86400,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin panel
+    |--------------------------------------------------------------------------
+    | `session_lifetime` is in minutes and is deliberately shorter than the
+    | application default: the panel holds embargoed stories and reader data.
+    */
+
+    'admin' => [
+        'session_lifetime' => 60,
+        'login_max_attempts' => 5,
+        'login_decay_minutes' => 1,
     ],
 
     /*

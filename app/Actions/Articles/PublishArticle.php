@@ -34,7 +34,29 @@ class PublishArticle
 
             $article->save();
 
-            return ($this->transition)($article, ArticleStatus::Published, $actor, $note);
+            $published = ($this->transition)($article, ArticleStatus::Published, $actor, $note);
+
+            $this->realignMentionTimestamps($published);
+
+            return $published;
         });
+    }
+
+    /**
+     * Entity pages sort by entity_mentions.created_at, which is set when the
+     * editor tags the entity — often days before the story runs. Left alone,
+     * /ar/companies/aramco would order its coverage by tagging order rather
+     * than publication order, which is wrong in a way a reader notices
+     * immediately and a seeded database never reveals.
+     *
+     * Realigning here keeps the sort on the (entity_type, entity_id, created_at)
+     * index instead of forcing a join to the content table.
+     */
+    private function realignMentionTimestamps(Article $article): void
+    {
+        DB::table('entity_mentions')
+            ->where('mentionable_type', $article->getMorphClass())
+            ->where('mentionable_id', $article->getKey())
+            ->update(['created_at' => $article->published_at]);
     }
 }
