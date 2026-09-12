@@ -31,8 +31,6 @@ use Database\Seeders\Support\ArticleWorkflow;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 /**
  * Local-only demo content. This is the dataset we judge the front-end against,
@@ -259,6 +257,7 @@ class DemoContentSeeder extends Seeder
                 $article = Article::factory()
                     ->withBlocks()
                     ->withSources()
+                    ->withHeroImage()
                     ->create([
                         'category_id' => $categories->random()->id,
                         'author_id' => $author->id,
@@ -325,6 +324,7 @@ class DemoContentSeeder extends Seeder
                 ->sponsored()
                 ->withBlocks()
                 ->withSources()
+                ->withHeroImage()
                 ->create([
                     'category_id' => $categories->random()->id,
                     'author_id' => $author->id,
@@ -413,10 +413,8 @@ class DemoContentSeeder extends Seeder
 
                 return $a;
             },
-            'صورة غلاف بلا نص بديل' => fn (Article $a) => $a->forceFill([
-                'hero_media_id' => $this->placeholderMediaId($a),
-                'hero_alt' => null,
-            ]),
+            'بلا صورة غلاف' => fn (Article $a) => $a->forceFill(['hero_media_id' => null]),
+            'صورة غلاف بلا نص بديل' => fn (Article $a) => $a->forceFill(['hero_alt' => null]),
             'لم تمر بالتدقيق' => fn (Article $a) => $a->forceFill([
                 'fact_checked_at' => null,
                 'fact_checker_id' => null,
@@ -429,9 +427,12 @@ class DemoContentSeeder extends Seeder
         ];
 
         foreach ($defects as $label => $applyDefect) {
+            // Every one of these starts complete — hero image included — so the
+            // defect applied below is the single reason the gate refuses it.
             $article = Article::factory()
                 ->withBlocks()
                 ->withSources()
+                ->withHeroImage()
                 ->create([
                     'title' => "[بوابة النشر] مادة {$label}",
                     'category_id' => $categories->random()->id,
@@ -442,33 +443,6 @@ class DemoContentSeeder extends Seeder
 
             $applyDefect($article->refresh())->save();
         }
-    }
-
-    /**
-     * A minimal media row so the "hero image without alt text" case is real —
-     * the rule only fires when there is actually an image to describe.
-     */
-    private function placeholderMediaId(Article $article): int
-    {
-        return (int) DB::table('media')->insertGetId([
-            'model_type' => $article->getMorphClass(),
-            'model_id' => $article->getKey(),
-            'uuid' => (string) Str::uuid(),
-            'collection_name' => 'hero',
-            'name' => 'hero-placeholder',
-            'file_name' => 'hero-placeholder.webp',
-            'mime_type' => 'image/webp',
-            'disk' => 'public',
-            'conversions_disk' => 'public',
-            'size' => 0,
-            'manipulations' => '[]',
-            'custom_properties' => '[]',
-            'generated_conversions' => '[]',
-            'responsive_images' => '[]',
-            'order_column' => 1,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
     }
 
     /**

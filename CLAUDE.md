@@ -47,6 +47,7 @@ say so explicitly and wait — do not silently implement an alternative.
 | Slugs | Transliterated Latin, never URL-encoded Arabic. `/ar/saudi/foreign-property-ownership`. A slug is an **editorial decision** — the system suggests a transliteration, the editor may override. No auto-slugging package. |
 | Public site | **Blade + Tailwind + Alpine.js**. Server-rendered. No SPA, no Inertia, no Node SSR |
 | Admin panel | **Filament v4** (Livewire). Custom theme with MASAR brand tokens, RTL enabled |
+| Admin RTL | Comes from `APP_LOCALE=ar` plus Filament's packaged Arabic translations. There is no `->direction()` or `->defaultLocale()` call in Filament v4. |
 | Database | MySQL 8 |
 | Cache / queue / session | Redis (required — we rely on cache tags) |
 | Search | Laravel Scout + Meilisearch, with an Arabic normalisation layer |
@@ -84,6 +85,7 @@ Route → Middleware → Form Request (validation) → Controller (thin) → Act
 - **Query objects** (`app/Queries/`) hold complex read queries. Do not let models grow past ~150 lines of scopes.
 - **Events** handle side effects of publishing: cache flush, search reindex, newsletter queue, push notification, audit log. Publishing has six side effects; putting them inline makes it fragile.
 - **Policies** on every editable model. Ownership matters: a writer edits their own draft, not someone else's.
+- **An Action checks permission and business rules separately; a Policy may fuse them for the UI.** If the gate check lives inside the policy call, a missing summary is reported to the editor as a permissions error. Actions throw the specific failure. Policies answer the single question Filament needs to enable or disable a button.
 - **Jobs** for anything slow: media conversions, source polling, campaign sends, metric aggregation.
 
 ### Folder structure
@@ -136,11 +138,16 @@ A startup becomes a company; splitting them forces a painful migration and break
 ## 5. Non-negotiables
 
 ### Publish gate
-Driven by `config('masar.publish_gate')`. An article cannot reach `published` without:
+Driven entirely by `config('masar.publish_gate')`. The rules below are illustrative, not
+exhaustive — the config is the source of truth.
+
+An article cannot reach `published` without:
 1. A 30-second summary (2–5 points)
 2. At least one source with a URL
-3. Alt text on the hero image
+3. A hero image **and** its alt text — every listing surface depends on it; an article without one breaks the grid
 4. Having passed the fact-check stage
+5. `why_it_matters` filled — this is the product promise, not a nice-to-have
+6. A sponsor name when `is_sponsored` — paid placement is disclosed to the reader, every time
 
 Enforce this in the Action **and** surface it in Filament before the button is clickable.
 
@@ -158,6 +165,8 @@ Enforce this in the Action **and** surface it in Filament before the button is c
 - Rate limit login, password reset, search, newsletter signup.
 
 ### Performance
+- **Denormalised counters count published rows only.** A topic page advertising 12 articles and rendering 3 is worse than showing no count at all.
+- **A filter that can't be expressed in SQL must not scan the table.** Narrow in SQL first, and denormalise the predicate once volume justifies it.
 - **Never write a query inside a loop.** Use eager loading. If you add a relation to a listing view, add it to the `with()`.
 - Article lists must not load body blocks or revisions.
 - Composite indexes on `(locale, status, published_at)` and `(category_id, status, published_at)`.
@@ -230,6 +239,7 @@ A task is not complete until all of these are true:
 | Test database | `masar_test` on MySQL, **not** SQLite. Native types and composite indexes do not behave identically on SQLite. |
 | Redis | running, `phpredis` extension. Cache, session and queue all point at it. Required — we rely on cache tags. |
 | Morph map | Enforced via `Relation::enforceMorphMap()` in `AppServiceProvider`. Stored values are short keys (`'company'`), never class names. Morph type columns are `string(100)`. |
+| Test-suite concurrency | Two runs against the single `masar_test` schema truncate each other via `RefreshDatabase`, producing scattered failures that look like real bugs. `Tests\TestCase` takes an exclusive `flock` on `masar-test-suite.lock` and refuses the second run with an explanatory message. The lock is held by the OS, so a killed run never leaves a stale one. Opt out with `MASAR_ALLOW_CONCURRENT_TESTS=1`; Pest `--parallel` is detected and exempt because it gives each process its own schema. |
 
 **Never** change these without saying so. A silent environment change is the hardest
 class of bug to find later.

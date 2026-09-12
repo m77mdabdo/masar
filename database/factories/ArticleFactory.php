@@ -14,6 +14,7 @@ use App\Models\Person;
 use App\Models\User;
 use Database\Factories\Support\ArabicContent;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
@@ -92,7 +93,7 @@ class ArticleFactory extends Factory
             'editor_id' => User::factory(),
             'fact_checker_id' => User::factory(),
             'views_count' => $this->faker->numberBetween(50, 25_000),
-        ])->withSources();
+        ])->withSources()->withHeroImage();
     }
 
     public function draft(): static
@@ -111,7 +112,7 @@ class ArticleFactory extends Factory
             'scheduled_for' => $this->faker->dateTimeBetween('+1 hour', '+3 weeks'),
             'fact_checked_at' => $this->faker->dateTimeBetween('-2 weeks', '-1 day'),
             'published_at' => null,
-        ])->withSources();
+        ])->withSources()->withHeroImage();
     }
 
     public function sponsored(): static
@@ -131,6 +132,48 @@ class ArticleFactory extends Factory
     public function inLocale(string $locale): static
     {
         return $this->state(['locale' => $locale]);
+    }
+
+    /**
+     * Attach a hero image.
+     *
+     * Media is a vendor model with no factory of its own, so the row is written
+     * directly. It carries no real file — nothing in these tests or the demo
+     * seeder reads the bytes, only the presence of the record and its alt text,
+     * which is what the publish gate asks about.
+     */
+    public function withHeroImage(?string $alt = null): static
+    {
+        return $this->afterCreating(function (Article $article) use ($alt): void {
+            if ($article->hero_media_id !== null) {
+                return;
+            }
+
+            $mediaId = DB::table('media')->insertGetId([
+                'model_type' => $article->getMorphClass(),
+                'model_id' => $article->getKey(),
+                'uuid' => (string) Str::uuid(),
+                'collection_name' => 'hero',
+                'name' => 'hero-'.$article->getKey(),
+                'file_name' => 'hero-'.$article->getKey().'.webp',
+                'mime_type' => 'image/webp',
+                'disk' => 'public',
+                'conversions_disk' => 'public',
+                'size' => 0,
+                'manipulations' => '[]',
+                'custom_properties' => '[]',
+                'generated_conversions' => '[]',
+                'responsive_images' => '[]',
+                'order_column' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            $article->forceFill([
+                'hero_media_id' => $mediaId,
+                'hero_alt' => $alt ?? $article->hero_alt ?? 'صورة تعبيرية توضح نشاطًا اقتصاديًا مرتبطًا بموضوع المادة.',
+            ])->save();
+        });
     }
 
     /**

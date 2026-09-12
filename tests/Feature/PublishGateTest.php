@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 use App\Actions\Articles\EvaluatePublishGate;
 use App\Models\Article;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 /**
  * Each of the six gate rules must fail on its own, so an editor fixing one
@@ -53,29 +51,30 @@ it('blocks an article whose only source has no url', function (): void {
     expect($article->fresh()->isPublishable())->toHaveCount(1);
 });
 
-it('blocks a hero image that has no alt text', function (): void {
-    $article = publishableArticle([
-        'hero_media_id' => fakeMediaId(),
-        'hero_alt' => null,
-    ]);
+it('blocks an article with no hero image', function (): void {
+    // Every listing surface renders a hero; an article without one breaks the grid.
+    $failures = publishableArticle(['hero_media_id' => null])->isPublishable();
 
-    $failures = $article->isPublishable();
+    expect($failures)->toHaveCount(1)
+        ->and($failures[0])->toContain('صورة غلاف');
+});
+
+it('blocks a hero image that has no alt text', function (): void {
+    $failures = publishableArticle(['hero_alt' => null])->isPublishable();
 
     expect($failures)->toHaveCount(1)
         ->and($failures[0])->toContain('نصًا بديلًا');
 });
 
-it('does not demand alt text when there is no hero image', function (): void {
-    // Nothing to describe, so the rule has nothing to say.
+it('demands alt text even though the image itself is also missing', function (): void {
+    // Two separate failures, so the editor is told about both at once rather
+    // than adding an image and then discovering a second problem.
     expect(publishableArticle(['hero_media_id' => null, 'hero_alt' => null])->isPublishable())
-        ->toBe([]);
+        ->toHaveCount(2);
 });
 
 it('accepts a hero image that has alt text', function (): void {
-    expect(publishableArticle([
-        'hero_media_id' => fakeMediaId(),
-        'hero_alt' => 'وصف للصورة.',
-    ])->isPublishable())->toBe([]);
+    expect(publishableArticle(['hero_alt' => 'وصف للصورة.'])->isPublishable())->toBe([]);
 });
 
 it('blocks an article that has not been fact checked', function (): void {
@@ -113,18 +112,25 @@ it('reports every failure at once rather than stopping at the first', function (
         'fact_checked_at' => null,
         'is_sponsored' => true,
         'sponsor_name' => null,
-        'hero_media_id' => fakeMediaId(),
+        'hero_media_id' => null,
         'hero_alt' => null,
     ]);
 
-    // All six: summary, source, hero alt, fact check, why it matters, sponsor.
-    expect($article->isPublishable())->toHaveCount(6);
+    // All seven: summary, source, hero image, hero alt, fact check,
+    // why it matters, sponsor name.
+    expect($article->isPublishable())->toHaveCount(7);
 });
 
 it('honours a disabled rule in config', function (): void {
     config(['masar.publish_gate.require_fact_check' => false]);
 
     expect(publishableArticle(['fact_checked_at' => null])->isPublishable())->toBe([]);
+});
+
+it('honours a disabled hero image rule in config', function (): void {
+    config(['masar.publish_gate.require_hero_image' => false]);
+
+    expect(publishableArticle(['hero_media_id' => null])->isPublishable())->toBe([]);
 });
 
 it('gives the same answer through the model and the action', function (): void {
@@ -145,28 +151,3 @@ it('writes every failure message in arabic and as an instruction', function (): 
             ->and($message)->not->toContain('null');
     }
 });
-
-/**
- * Minimal media row — the hero-alt rule only fires when an image exists.
- */
-function fakeMediaId(): int
-{
-    return (int) DB::table('media')->insertGetId([
-        'model_type' => 'article',
-        'model_id' => 1,
-        'uuid' => (string) Str::uuid(),
-        'collection_name' => 'hero',
-        'name' => 'hero',
-        'file_name' => 'hero.webp',
-        'mime_type' => 'image/webp',
-        'disk' => 'public',
-        'size' => 0,
-        'manipulations' => '[]',
-        'custom_properties' => '[]',
-        'generated_conversions' => '[]',
-        'responsive_images' => '[]',
-        'order_column' => 1,
-        'created_at' => now(),
-        'updated_at' => now(),
-    ]);
-}

@@ -23,16 +23,32 @@ use App\Models\ArticleSource;
 class EvaluatePublishGate
 {
     /**
+     * Editor-facing messages only. This is the contract the publish Action and
+     * the model's isPublishable() rely on.
+     *
      * @return array<int, string>
      */
     public function __invoke(Article $article): array
+    {
+        return array_column($this->detailed($article), 'message');
+    }
+
+    /**
+     * The same failures, each tagged with the rule that produced it.
+     *
+     * The admin panel uses the rule key to point an editor at the tab that fixes
+     * the problem; nothing else should need to branch on it.
+     *
+     * @return array<int, array{rule: string, message: string}>
+     */
+    public function detailed(Article $article): array
     {
         $gate = config('masar.publish_gate');
         $failures = [];
 
         $this->checkSummary($article, $gate, $failures);
         $this->checkSource($article, $gate, $failures);
-        $this->checkHeroAlt($article, $gate, $failures);
+        $this->checkHero($article, $gate, $failures);
         $this->checkFactCheck($article, $gate, $failures);
         $this->checkWhyItMatters($article, $gate, $failures);
         $this->checkSponsorship($article, $gate, $failures);
@@ -42,7 +58,7 @@ class EvaluatePublishGate
 
     /**
      * @param  array<string, mixed>  $gate
-     * @param  array<int, string>  $failures
+     * @param  array<int, array{rule: string, message: string}>  $failures
      */
     private function checkSummary(Article $article, array $gate, array &$failures): void
     {
@@ -60,25 +76,25 @@ class EvaluatePublishGate
         $count = count($points);
 
         if ($count === 0) {
-            $failures[] = "أضف ملخص الثلاثين ثانية ({$min} نقاط على الأقل).";
+            $failures[] = ['rule' => 'summary', 'message' => "أضف ملخص الثلاثين ثانية ({$min} نقاط على الأقل)."];
 
             return;
         }
 
         if ($count < $min) {
-            $failures[] = "أضف نقاطًا إلى ملخص الثلاثين ثانية: المطلوب {$min} على الأقل والحالي {$count}.";
+            $failures[] = ['rule' => 'summary', 'message' => "أضف نقاطًا إلى ملخص الثلاثين ثانية: المطلوب {$min} على الأقل والحالي {$count}."];
 
             return;
         }
 
         if ($count > $max) {
-            $failures[] = "اختصر ملخص الثلاثين ثانية إلى {$max} نقاط كحد أقصى؛ الحالي {$count}.";
+            $failures[] = ['rule' => 'summary', 'message' => "اختصر ملخص الثلاثين ثانية إلى {$max} نقاط كحد أقصى؛ الحالي {$count}."];
         }
     }
 
     /**
      * @param  array<string, mixed>  $gate
-     * @param  array<int, string>  $failures
+     * @param  array<int, array{rule: string, message: string}>  $failures
      */
     private function checkSource(Article $article, array $gate, array &$failures): void
     {
@@ -91,34 +107,35 @@ class EvaluatePublishGate
             : $article->sources()->whereNotNull('url')->where('url', '!=', '')->count();
 
         if ($withUrl === 0) {
-            $failures[] = 'أضف مصدرًا واحدًا على الأقل مع رابط يمكن التحقق منه.';
+            $failures[] = ['rule' => 'source', 'message' => 'أضف مصدرًا واحدًا على الأقل مع رابط يمكن التحقق منه.'];
         }
     }
 
     /**
-     * Alt text is required only when there is actually a hero image to describe.
+     * The image and its alt text are one rule with two failure modes.
+     *
+     * The image is required because every listing surface renders one — an
+     * article without a hero leaves a hole in the homepage grid. The alt text is
+     * required unconditionally alongside it, because a hero image that no
+     * screen reader can describe fails the accessibility floor.
      *
      * @param  array<string, mixed>  $gate
-     * @param  array<int, string>  $failures
+     * @param  array<int, array{rule: string, message: string}>  $failures
      */
-    private function checkHeroAlt(Article $article, array $gate, array &$failures): void
+    private function checkHero(Article $article, array $gate, array &$failures): void
     {
-        if (! ($gate['require_hero_alt'] ?? false)) {
-            return;
+        if (($gate['require_hero_image'] ?? true) && $article->hero_media_id === null) {
+            $failures[] = ['rule' => 'hero_image', 'message' => 'أضف صورة غلاف للمادة؛ كل بطاقات العرض والقوائم تعتمد عليها.'];
         }
 
-        if ($article->hero_media_id === null) {
-            return;
-        }
-
-        if (blank($article->hero_alt)) {
-            $failures[] = 'اكتب نصًا بديلًا يصف صورة الغلاف لقارئ لا يراها.';
+        if (($gate['require_hero_alt'] ?? true) && blank($article->hero_alt)) {
+            $failures[] = ['rule' => 'hero_alt', 'message' => 'اكتب نصًا بديلًا يصف صورة الغلاف لقارئ لا يراها.'];
         }
     }
 
     /**
      * @param  array<string, mixed>  $gate
-     * @param  array<int, string>  $failures
+     * @param  array<int, array{rule: string, message: string}>  $failures
      */
     private function checkFactCheck(Article $article, array $gate, array &$failures): void
     {
@@ -127,7 +144,7 @@ class EvaluatePublishGate
         }
 
         if ($article->fact_checked_at === null) {
-            $failures[] = 'مرّر المادة على مرحلة تدقيق المعلومات قبل النشر.';
+            $failures[] = ['rule' => 'fact_check', 'message' => 'مرّر المادة على مرحلة تدقيق المعلومات قبل النشر.'];
         }
     }
 
@@ -136,7 +153,7 @@ class EvaluatePublishGate
      * article without it is a wire story, which is explicitly not what we make.
      *
      * @param  array<string, mixed>  $gate
-     * @param  array<int, string>  $failures
+     * @param  array<int, array{rule: string, message: string}>  $failures
      */
     private function checkWhyItMatters(Article $article, array $gate, array &$failures): void
     {
@@ -145,13 +162,13 @@ class EvaluatePublishGate
         }
 
         if (blank($article->why_it_matters)) {
-            $failures[] = 'اكتب فقرة "لماذا يهم هذا؟" — هي وعد المنصة للقارئ وليست حقلًا اختياريًا.';
+            $failures[] = ['rule' => 'why_it_matters', 'message' => 'اكتب فقرة "لماذا يهم هذا؟" — هي وعد المنصة للقارئ وليست حقلًا اختياريًا.'];
         }
     }
 
     /**
      * @param  array<string, mixed>  $gate
-     * @param  array<int, string>  $failures
+     * @param  array<int, array{rule: string, message: string}>  $failures
      */
     private function checkSponsorship(Article $article, array $gate, array &$failures): void
     {
@@ -160,7 +177,7 @@ class EvaluatePublishGate
         }
 
         if ($article->is_sponsored && blank($article->sponsor_name)) {
-            $failures[] = 'حدّد اسم الجهة الراعية؛ المحتوى المدفوع يجب أن يُفصح عنه للقارئ.';
+            $failures[] = ['rule' => 'sponsor_name', 'message' => 'حدّد اسم الجهة الراعية؛ المحتوى المدفوع يجب أن يُفصح عنه للقارئ.'];
         }
     }
 }

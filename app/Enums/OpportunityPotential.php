@@ -39,6 +39,22 @@ enum OpportunityPotential: string
     }
 
     /**
+     * Brand token name, not a hex value or a Filament colour.
+     *
+     * The caller maps it to whatever its medium needs — a CSS variable on the
+     * public site, a badge colour in the panel — so the palette stays defined in
+     * one place instead of being re-picked at each call site.
+     */
+    public function colour(): string
+    {
+        return match ($this) {
+            self::High => 'mint',
+            self::Medium => 'gold',
+            self::Low => 'ink-3',
+        };
+    }
+
+    /**
      * @return array<string, string>
      */
     public static function options(): array

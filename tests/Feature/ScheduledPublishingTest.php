@@ -119,3 +119,52 @@ it('publishes through the action so the audit trail exists', function (): void {
     expect(Activity::query()->where('log_name', 'article.published')->count())
         ->toBe(1);
 });
+
+it('records who scheduled the publication', function (): void {
+    $chief = staff('editor_in_chief');
+    $article = publishableArticle(['status' => ArticleStatus::Ready]);
+
+    $result = schedule()($article, now()->addDay(), $chief);
+
+    expect($result->scheduled_by_id)->toBe($chief->id);
+});
+
+it('publishes as the scheduler, not the editor', function (): void {
+    $scheduler = staff('editor_in_chief');
+    $editor = staff('editor');
+
+    $article = publishableArticle([
+        'status' => ArticleStatus::Ready,
+        'editor_id' => $editor->id,
+    ]);
+
+    schedule()($article, now()->addMinutes(5), $scheduler);
+
+    $this->travelTo(now()->addMinutes(10));
+    $this->artisan('masar:publish-scheduled')->assertSuccessful();
+
+    $entry = Activity::query()
+        ->where('log_name', 'article.published')
+        ->latest('id')
+        ->first();
+
+    // The decision belongs to whoever scheduled it, not whoever happens to be
+    // listed as the article's editor.
+    expect((int) $entry->causer_id)->toBe($scheduler->id)
+        ->and((int) $entry->causer_id)->not->toBe($editor->id);
+});
+
+it('falls back to inference for rows scheduled before the column existed', function (): void {
+    $editor = staff('editor');
+    $article = publishableArticle(['status' => ArticleStatus::Ready, 'editor_id' => $editor->id]);
+
+    schedule()($article, now()->addMinutes(5), $editor);
+
+    // Simulate a legacy row: scheduled, but with no recorded scheduler.
+    $article->fresh()->forceFill(['scheduled_by_id' => null])->save();
+
+    $this->travelTo(now()->addMinutes(10));
+    $this->artisan('masar:publish-scheduled')->assertSuccessful();
+
+    expect($article->fresh()->status)->toBe(ArticleStatus::Published);
+});

@@ -6,6 +6,8 @@ use App\Models\Article;
 use App\Models\User;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -35,14 +37,11 @@ function staff(string $role): User
  */
 function publishableArticle(array $attributes = []): Article
 {
-    $article = Article::factory()->create([
+    $article = Article::factory()->withHeroImage()->create([
         'summary' => ['نقطة أولى', 'نقطة ثانية', 'نقطة ثالثة'],
         'why_it_matters' => 'هذا التحول يعيد تعريف المنافسة في القطاع.',
         'fact_checked_at' => now()->subDay(),
-        'hero_media_id' => null,
-        'hero_alt' => null,
         'is_sponsored' => false,
-        ...$attributes,
     ]);
 
     $article->sources()->create([
@@ -52,5 +51,37 @@ function publishableArticle(array $attributes = []): Article
         'sort_order' => 0,
     ]);
 
+    // Applied after the factory's afterCreating hooks, which would otherwise
+    // overwrite an override — withHeroImage() sets hero_media_id last.
+    if ($attributes !== []) {
+        $article->forceFill($attributes)->save();
+    }
+
     return $article->fresh();
+}
+
+/**
+ * A bare media row. Media is a vendor model with no factory; nothing here reads
+ * the bytes, only the presence of the record.
+ */
+function fakeMediaId(): int
+{
+    return (int) DB::table('media')->insertGetId([
+        'model_type' => 'article',
+        'model_id' => 1,
+        'uuid' => (string) Str::uuid(),
+        'collection_name' => 'hero',
+        'name' => 'hero',
+        'file_name' => 'hero.webp',
+        'mime_type' => 'image/webp',
+        'disk' => 'public',
+        'size' => 0,
+        'manipulations' => '[]',
+        'custom_properties' => '[]',
+        'generated_conversions' => '[]',
+        'responsive_images' => '[]',
+        'order_column' => 1,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
 }

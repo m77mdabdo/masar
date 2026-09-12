@@ -85,17 +85,22 @@ class PublishScheduledArticles extends Command
     }
 
     /**
-     * Publishing happens as the person who owns the decision.
+     * Publishing happens as the person who made the decision.
      *
-     * The editor is the right actor — they scheduled it, and they hold the
-     * publish permission. We fall back to any user who can publish so a missing
-     * editor does not strand a scheduled story.
-     *
-     * A `scheduled_by_id` column would make this exact rather than inferred;
-     * see the note in the task report.
+     * `scheduled_by_id` records exactly who that was. The editor/author chain
+     * below is a fallback only for rows scheduled before that column existed —
+     * inference is acceptable for legacy data, never for new decisions.
      */
     private function actorFor(Article $article): ?User
     {
+        if ($article->scheduled_by_id !== null) {
+            $scheduler = User::find($article->scheduled_by_id);
+
+            if ($scheduler?->can('article.publish')) {
+                return $scheduler;
+            }
+        }
+
         foreach ([$article->editor_id, $article->author_id] as $candidateId) {
             if ($candidateId === null) {
                 continue;

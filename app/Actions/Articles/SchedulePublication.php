@@ -34,6 +34,11 @@ class SchedulePublication
 
         return DB::transaction(function () use ($article, $when, $actor, $note): Article {
             $article->scheduled_for = $when;
+
+            // Scheduling is the editorial decision; the cron only carries it out.
+            // Recording who made it keeps the eventual publish audit honest.
+            $article->scheduled_by_id = $actor->getKey();
+
             $article->save();
 
             return ($this->transition)($article, ArticleStatus::Scheduled, $actor, $note);
