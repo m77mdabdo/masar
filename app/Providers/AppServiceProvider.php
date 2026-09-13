@@ -14,6 +14,7 @@ use App\Models\MenuItem;
 use App\Models\Opportunity;
 use App\Models\Person;
 use App\Models\Setting;
+use App\Models\Source;
 use App\Models\Topic;
 use App\Models\User;
 use App\Policies\ArticlePolicy;
@@ -21,15 +22,28 @@ use App\Policies\CompanyPolicy;
 use App\Policies\MenuItemPolicy;
 use App\Policies\OpportunityPolicy;
 use App\Policies\SettingPolicy;
+use App\Services\Ai\AiProvider;
+use App\Services\Ai\NullAiProvider;
+use App\Support\Settings;
+use App\View\Composers\NavigationComposer;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        // No provider is selected. The null implementation ships so everything
+        // downstream can be written and tested, and so the unclassified rate
+        // measures exactly what an AI provider would be paid to do.
+        $this->app->bind(AiProvider::class, NullAiProvider::class);
+
+        // One instance per request: settings are read on nearly every page and
+        // the day-long cache should be consulted once, not per call site.
+        $this->app->singleton(Settings::class);
     }
 
     public function boot(): void
@@ -57,13 +71,26 @@ class AppServiceProvider extends ServiceProvider
             // entry is written, so every LogsActivity model must be mapped.
             'menu_item' => MenuItem::class,
             'setting' => Setting::class,
+            'source' => Source::class,
 
             // Spatie's activity log (causer) and permission tables store User
             // morphs, so it must be mapped or enforceMorphMap() will reject them.
             'user' => User::class,
         ]);
 
+        // Laravel's bundled pagination markup uses physical margin utilities,
+        // which break RTL. Ours uses logical properties.
+        Paginator::defaultView('vendor.pagination.masar');
+        Paginator::defaultSimpleView('vendor.pagination.masar');
+
         $this->registerPolicies();
+
+        // Navigation is needed by the public layout and nothing else, so it is
+        // composed onto those views rather than shared globally.
+        View::composer(
+            ['components.layout.public'],
+            NavigationComposer::class,
+        );
     }
 
     /**

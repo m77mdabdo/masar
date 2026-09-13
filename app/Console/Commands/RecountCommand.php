@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Actions\Articles\SyncArticleTopics;
+use App\Actions\Articles\UpdateGateFailuresCount;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -20,7 +21,7 @@ class RecountCommand extends Command
 
     protected $description = 'Rebuild denormalised counters (mentions_count, articles_count) from source';
 
-    public function handle(SyncArticleTopics $topics): int
+    public function handle(SyncArticleTopics $topics, UpdateGateFailuresCount $gateCount): int
     {
         $dryRun = (bool) $this->option('dry-run');
 
@@ -28,6 +29,7 @@ class RecountCommand extends Command
             'companies.mentions_count' => $this->driftFor('companies', 'mentions_count', 'company'),
             'people.mentions_count' => $this->driftFor('people', 'mentions_count', 'person'),
             'topics.articles_count' => $this->topicDrift(),
+            'articles.gate_failures_count' => $this->gateDrift(),
         ];
 
         foreach ($drift as $label => $count) {
@@ -45,6 +47,10 @@ class RecountCommand extends Command
             $this->rebuildMentionCounts('people', 'person');
             $topics->recountAll();
         });
+
+        // Outside the transaction: the gate is PHP and evaluates every article,
+        // so holding a write lock across it would block the newsroom.
+        $gateCount->all();
 
         $this->info('Counters rebuilt.');
 
@@ -75,6 +81,15 @@ class RecountCommand extends Command
              )",
             [$morphKey],
         );
+    }
+
+    /**
+     * NULL counts as drift: it means the gate has never been evaluated for that
+     * row, which is exactly what this command exists to fix.
+     */
+    private function gateDrift(): int
+    {
+        return (int) DB::scalar('select count(*) from `articles` where `gate_failures_count` is null');
     }
 
     private function topicDrift(): int

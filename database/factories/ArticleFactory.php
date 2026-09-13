@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\ArticleSection;
 use App\Enums\ArticleStatus;
 use App\Enums\ContentType;
 use App\Enums\EntityRole;
@@ -26,7 +27,7 @@ class ArticleFactory extends Factory
 
     public function definition(): array
     {
-        $headline = $this->faker->randomElement(ArabicContent::HEADLINES);
+        $headline = ArabicContent::headline();
 
         return [
             'locale' => 'ar',
@@ -48,6 +49,7 @@ class ArticleFactory extends Factory
             'body' => implode("\n\n", $this->faker->randomElements(ArabicContent::PARAGRAPHS, 4)),
 
             'why_it_matters' => $this->faker->randomElement(ArabicContent::WHY_IT_MATTERS),
+            'what_happened' => $this->faker->randomElement(ArabicContent::WHAT_HAPPENED),
             'business_impact' => $this->faker->randomElement(ArabicContent::BUSINESS_IMPACT),
             'opportunity' => $this->faker->randomElement(ArabicContent::OPPORTUNITY),
             'key_numbers' => [
@@ -185,13 +187,70 @@ class ArticleFactory extends Factory
         return $this->afterCreating(function (Article $article) use ($count): void {
             $order = 0;
 
+            // The four questions are the article's structure, not a summary
+            // above it: each one owns its heading, its prose and whatever it
+            // needs to make its point — the figure belongs to what happened,
+            // the sourced quote to why it matters.
+            $paragraphs = fake()->randomElements(ArabicContent::PARAGRAPHS, min(4, max(4, $count)));
+            $quotes = fake()->randomElements(ArabicContent::QUOTES, 2);
+
+            $plan = [
+                ArticleSection::WhatHappened->value => [
+                    ['type' => 'heading', 'data' => ['level' => 3, 'text' => fake()->randomElement(ArabicContent::SECTION_SUBHEADS['what_happened'])]],
+                    ['type' => 'paragraph', 'data' => ['text' => $paragraphs[0]]],
+                    ['type' => 'image', 'data' => ['caption' => fake()->randomElement(ArabicContent::IMAGE_CAPTIONS)]],
+                ],
+                ArticleSection::WhyItMatters->value => [
+                    ['type' => 'heading', 'data' => ['level' => 3, 'text' => fake()->randomElement(ArabicContent::SECTION_SUBHEADS['why_it_matters'])]],
+                    ['type' => 'paragraph', 'data' => ['text' => $paragraphs[1]]],
+                    ['type' => 'quote', 'data' => ['text' => $quotes[0], 'attribution' => null, 'role' => null]],
+                ],
+                ArticleSection::WhoIsAffected->value => [
+                    ['type' => 'heading', 'data' => ['level' => 3, 'text' => fake()->randomElement(ArabicContent::SECTION_SUBHEADS['who_is_affected'])]],
+                    ['type' => 'paragraph', 'data' => ['text' => $paragraphs[2]]],
+                    ['type' => 'callout', 'data' => ['tone' => 'context', 'text' => fake()->randomElement(ArabicContent::BUSINESS_IMPACT)]],
+                ],
+                ArticleSection::Opportunity->value => [
+                    ['type' => 'heading', 'data' => ['level' => 3, 'text' => fake()->randomElement(ArabicContent::SECTION_SUBHEADS['opportunity'])]],
+                    ['type' => 'paragraph', 'data' => ['text' => $paragraphs[3]]],
+                    ['type' => 'opportunity', 'data' => ['text' => fake()->randomElement(ArabicContent::OPPORTUNITY)]],
+                ],
+            ];
+
+            foreach ($plan as $section => $blocks) {
+                foreach ($blocks as $block) {
+                    $article->blocks()->create($block + ['section' => $section, 'sort_order' => $order++]);
+                }
+            }
+
+            // Unsectioned on purpose: the short line the hero floats beside the
+            // photograph. It belongs to the article, not to one of its answers.
             $article->blocks()->create([
-                'type' => 'heading',
-                'data' => ['level' => 2, 'text' => 'ما الذي حدث؟'],
+                'type' => 'pullquote',
+                'section' => null,
+                'data' => ['text' => $quotes[1]],
+                'sort_order' => $order,
+            ]);
+        });
+    }
+
+    /**
+     * Body with no sections — the shape an opinion piece or a success story
+     * actually takes. Four headings over a paragraph each would be a lie about
+     * how the piece is written.
+     */
+    public function withFlatBlocks(int $count = 4): static
+    {
+        return $this->afterCreating(function (Article $article) use ($count): void {
+            $order = 0;
+
+            $article->blocks()->create([
+                'type' => 'pullquote',
+                'data' => ['text' => fake()->randomElement(ArabicContent::QUOTES)],
                 'sort_order' => $order++,
             ]);
 
-            foreach (fake()->randomElements(ArabicContent::PARAGRAPHS, min(3, $count)) as $paragraph) {
+            foreach (fake()->randomElements(ArabicContent::PARAGRAPHS, min($count, 4)) as $paragraph) {
                 $article->blocks()->create([
                     'type' => 'paragraph',
                     'data' => ['text' => $paragraph],
@@ -200,20 +259,8 @@ class ArticleFactory extends Factory
             }
 
             $article->blocks()->create([
-                'type' => 'numbers',
-                'data' => ['items' => $article->key_numbers ?? []],
-                'sort_order' => $order++,
-            ]);
-
-            $article->blocks()->create([
-                'type' => 'callout',
-                'data' => ['tone' => 'insight', 'text' => fake()->randomElement(ArabicContent::WHY_IT_MATTERS)],
-                'sort_order' => $order++,
-            ]);
-
-            $article->blocks()->create([
-                'type' => 'opportunity',
-                'data' => ['text' => fake()->randomElement(ArabicContent::OPPORTUNITY)],
+                'type' => 'image',
+                'data' => ['caption' => fake()->randomElement(ArabicContent::IMAGE_CAPTIONS)],
                 'sort_order' => $order,
             ]);
         });

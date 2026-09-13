@@ -21,6 +21,10 @@
     --masar-cream: #F6F4EF;
     --masar-line:  #E2DED4;
     --masar-ink:   #14181A;
+    /* Semantic only — mint owns the accent role. */
+    --masar-gold:  #C9A063;
+    /* Tertiary text: metadata, timestamps, captions. */
+    --masar-ink-3: #61696F;
 
     --font-display: 'Readex Pro', system-ui, sans-serif;
     --font-sans: 'IBM Plex Sans Arabic', system-ui, sans-serif;
@@ -70,8 +74,26 @@ body, .fi-body {
     color: var(--masar-cream);
 }
 
-.fi-sidebar-item-active .fi-sidebar-item-button {
-    background-color: var(--masar-g-700);
+/*
+ * The active item was telling the reader where they are by turning invisible.
+ *
+ * Two separate faults. Filament's own active style paints a near-white pill,
+ * and the rule above colours every sidebar label cream — so the current page's
+ * label measured 1.05:1 against its own background. And the override meant to
+ * prevent that targeted `.fi-sidebar-item-active .fi-sidebar-item-button`,
+ * which are not the class names Filament renders: the real ones are `.fi-active`
+ * and `.fi-sidebar-item-btn`, so the rule had never matched anything.
+ *
+ * Dead CSS fails silently — no error, no warning, and a theme that looks
+ * finished. Found by reading the computed colour off the rendered page.
+ */
+.fi-sidebar-item.fi-active .fi-sidebar-item-btn {
+    background-color: var(--masar-cream);
+}
+
+.fi-sidebar-item.fi-active .fi-sidebar-item-label,
+.fi-sidebar-item.fi-active .fi-sidebar-item-icon {
+    color: var(--masar-g-950);
 }
 
 /* The accent is an accent. It is never a button fill. */

@@ -1,0 +1,90 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Opportunities — MASAR</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="masar.css">
+<link rel="stylesheet" href="prototype-images.css">
+<style>
+.ohero{padding:34px 0 26px;border-bottom:1px solid var(--line)}
+.ohero h1{font-family:"Playfair Display",serif;font-size:50px;line-height:1.03}
+.ohero p{font-size:15px;color:var(--ink-2);max-width:56ch;margin:12px 0 0}
+.subnav{display:flex;gap:8px;flex-wrap:wrap;padding:20px 0}
+.ogrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.ocard{position:relative;overflow:hidden;min-height:250px;display:flex;flex-direction:column;justify-content:flex-end;padding:20px;color:#fff}
+.ocard .ov{position:absolute;inset:0;background:linear-gradient(0deg,rgba(6,18,12,.95) 16%,rgba(6,18,12,.1) 74%);z-index:0}
+.ocard h4{font-family:"Playfair Display",serif;font-size:21px;line-height:1.25;margin-bottom:6px}
+.ocard p{font-size:12.5px;color:#B6C7BC;line-height:1.6;margin:0 0 12px}
+.ocard .foot{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#9FB3A7}
+.badge{position:absolute;top:16px;left:16px;z-index:1;font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  background:rgba(127,182,154,.2);border:1px solid rgba(127,182,154,.5);color:#CFE6DA;border-radius:999px;padding:4px 11px}
+.badge.med{background:rgba(201,160,99,.18);border-color:rgba(201,160,99,.5);color:#E7D2B0}
+.radar{position:relative;overflow:hidden;color:#fff;padding:40px;margin:44px 0;min-height:280px;display:flex;flex-direction:column;justify-content:center}
+.radar .ov{position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,18,12,.97),rgba(20,53,38,.86));z-index:0}
+.radar h3{font-family:"Playfair Display",serif;font-size:30px;margin-bottom:10px}
+.radar p{font-size:13.5px;color:#B6C7BC;max-width:52ch}
+.radar .map{position:absolute;right:40px;top:0;bottom:0;width:46%;display:flex;align-items:center;z-index:1;opacity:.5}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin:10px 0 10px}
+.stepc{border-top:2px solid var(--g-900);padding-top:16px}
+.stepc .n{font-family:"Playfair Display",serif;font-size:26px;color:var(--g-600)}
+.stepc h4{font-size:16px;margin:6px 0 8px}
+.stepc p{font-size:13px;color:var(--ink-2);line-height:1.7;margin:0}
+@media(max-width:1000px){.ogrid,.steps{grid-template-columns:1fr 1fr}.radar .map{display:none}}
+@media(max-width:640px){.ohero h1{font-size:32px}.ogrid,.steps{grid-template-columns:1fr}}
+</style></head><body>
+<!--HEADER-->
+<div class="wrap">
+<section class="ohero">
+  <span class="eyebrow">Opportunities</span>
+  <h1 style="margin-top:12px">Turning insight<br>into action.</h1>
+  <p>Where the market is opening, who it favours, and what it takes to enter. Updated as new decisions and regulations land.</p>
+</section>
+<nav class="subnav"><span class="pill on">All</span><span class="pill">Saudi Arabia</span><span class="pill">Energy</span><span class="pill">Technology</span><span class="pill">Real estate</span><span class="pill">Tourism</span><span class="pill">Logistics</span><span class="pill">Manufacturing</span></nav>
+
+<section class="ogrid">
+  <a class="ocard ph img-solar-wind"><div class="ov"></div><span class="badge">High potential</span>
+    <h4>Renewable energy supply chain</h4><p>Local content targets are rising faster than qualified suppliers can be certified.</p>
+    <div class="foot"><span>Energy · Kingdom-wide</span><span class="arrow" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.35);color:#fff;width:28px;height:28px">→</span></div></a>
+  <a class="ocard ph img-waterfront-park"><div class="ov"></div><span class="badge">High potential</span>
+    <h4>Coastal real estate services</h4><p>New ownership rules create demand for valuation, brokerage and property management.</p>
+    <div class="foot"><span>Real estate · Western region</span><span class="arrow" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.35);color:#fff;width:28px;height:28px">→</span></div></a>
+  <a class="ocard ph img-office-window"><div class="ov"></div><span class="badge">High potential</span>
+    <h4>AI and data infrastructure</h4><p>Compute demand is outpacing regional capacity, and procurement cycles are shortening.</p>
+    <div class="foot"><span>Technology · Central region</span><span class="arrow" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.35);color:#fff;width:28px;height:28px">→</span></div></a>
+  <a class="ocard ph img-jeddah-balad"><div class="ov"></div><span class="badge med">Medium potential</span>
+    <h4>Heritage hospitality</h4><p>Restoration districts need operators who can run small, high-margin properties.</p>
+    <div class="foot"><span>Tourism · Jeddah</span><span class="arrow" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.35);color:#fff;width:28px;height:28px">→</span></div></a>
+  <a class="ocard ph img-refinery-aerial"><div class="ov"></div><span class="badge">High potential</span>
+    <h4>Industrial maintenance</h4><p>Ageing assets plus localisation rules are pushing work toward domestic contractors.</p>
+    <div class="foot"><span>Industry · Eastern region</span><span class="arrow" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.35);color:#fff;width:28px;height:28px">→</span></div></a>
+  <a class="ocard ph img-coast-fireworks-2"><div class="ov"></div><span class="badge med">Medium potential</span>
+    <h4>Live events production</h4><p>A crowded calendar, a thin supplier base, and contracts awarded a season ahead.</p>
+    <div class="foot"><span>Entertainment · Kingdom-wide</span><span class="arrow" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.35);color:#fff;width:28px;height:28px">→</span></div></a>
+  <a class="ocard ph img-desert-camels"><div class="ov"></div><span class="badge med">Medium potential</span>
+    <h4>Agritech and food security</h4><p>Import substitution targets are creating long-term offtake agreements.</p>
+    <div class="foot"><span>Agriculture · Northern region</span><span class="arrow" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.35);color:#fff;width:28px;height:28px">→</span></div></a>
+  <a class="ocard ph img-riyadh-kafd-2"><div class="ov"></div><span class="badge">High potential</span>
+    <h4>Professional services</h4><p>New entrants need legal, tax and compliance support before they need offices.</p>
+    <div class="foot"><span>Services · Riyadh</span><span class="arrow" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.35);color:#fff;width:28px;height:28px">→</span></div></a>
+  <a class="ocard ph img-refinery-sunset"><div class="ov"></div><span class="badge med">Medium potential</span>
+    <h4>Carbon and emissions services</h4><p>Reporting requirements arrive before the measurement capability does.</p>
+    <div class="foot"><span>Sustainability · Kingdom-wide</span><span class="arrow" style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.35);color:#fff;width:28px;height:28px">→</span></div></a>
+</section>
+
+<section class="radar ph img-riyadh-night">
+  <div class="ov"></div>
+  <div class="map"><svg viewBox="0 0 400 170" style="width:100%"><path fill="#7FB69A" d="M40 60q22-18 46-12t38 4 30-10 34 6 40-4 46 10 56 6v50q-30 8-58 2t-52 6-44-8-38 10-40-6-36 4-32-10z"/></svg></div>
+  <span class="eyebrow eyebrow-mint">Opportunity Radar</span>
+  <h3 style="margin-top:10px">See where the market is opening.</h3>
+  <p>An interactive view of sectors, regions and regulatory changes — and what each one means for a business trying to enter.</p>
+  <span class="btn btn-outline" style="align-self:flex-start;margin-top:16px">Open the radar →</span>
+</section>
+
+<div style="display:flex;align-items:center;gap:18px;margin:10px 0 18px"><h2 style="font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase">How we assess an opportunity</h2><i style="flex:1;height:1px;background:var(--line)"></i></div>
+<section class="steps">
+  <div class="stepc"><div class="n tnum">01</div><h4>What changed</h4><p>A decision, a regulation, a budget line or a shift in demand. Always sourced to an official document.</p></div>
+  <div class="stepc"><div class="n tnum">02</div><h4>Who it favours</h4><p>The type and size of business positioned to benefit, and the capability the market is missing.</p></div>
+  <div class="stepc"><div class="n tnum">03</div><h4>What it takes</h4><p>Licences, capital, timelines and the window before the advantage closes.</p></div>
+</section>
+</div>
+<!--BAND--><!--FOOTER-->
+</body></html>

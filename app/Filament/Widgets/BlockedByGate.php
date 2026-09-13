@@ -19,10 +19,9 @@ use Illuminate\Database\Eloquent\Builder;
  * This is the widget an editor-in-chief acts on: every row is someone waiting,
  * and the failing rule is shown so the fix is obvious without opening the piece.
  *
- * Like the table filter, the gate itself is PHP, so this narrows in SQL to the
- * only statuses that can be blocked and evaluates those. It is bounded by the
- * size of the ready queue, not the archive — and it gets a denormalised column
- * in TASK 04.
+ * Pure SQL against `gate_failures_count`, which is written wherever the gate
+ * already runs. NULL is excluded deliberately: it means never evaluated, not
+ * blocked.
  */
 class BlockedByGate extends TableWidget
 {
@@ -44,8 +43,8 @@ class BlockedByGate extends TableWidget
             ->emptyStateDescription('كل المواد الجاهزة تستوفي شروط النشر.')
             ->query(fn (): Builder => ScopedArticles::for(auth()->user())
                 ->whereIn('status', [ArticleStatus::Ready->value, ArticleStatus::Scheduled->value])
-                ->whereIn('id', $this->blockedIds())
-                ->with(['category.translations', 'author:id,name']))
+                ->where('gate_failures_count', '>', 0)
+                ->with(['category.translations', 'author:id,name', 'sources']))
             ->defaultSort('updated_at', 'desc')
             ->paginated([5, 10])
             ->columns([
@@ -65,23 +64,5 @@ class BlockedByGate extends TableWidget
                 TextColumn::make('author.name')->label('الكاتب')->placeholder('—'),
             ])
             ->recordActions([]);
-    }
-
-    /**
-     * @return array<int, int>
-     */
-    private function blockedIds(): array
-    {
-        $ids = ScopedArticles::for(auth()->user())
-            ->whereIn('status', [ArticleStatus::Ready->value, ArticleStatus::Scheduled->value])
-            ->with('sources')
-            ->get()
-            ->filter(fn (Article $article): bool => $article->isPublishable() !== [])
-            ->pluck('id')
-            ->all();
-
-        // whereIn([]) matches everything in some drivers; a sentinel keeps the
-        // empty case meaning "nothing".
-        return $ids === [] ? [0] : $ids;
     }
 }

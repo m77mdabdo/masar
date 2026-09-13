@@ -27,6 +27,7 @@ class TransitionArticleStatus
 {
     public function __construct(
         private readonly EvaluatePublishGate $gate,
+        private readonly UpdateGateFailuresCount $gateCount,
     ) {}
 
     /**
@@ -75,6 +76,11 @@ class TransitionArticleStatus
 
             return $article;
         });
+
+        // A transition can change the gate result — entering editor_review
+        // stamps fact_checked_at, for one — so the denormalised count is
+        // refreshed here rather than left to drift until the next save.
+        ($this->gateCount)($article);
 
         ArticleStatusChanged::dispatch($article, $from, $to, $actor, $note);
 

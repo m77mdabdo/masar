@@ -1,0 +1,38 @@
+/* prototype-images.css — maps every image slot to /images/NAME.jpg
+   Point IMG_BASE at wherever the photographs live. In the Laravel app this
+   is /images/ under public/. */
+.ph{position:relative;overflow:hidden;isolation:isolate;background:#0E2A1C}
+.ph::after{display:none!important}
+.ph::before{content:"";position:absolute;inset:0;z-index:0;background-image:var(--photo);
+  background-size:cover;background-position:center;background-repeat:no-repeat}
+.ph>*{position:relative;z-index:1}
+.ph-person{background:linear-gradient(150deg,#8A9A91,#2B3830)}
+
+.img-boardroom{--photo:url("/images/boardroom.jpg")}
+.img-coast-fireworks{--photo:url("/images/coast-fireworks.jpg")}
+.img-coast-fireworks-2{--photo:url("/images/coast-fireworks-2.jpg")}
+.img-desert-camels{--photo:url("/images/desert-camels.jpg")}
+.img-energy-aramco{--photo:url("/images/energy-aramco.jpg")}
+.img-flag{--photo:url("/images/flag.jpg")}
+.img-heritage{--photo:url("/images/heritage.jpg")}
+.img-jeddah-balad{--photo:url("/images/jeddah-balad.jpg")}
+.img-jeddah-corniche{--photo:url("/images/jeddah-corniche.jpg")}
+.img-mountains-sunset{--photo:url("/images/mountains-sunset.jpg")}
+.img-office-window{--photo:url("/images/office-window.jpg")}
+.img-park-sunset{--photo:url("/images/park-sunset.jpg")}
+.img-refinery-aerial{--photo:url("/images/refinery-aerial.jpg")}
+.img-refinery-blue{--photo:url("/images/refinery-blue.jpg")}
+.img-refinery-green{--photo:url("/images/refinery-green.jpg")}
+.img-refinery-sunset{--photo:url("/images/refinery-sunset.jpg")}
+.img-riyadh-dusk-office{--photo:url("/images/riyadh-dusk-office.jpg")}
+.img-riyadh-kafd{--photo:url("/images/riyadh-kafd.jpg")}
+.img-riyadh-kafd-2{--photo:url("/images/riyadh-kafd-2.jpg")}
+.img-riyadh-night{--photo:url("/images/riyadh-night.jpg")}
+.img-riyadh-night-purple{--photo:url("/images/riyadh-night-purple.jpg")}
+.img-riyadh-tower-dusk{--photo:url("/images/riyadh-tower-dusk.jpg")}
+.img-riyadh-vision{--photo:url("/images/riyadh-vision.jpg")}
+.img-solar-wind{--photo:url("/images/solar-wind.jpg")}
+.img-tower-lights{--photo:url("/images/tower-lights.jpg")}
+.img-trading-desk{--photo:url("/images/trading-desk.jpg")}
+.img-waterfront-park{--photo:url("/images/waterfront-park.jpg")}
+.img-wind-farm{--photo:url("/images/wind-farm.jpg")}

@@ -1,0 +1,74 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Search — MASAR</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="masar.css">
+<link rel="stylesheet" href="prototype-images.css">
+<style>
+.stop{padding:34px 0 22px}
+.stop h1{font-family:"Playfair Display",serif;font-size:44px}
+.sbar{display:flex;gap:10px;margin-top:18px;max-width:760px}
+.sbar .f{flex:1;display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:13px 20px;font-size:14px}
+.subnav{display:flex;gap:8px;flex-wrap:wrap;padding:20px 0;border-bottom:1px solid var(--line)}
+.tools{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+.res{display:grid;grid-template-columns:1fr 290px;gap:34px;align-items:start}
+.r{display:grid;grid-template-columns:180px 1fr;gap:18px;padding:20px 0;border-bottom:1px solid var(--line-2)}
+.r .th{aspect-ratio:16/10}
+.r h4{font-family:"Playfair Display",serif;font-size:20px;line-height:1.32;margin:8px 0}
+.r p{font-size:13px;color:var(--ink-2);line-height:1.65;margin:0 0 8px}
+.pag{display:flex;gap:7px;justify-content:center;margin-top:26px}
+.pag a{width:30px;height:30px;border:1px solid var(--line);background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px}
+.pag a.on{background:var(--g-900);color:#fff;border-color:var(--g-900)}
+.panel{border:1px solid var(--line);background:#fff;padding:16px;margin-bottom:18px}
+.panel b{font-size:11px;letter-spacing:.11em;text-transform:uppercase;display:block;margin-bottom:10px}
+.panel a{display:block;padding:7px 0;font-size:13px;color:var(--ink-2);border-bottom:1px solid var(--line-2)}
+.panel a:last-child{border-bottom:0}
+@media(max-width:1000px){.res{grid-template-columns:1fr}.r{grid-template-columns:1fr}}
+@media(max-width:640px){.stop h1{font-size:30px}}
+</style></head><body>
+<!--HEADER-->
+<div class="wrap">
+<section class="stop">
+  <h1>Search</h1>
+  <div class="sbar"><div class="f"><span>⌕</span><span>Saudi investment</span></div><button class="btn">Search</button></div>
+  <p class="meta" style="margin-top:10px">Search articles, companies, people, topics, videos and issues.</p>
+</section>
+<nav class="subnav"><span class="pill on">All</span><span class="pill">Articles</span><span class="pill">Companies</span><span class="pill">People</span><span class="pill">Topics</span><span class="pill">Videos</span><span class="pill">Issues</span><span class="pill">Reports</span></nav>
+<div class="tools"><b style="font-size:13px" class="tnum">About 1,240 results</b><span class="pill">Sort by: Relevance ⌄</span></div>
+
+<section class="res">
+  <div>
+    <a class="r"><div class="th ph img-riyadh-vision"></div><div><span class="chip">Saudi Arabia</span>
+      <h4>Saudi Arabia's investment strategy for 2030</h4>
+      <p>A comprehensive look at the Kingdom's investment strategy, the sectors it prioritises and the decisions behind them.</p>
+      <span class="meta tnum">6 min read · Oct 20, 2026</span></div></a>
+    <a class="r"><div class="th ph img-solar-wind"></div><div><span class="chip">Opportunities</span>
+      <h4>Ten investment opportunities in Saudi Arabia</h4>
+      <p>From technology to tourism, the openings with the widest gap between demand and available supply.</p>
+      <span class="meta tnum">8 min read · Oct 18, 2026</span></div></a>
+    <a class="r"><div class="th ph img-riyadh-kafd"></div><div><span class="chip">Markets</span>
+      <h4>Foreign investment on Tadawul reaches a record</h4>
+      <p>What the inflow data shows, which sectors received it, and why the composition matters more than the total.</p>
+      <span class="meta tnum">4 min read · Oct 17, 2026</span></div></a>
+    <a class="r"><div class="th ph img-refinery-blue"></div><div><span class="chip">Energy</span>
+      <h4>Inside the petrochemical expansion</h4>
+      <p>Capacity is being added quietly across the Gulf. The question is who buys the output.</p>
+      <span class="meta tnum">6 min read · Oct 16, 2026</span></div></a>
+    <a class="r"><div class="th ph img-jeddah-balad"></div><div><span class="chip">Tourism</span>
+      <h4>Heritage districts as an investment class</h4>
+      <p>Restoration programmes are creating a small, high-margin hospitality market with few qualified operators.</p>
+      <span class="meta tnum">7 min read · Oct 15, 2026</span></div></a>
+    <nav class="pag"><a class="on">1</a><a>2</a><a>3</a><a>4</a><span style="color:var(--ink-3);align-self:center">…</span><a>62</a><a>→</a></nav>
+  </div>
+  <aside>
+    <div class="panel"><b>Popular searches</b>
+      <a>Vision 2030</a><a>Foreign ownership</a><a>Tadawul inflows</a><a>Renewable energy</a><a>NEOM</a><a>Startup funding</a></div>
+    <div class="panel"><b>Companies</b>
+      <a>Saudi Aramco</a><a>NEOM</a><a>SABIC</a><a>stc</a><a>Red Sea Global</a></div>
+    <div class="panel"><b>Topics</b>
+      <a>Economic diversification</a><a>Logistics</a><a>Real estate</a><a>Energy transition</a></div>
+  </aside>
+</section>
+</div>
+<!--BAND--><!--FOOTER-->
+</body></html>

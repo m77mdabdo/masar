@@ -1,0 +1,113 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Markets — MASAR</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="masar.css">
+<link rel="stylesheet" href="prototype-images.css">
+<style>
+.phero{position:relative;overflow:hidden;min-height:260px;display:flex;flex-direction:column;justify-content:flex-end;padding:34px;color:#fff;margin:22px 0 0}
+.phero .ov{position:absolute;inset:0;background:linear-gradient(72deg,rgba(6,18,12,.95) 24%,rgba(6,18,12,.5) 70%,rgba(6,18,12,.1) 100%);z-index:0}
+.phero h1{font-family:"Playfair Display",serif;font-size:46px;line-height:1.05}
+.phero p{font-size:15px;color:#C4D2C9;max-width:50ch;margin:12px 0 0}
+.subnav{display:flex;gap:8px;flex-wrap:wrap;padding:18px 0;border-bottom:1px solid var(--line)}
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:22px 0}
+.grid5 div{background:#fff;padding:16px 18px}
+.grid5 .l{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.grid5 .n{font-family:"Playfair Display",serif;font-size:22px;margin:4px 0 2px}
+.grid5 .c{font-size:12px;font-weight:600}
+.two{display:grid;grid-template-columns:1.45fr .55fr;gap:28px;align-items:start;margin-top:8px}
+.chartbox{border:1px solid var(--line);background:#fff;padding:20px}
+.chartbox svg{width:100%;height:230px;display:block}
+.range{display:flex;gap:14px;font-size:11.5px;color:var(--ink-3);margin-top:10px}
+.range b{color:var(--ink)}
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl th{text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding:9px 10px;border-bottom:2px solid var(--g-900)}
+.tbl td{padding:10px;border-bottom:1px solid var(--line-2);font-variant-numeric:tabular-nums}
+.tbl td:first-child{font-weight:600}
+.heat{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.heat div{padding:14px 12px;color:#fff}
+.heat b{display:block;font-size:12.5px}
+.heat span{font-size:15px;font-variant-numeric:tabular-nums}
+.ilist a{display:grid;grid-template-columns:26px 1fr;gap:12px;padding:11px 0;border-bottom:1px solid var(--line-2);font-size:13.5px;line-height:1.5}
+.ilist a:last-child{border-bottom:0}
+.ilist .n{font-family:"Playfair Display",serif;color:var(--ink-4)}
+.news{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:14px}
+.ncard{border:1px solid var(--line);background:#fff}
+.ncard .img{aspect-ratio:16/9;position:relative}
+.ncard .img span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;z-index:1}
+.ncard .in{padding:14px 15px 16px}
+.ncard h4{font-family:"Playfair Display",serif;font-size:17px;line-height:1.35;margin:8px 0}
+@media(max-width:1000px){.two,.news,.heat{grid-template-columns:1fr 1fr}.grid5{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.phero h1{font-size:30px}.news,.heat,.grid5{grid-template-columns:1fr}}
+</style></head><body>
+<!--HEADER-->
+<div class="wrap">
+<section class="phero ph img-trading-desk"><div class="ov"></div>
+  <span class="eyebrow eyebrow-mint">Markets</span>
+  <h1 style="margin-top:10px">Data. Analysis.<br>What's moving.</h1>
+  <p>Tadawul, regional exchanges, commodities and currencies — with the context that explains the number.</p>
+</section>
+<nav class="subnav"><span class="pill on">Overview</span><span class="pill">Saudi market</span><span class="pill">Global markets</span><span class="pill">Commodities</span><span class="pill">Currencies</span><span class="pill">Sectors</span></nav>
+
+<div class="grid5">
+  <div><div class="l">Tadawul</div><div class="n tnum">11,234.56</div><div class="c up tnum">▲ 1.24%</div></div>
+  <div><div class="l">Nomu</div><div class="n tnum">26,310.00</div><div class="c down tnum">▼ 0.41%</div></div>
+  <div><div class="l">Brent Oil</div><div class="n tnum">82.14</div><div class="c down tnum">▼ 0.31%</div></div>
+  <div><div class="l">Gold</div><div class="n tnum">2,328.50</div><div class="c up tnum">▲ 0.82%</div></div>
+  <div><div class="l">USD / SAR</div><div class="n tnum">3.75</div><div class="c flat tnum">0.00%</div></div>
+</div>
+
+<section class="two">
+  <div class="chartbox">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+      <div><b style="font-size:16px">Tadawul All Share Index</b> <span class="tnum" style="color:var(--up);font-size:13px">11,234.56 ▲ 1.24%</span></div>
+      <span class="meta">Close · delayed 15 min</span>
+    </div>
+    <svg viewBox="0 0 800 230" preserveAspectRatio="none">
+      <polygon points="0,230 0,180 70,164 140,188 210,130 280,150 350,100 420,120 490,70 560,90 630,46 700,60 800,26 800,230" fill="#2E7D52" opacity=".12"/>
+      <polyline points="0,180 70,164 140,188 210,130 280,150 350,100 420,120 490,70 560,90 630,46 700,60 800,26" fill="none" stroke="#2E7D52" stroke-width="2.5"/>
+    </svg>
+    <div class="range"><span>1D</span><span>1W</span><span>1M</span><span>6M</span><b>1Y</b><span>ALL</span></div>
+    <table class="tbl" style="margin-top:22px">
+      <thead><tr><th>Top movers</th><th>Last</th><th>Change</th><th>Volume</th></tr></thead>
+      <tbody>
+        <tr><td>Energy major</td><td>34.20</td><td class="up">+3.4%</td><td>18.2M</td></tr>
+        <tr><td>Regional bank</td><td>51.75</td><td class="up">+2.1%</td><td>9.6M</td></tr>
+        <tr><td>Telecom group</td><td>43.10</td><td class="up">+1.6%</td><td>7.1M</td></tr>
+        <tr><td>Petrochemicals</td><td>88.40</td><td class="down">−1.2%</td><td>5.4M</td></tr>
+        <tr><td>Retail holding</td><td>22.95</td><td class="down">−2.8%</td><td>3.9M</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div>
+    <b style="font-size:11px;letter-spacing:.12em;text-transform:uppercase">Market insights</b>
+    <div class="ilist" style="margin-top:10px">
+      <a><span class="n tnum">1</span><span>Banks post stronger margins on lending growth</span></a>
+      <a><span class="n tnum">2</span><span>Oil holds steady as supply discipline continues</span></a>
+      <a><span class="n tnum">3</span><span>Technology names lead the regional rally</span></a>
+      <a><span class="n tnum">4</span><span>Gold above $2,300 as rate expectations shift</span></a>
+      <a><span class="n tnum">5</span><span>Foreign ownership reaches a record on Tadawul</span></a>
+    </div>
+    <div style="margin-top:26px"><b style="font-size:11px;letter-spacing:.12em;text-transform:uppercase">Sector heatmap</b></div>
+    <div class="heat" style="margin-top:10px">
+      <div style="background:#1E5E3F"><b>Energy</b><span>+2.4%</span></div>
+      <div style="background:#2E7D52"><b>Banks</b><span>+1.8%</span></div>
+      <div style="background:#4E8F6B"><b>Telecom</b><span>+0.9%</span></div>
+      <div style="background:#7FA491"><b>Utilities</b><span>+0.2%</span></div>
+      <div style="background:#9E8C7A"><b>Retail</b><span>−0.4%</span></div>
+      <div style="background:#B0705F"><b>Materials</b><span>−1.1%</span></div>
+      <div style="background:#A85949"><b>Transport</b><span>−1.8%</span></div>
+      <div style="background:#8E3B2E"><b>Real estate</b><span>−2.6%</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="rule" style="display:flex;align-items:center;gap:18px;margin:48px 0 4px"><h2 style="font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase">Latest market news</h2><i style="flex:1;height:1px;background:var(--line)"></i><a style="font-size:12px;color:var(--ink-3)">View all →</a></div>
+<section class="news">
+  <article class="ncard"><a class="img ph img-riyadh-kafd" data-vid><span>▶</span></a><div class="in"><span class="chip">Tadawul</span><h4>Record foreign inflows reshape the order book</h4><span class="meta tnum">4 min read</span></div></article>
+  <article class="ncard"><a class="img ph img-refinery-blue" data-vid><span>▶</span></a><div class="in"><span class="chip">Commodities</span><h4>Oil steadies as supply discipline continues</h4><span class="meta tnum">5 min read</span></div></article>
+  <article class="ncard"><a class="img ph img-riyadh-night-purple" data-vid><span>▶</span></a><div class="in"><span class="chip">Global</span><h4>Markets react to new US rate signals</h4><span class="meta tnum">4 min read</span></div></article>
+</section>
+</div>
+<!--BAND--><!--FOOTER-->
+</body></html>

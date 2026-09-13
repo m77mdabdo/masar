@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MASAR — Business. Economy. Markets. Opportunities.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="masar.css">
+<link rel="stylesheet" href="prototype-images.css">
+<style>
+/* ================= HOME ================= */
+.rule{display:flex;align-items:center;gap:18px;margin:52px 0 20px}
+.rule h2{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+.rule i{flex:1;height:1px;background:var(--line);display:block}
+.rule a{font-size:12px;color:var(--ink-3);white-space:nowrap}
+
+/* THE BIG STORY */
+.big{margin:22px 0 8px}
+.big .stage{display:grid;grid-template-columns:1.36fr .64fr;min-height:470px}
+.big .left{position:relative;overflow:hidden;padding:44px;display:flex;flex-direction:column;justify-content:flex-end;color:#fff}
+.big .left .ov{position:absolute;inset:0;background:linear-gradient(72deg,rgba(6,18,12,.95) 20%,rgba(6,18,12,.58) 60%,rgba(6,18,12,.12) 100%);z-index:0}
+.big h1{font-size:52px;line-height:1.06;max-width:12ch;margin-bottom:18px}
+.big h1 em{font-style:italic;color:var(--mint)}
+.big .sf{font-size:15px;line-height:1.75;color:#C4D2C9;max-width:46ch;margin-bottom:22px}
+.big .meta2{font-size:12px;color:#9FB3A7;margin-bottom:20px}
+.big .right{background:var(--g-900);padding:34px 28px;display:flex;flex-direction:column;gap:24px;justify-content:center}
+.step{display:grid;grid-template-columns:36px 1fr;gap:13px;align-items:start}
+.step .n{font-family:"Playfair Display",serif;font-size:25px;color:var(--mint);line-height:1}
+.step b{display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#fff;margin-bottom:5px}
+.step p{font-size:12.5px;line-height:1.65;color:#A9BCB0;margin:0}
+
+/* strip of secondary leads */
+.leads{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-bottom:1px solid var(--line)}
+.lead{background:var(--cream);padding:20px 22px 22px;display:grid;grid-template-columns:1fr 92px;gap:16px;align-items:start}
+.lead h4{font-family:"Playfair Display",serif;font-size:17px;line-height:1.35;margin:7px 0 8px}
+.lead .th{aspect-ratio:1}
+
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.tile .img{aspect-ratio:1/.8}
+.tile b{display:block;font-size:13.5px;margin-top:10px}
+.tile p{font-size:11px;color:var(--ink-3);line-height:1.5;margin:3px 0 9px}
+
+/* generic split */
+.split{display:grid;grid-template-columns:1.25fr .75fr;gap:34px;align-items:start}
+.split3{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;align-items:start}
+.split4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+
+.feat{position:relative;overflow:hidden;min-height:380px;display:flex;flex-direction:column;justify-content:flex-end;padding:28px;color:#fff}
+.feat .ov{position:absolute;inset:0;background:linear-gradient(0deg,rgba(6,18,12,.95) 12%,rgba(6,18,12,.08) 74%);z-index:0}
+.feat h3{font-family:"Playfair Display",serif;font-size:30px;line-height:1.18;margin:12px 0 10px;max-width:20ch}
+.feat p{font-size:13px;color:#BCCCC2;max-width:44ch;line-height:1.7}
+.feat .bt{display:flex;align-items:center;justify-content:space-between;margin-top:16px}
+
+.lrow{display:grid;grid-template-columns:78px 1fr;gap:13px;padding:13px 0;border-bottom:1px solid var(--line-2);align-items:center}
+.lrow:last-child{border-bottom:0}
+.lrow .th{aspect-ratio:1}
+.lrow h5{font-size:14px;line-height:1.5;font-weight:600;margin-top:5px}
+
+.acard{border:1px solid var(--line);background:#fff;display:flex;flex-direction:column}
+.acard .img{aspect-ratio:16/9}
+.acard .in{padding:14px 15px 16px;display:flex;flex-direction:column;flex:1}
+.acard h4{font-family:"Playfair Display",serif;font-size:18px;line-height:1.3;margin:8px 0}
+.acard p{font-size:12.5px;line-height:1.65;color:var(--ink-2);margin:0 0 12px}
+.acard .ft{display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:10px;border-top:1px solid var(--line-2);font-size:11px;color:var(--ink-3)}
+
+/* markets */
+.mk{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+.mk div{background:#fff;padding:16px 18px}
+.mk .n{font-family:"Playfair Display",serif;font-size:22px}
+.mk .l{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:5px}
+.chartbox{border:1px solid var(--line);background:#fff;padding:20px}
+.chartbox svg{width:100%;height:170px;display:block}
+.insights-list{counter-reset:i}
+.insights-list a{display:grid;grid-template-columns:26px 1fr;gap:12px;padding:11px 0;border-bottom:1px solid var(--line-2);font-size:13.5px;line-height:1.5}
+.insights-list a:last-child{border-bottom:0}
+.insights-list .n{font-family:"Playfair Display",serif;color:var(--ink-4);font-size:15px}
+
+/* opportunities */
+.opps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.opp{position:relative;overflow:hidden;min-height:190px;display:flex;flex-direction:column;justify-content:flex-end;padding:18px;color:#fff}
+.opp .ov{position:absolute;inset:0;background:linear-gradient(0deg,rgba(6,18,12,.94) 14%,rgba(6,18,12,.1) 72%);z-index:0}
+.opp h5{font-size:16px;font-weight:600;margin-bottom:4px}
+.opp span{font-size:11.5px;color:#AFC2B6}
+.opp .badge{position:absolute;top:14px;left:14px;z-index:1;font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  background:rgba(127,182,154,.2);border:1px solid rgba(127,182,154,.5);color:#CFE6DA;border-radius:999px;padding:4px 10px}
+.opp .badge.med{background:rgba(201,160,99,.18);border-color:rgba(201,160,99,.5);color:#E7D2B0}
+
+/* intelligence */
+.intel{display:grid;grid-template-columns:1.5fr 1fr;gap:20px}
+.tabs{display:flex;gap:24px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.tabs a{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding-bottom:11px;color:var(--ink-3);border-bottom:2px solid transparent}
+.tabs a.on{color:var(--ink);border-bottom-color:var(--g-900)}
+.pulsebox{border:1px solid var(--line);background:#fff;padding:20px;display:grid;grid-template-columns:220px 1fr;gap:22px}
+.mrow{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line-2);font-size:13px}
+.mrow:last-child{border-bottom:0}
+.mrow i{width:9px;height:9px;border-radius:2px;background:var(--g-500);display:inline-block;margin-right:9px}
+.map{position:relative;background:var(--cream-2);min-height:180px;display:flex;align-items:center;justify-content:center}
+.map .pin{position:absolute;width:9px;height:9px;border-radius:50%;background:var(--g-600);box-shadow:0 0 0 6px rgba(46,125,82,.16)}
+.oppweek{position:relative;overflow:hidden;color:#fff;padding:26px 24px;display:flex;flex-direction:column;justify-content:flex-end;min-height:100%}
+.oppweek .ov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,18,12,.5),rgba(6,18,12,.96));z-index:0}
+.oppweek h4{font-family:"Playfair Display",serif;font-size:25px;line-height:1.25;margin:10px 0 12px}
+.oppweek p{font-size:12.5px;color:#B6C7BC;line-height:1.7}
+
+/* success stories */
+.story{display:grid;grid-template-columns:180px 1fr;gap:20px;align-items:center;border-bottom:1px solid var(--line-2);padding:18px 0}
+.story:last-child{border-bottom:0}
+.story .img{aspect-ratio:4/3}
+.story h4{font-family:"Playfair Display",serif;font-size:20px;line-height:1.3;margin:8px 0}
+.story p{font-size:13px;color:var(--ink-2);margin:0}
+
+/* video */
+.vhero{position:relative;overflow:hidden;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;color:#fff}
+.vhero .ov{position:absolute;inset:0;background:linear-gradient(0deg,rgba(6,18,12,.9) 8%,rgba(6,18,12,.25) 70%);z-index:0}
+.vhero .play{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.92);color:var(--g-900);display:flex;align-items:center;justify-content:center;font-size:20px}
+.vhero .cap{position:absolute;left:0;right:0;bottom:0;padding:22px;z-index:1}
+.vhero h3{font-family:"Playfair Display",serif;font-size:26px;line-height:1.2}
+.vlist a{display:grid;grid-template-columns:104px 1fr;gap:13px;padding:11px 0;border-bottom:1px solid var(--line-2);align-items:center}
+.vlist a:last-child{border-bottom:0}
+.vlist .th{aspect-ratio:16/10;position:relative}
+.vlist .th span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;z-index:1}
+.vlist h5{font-size:13px;line-height:1.5;font-weight:600}
+.vlist em{font-style:normal;font-size:10.5px;color:var(--ink-3)}
+
+/* podcast + reports */
+.pod{display:grid;grid-template-columns:84px 1fr auto;gap:14px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line-2)}
+.pod:last-child{border-bottom:0}
+.pod .art{aspect-ratio:1}
+.pod h5{font-size:13.5px;font-weight:600;line-height:1.45}
+.rep{display:grid;grid-template-columns:32px 1fr 18px;gap:13px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line-2)}
+.rep:last-child{border-bottom:0}
+.rep .ic{width:32px;height:32px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--g-600);font-size:12px}
+.rep b{font-size:13px;display:block}
+
+/* issue */
+.issue{display:grid;grid-template-columns:1.1fr .9fr;gap:34px;background:#fff;border:1px solid var(--line);padding:34px;align-items:center}
+.issue h2{font-family:"Playfair Display",serif;font-size:42px;line-height:1.04;margin:12px 0 14px}
+.issue .d{font-size:13.5px;color:var(--ink-2);line-height:1.75;max-width:42ch;margin-bottom:22px}
+.istats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);padding-top:18px;margin-bottom:22px}
+.istats .n{font-family:"Playfair Display",serif;font-size:26px}
+.istats .l{font-size:10.5px;color:var(--ink-3)}
+.cover{display:flex;align-items:center;justify-content:center}
+.cover .bk{width:240px;aspect-ratio:3/4.1;position:relative;box-shadow:24px 24px 48px rgba(20,24,26,.3);transform:perspective(950px) rotateY(-14deg);overflow:hidden}
+.cover .bk .ov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,18,12,.2),rgba(6,18,12,.92));z-index:0}
+.cover .bk .tx{position:absolute;inset:0;padding:20px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;z-index:1}
+.cover .bk .tx h5{font-family:"Playfair Display",serif;font-size:24px;line-height:1.14}
+.cover .bk .spine{position:absolute;left:0;top:0;bottom:0;width:10px;background:linear-gradient(90deg,rgba(0,0,0,.55),transparent);z-index:1}
+
+/* companies strip */
+.cos{display:grid;grid-template-columns:repeat(8,1fr);gap:10px}
+.co{border:1px solid var(--line);background:#fff;padding:14px 6px;text-align:center}
+.co .mk2{height:22px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11.5px;color:var(--g-700)}
+.co span{display:block;font-size:9.5px;color:var(--ink-3);margin-top:7px}
+
+/* most read */
+.most a{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--line-2)}
+.most a:last-child{border-bottom:0}
+.most .n{font-family:"Playfair Display",serif;font-size:18px;color:var(--ink-4)}
+.most h5{font-size:13.5px;line-height:1.5;font-weight:600}
+
+@media(max-width:1150px){
+  .big .stage{grid-template-columns:1fr}
+  .tiles{grid-template-columns:repeat(3,1fr)}
+  .leads{grid-template-columns:1fr}
+  .split,.intel,.issue,.pulsebox{grid-template-columns:1fr}
+  .split3,.opps{grid-template-columns:1fr 1fr}
+  .cos{grid-template-columns:repeat(4,1fr)}
+}
+@media(max-width:700px){
+  .big h1{font-size:32px}.big .left{padding:26px}
+  .tiles,.split3,.opps,.split4{grid-template-columns:1fr 1fr}
+  .istats{grid-template-columns:1fr 1fr;gap:14px 0}
+  .story{grid-template-columns:1fr}
+  .issue h2{font-size:32px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="wrap">
+  <div>Business. Economy. Markets. Opportunities.</div>
+  <nav><a href="masar-about.html">About</a><a>Our Team</a><a>Careers</a><a>Contact</a><span>⌕</span>
+    <span class="lang"><b>EN</b> / عربي</span><button class="btn">Subscribe</button></nav>
+</div></div>
+
+<header class="masthead"><div class="wrap">
+  <a class="logo" href="#"><span class="lat">MASAR</span><span class="ar">مسار</span></a>
+  <div class="logo-tag">A clearer path to a brighter tomorrow</div>
+  <nav class="mainnav">
+    <a href="masar-saudi-arabia.html">Saudi Arabia</a><a>Economy</a><a>Markets</a><a>Business</a>
+    <a>Startups</a><a>Opportunities</a><a href="masar-insights.html">Insights</a><a>Video</a>
+  </nav>
+  <div class="burger"><i></i><i></i><i></i></div>
+</div></header>
+
+<div class="ticker"><div class="wrap">
+  <div class="tk"><svg viewBox="0 0 32 15"><polyline points="0,11 6,8 12,10 18,4 24,6 32,2" fill="none" stroke="#6FD39D" stroke-width="1.3"/></svg><div><div class="l">Tadawul</div><div class="v tnum">11,234.56</div></div><div class="c up tnum">▲ 1.24%</div></div>
+  <div class="tk"><svg viewBox="0 0 32 15"><polyline points="0,9 7,11 14,6 21,8 32,4" fill="none" stroke="#6FD39D" stroke-width="1.3"/></svg><div><div class="l">S&amp;P 500</div><div class="v tnum">5,487.21</div></div><div class="c up tnum">▲ 0.63%</div></div>
+  <div class="tk"><svg viewBox="0 0 32 15"><polyline points="0,4 7,6 14,5 21,9 32,12" fill="none" stroke="#E98880" stroke-width="1.3"/></svg><div><div class="l">Brent Oil</div><div class="v tnum">82.14</div></div><div class="c down tnum">▼ 0.31%</div></div>
+  <div class="tk"><svg viewBox="0 0 32 15"><polyline points="0,10 7,8 14,9 21,5 32,3" fill="none" stroke="#C9A063" stroke-width="1.3"/></svg><div><div class="l">Gold</div><div class="v tnum">2,328.50</div></div><div class="c up tnum">▲ 0.82%</div></div>
+  <div class="tk"><svg viewBox="0 0 32 15"><polyline points="0,8 16,8 32,8" fill="none" stroke="#8EA398" stroke-width="1.3"/></svg><div><div class="l">USD/SAR</div><div class="v tnum">3.75</div></div><div class="c flat tnum">0.00%</div></div>
+  <div class="pulse">Market Pulse →</div>
+</div></div>
+
+<div class="wrap">
+
+<!-- ================= THE BIG STORY ================= -->
+<section class="big"><div class="stage">
+  <div class="left ph img-riyadh-vision">
+    <div class="ov"></div>
+    <span class="chip chip-dark" style="align-self:flex-start;margin-bottom:16px">The Big Story</span>
+    <h1 class="serif">Saudi Arabia is changing the rules of <em>the game.</em></h1>
+    <p class="sf">From technology to tourism, new markets are opening fast. The Kingdom is reshaping the future of business, regionally and globally.</p>
+    <p class="meta2">By Ahmed Mostafa &nbsp;·&nbsp; <span class="tnum">Oct 20, 2026</span> &nbsp;·&nbsp; 8 min read</p>
+    <a class="btn btn-light" href="masar-article.html">Read the full story →</a>
+  </div>
+  <div class="right">
+    <div class="step"><span class="n tnum">01</span><div><b>What happened?</b><p>A wave of new investment regulations is transforming key sectors across the Kingdom.</p></div></div>
+    <div class="step"><span class="n tnum">02</span><div><b>Why it matters?</b><p>It positions Saudi Arabia as a global economic hub for capital, innovation and talent.</p></div></div>
+    <div class="step"><span class="n tnum">03</span><div><b>Where's the opportunity?</b><p>From technology to tourism, new markets are opening faster than the supply can follow.</p></div></div>
+  </div>
+</div></section>
+
+<section class="leads">
+  <a class="lead"><div><span class="cat">Markets</span><h4>Tadawul attracts record foreign inflows in Q3</h4><span class="meta tnum">4 min read</span></div><div class="th ph img-riyadh-kafd-2"></div></a>
+  <a class="lead"><div><span class="cat">Energy</span><h4>Why the refining margin story is changing</h4><span class="meta tnum">6 min read</span></div><div class="th ph img-refinery-sunset"></div></a>
+  <a class="lead"><div><span class="cat">Tourism</span><h4>Jeddah's waterfront economy comes of age</h4><span class="meta tnum">5 min read</span></div><div class="th ph img-jeddah-corniche"></div></a>
+</section>
+
+<!-- ================= SECTIONS ================= -->
+<div class="rule"><h2>Explore Masar</h2><i></i><a>All sections →</a></div>
+<section class="tiles">
+  <a class="tile" href="masar-saudi-arabia.html"><div class="img ph img-riyadh-tower-dusk"></div><b>Saudi Arabia</b><p>Vision, projects and the Kingdom's next chapter</p><span class="arrow">→</span></a>
+  <a class="tile"><div class="img ph img-mountains-sunset"></div><b>Economy</b><p>Trends, policies and impact</p><span class="arrow">→</span></a>
+  <a class="tile"><div class="img ph img-trading-desk"></div><b>Markets</b><p>Data, analysis and what's moving</p><span class="arrow">→</span></a>
+  <a class="tile"><div class="img ph img-riyadh-kafd"></div><b>Business</b><p>Companies, deals and industry</p><span class="arrow">→</span></a>
+  <a class="tile"><div class="img ph img-office-window"></div><b>Startups</b><p>Innovation, founders and funding</p><span class="arrow">→</span></a>
+  <a class="tile"><div class="img ph img-solar-wind"></div><b>Opportunities</b><p>Turning insight into action</p><span class="arrow">→</span></a>
+</section>
+
+<!-- ================= SAUDI ARABIA ================= -->
+<div class="rule"><h2>Saudi Arabia</h2><i></i><a href="masar-saudi-arabia.html">View all →</a></div>
+<section class="split">
+  <a class="feat ph img-riyadh-night">
+    <div class="ov"></div>
+    <span class="chip chip-dark" style="align-self:flex-start">Mega Projects</span>
+    <h3>The new Riyadh: a global city in the making</h3>
+    <p>From infrastructure to quality of life, Riyadh's transformation is redefining what a Gulf capital can be.</p>
+    <div class="bt"><span style="font-size:11.5px;color:#A9BCB0">5 min read</span><span class="arrow arrow-lg" style="background:#fff;color:var(--g-900);border:0">→</span></div>
+  </a>
+  <div>
+    <a class="lrow"><div class="th ph img-riyadh-night-purple"></div><div><span class="cat">Economy</span><h5>Non-oil economy grows 4.6% in the second quarter</h5></div></a>
+    <a class="lrow"><div class="th ph img-jeddah-balad"></div><div><span class="cat">Heritage</span><h5>Al Balad's restoration becomes a business case</h5></div></a>
+    <a class="lrow"><div class="th ph img-waterfront-park"></div><div><span class="cat">Projects</span><h5>Coastal developments enter their delivery phase</h5></div></a>
+    <a class="lrow"><div class="th ph img-park-sunset"></div><div><span class="cat">Quality of life</span><h5>Why urban green space became an economic policy</h5></div></a>
+    <a class="lrow"><div class="th ph img-desert-camels"></div><div><span class="cat">Regions</span><h5>Outside the cities: the quieter growth story</h5></div></a>
+  </div>
+</section>
+
+<!-- ================= MARKETS ================= -->
+<div class="rule"><h2>Markets</h2><i></i><a>Market pulse →</a></div>
+<section class="split">
+  <div class="chartbox">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px">
+      <div><b style="font-size:15px">Tadawul All Share</b> <span class="tnum" style="color:var(--up);font-size:13px">11,234.56 ▲ 1.24%</span></div>
+      <span class="meta">Close · delayed</span>
+    </div>
+    <svg viewBox="0 0 600 170" preserveAspectRatio="none" aria-label="Index performance">
+      <polygon points="0,170 0,132 60,120 120,138 180,96 240,110 300,74 360,88 420,52 480,66 540,34 600,22 600,170" fill="#2E7D52" opacity=".12"/>
+      <polyline points="0,132 60,120 120,138 180,96 240,110 300,74 360,88 420,52 480,66 540,34 600,22" fill="none" stroke="#2E7D52" stroke-width="2.5"/>
+    </svg>
+    <div style="display:flex;gap:16px;font-size:11px;color:var(--ink-3);margin-top:8px">
+      <span>1D</span><span>1W</span><span>1M</span><span style="color:var(--ink);font-weight:700">1Y</span><span>ALL</span>
+    </div>
+    <div class="mk" style="margin-top:18px">
+      <div><div class="l">Brent Oil</div><div class="n tnum">82.14 <span style="font-size:12px;color:var(--down)">▼0.31%</span></div></div>
+      <div><div class="l">Gold</div><div class="n tnum">2,328.50 <span style="font-size:12px;color:var(--up)">▲0.82%</span></div></div>
+      <div><div class="l">USD / SAR</div><div class="n tnum">3.75</div></div>
+      <div><div class="l">Nomu</div><div class="n tnum">26,310 <span style="font-size:12px;color:var(--down)">▼0.41%</span></div></div>
+    </div>
+  </div>
+  <div>
+    <b style="font-size:11px;letter-spacing:.12em;text-transform:uppercase">Market insights</b>
+    <div class="insights-list" style="margin-top:10px">
+      <a><span class="n tnum">1</span><span>Saudi banks post stronger margins on lending growth</span></a>
+      <a><span class="n tnum">2</span><span>Oil holds steady as supply discipline continues</span></a>
+      <a><span class="n tnum">3</span><span>Technology names lead the regional rally</span></a>
+      <a><span class="n tnum">4</span><span>Gold above $2,300 as rate expectations shift</span></a>
+      <a><span class="n tnum">5</span><span>Foreign ownership reaches a new high on Tadawul</span></a>
+    </div>
+    <a class="btn btn-outline-dark" style="margin-top:18px">Open markets page →</a>
+  </div>
+</section>
+
+<!-- ================= BUSINESS & COMPANIES ================= -->
+<div class="rule"><h2>Business &amp; Companies</h2><i></i><a>View all →</a></div>
+<section class="split3">
+  <article class="acard"><a class="img ph img-refinery-blue"></a><div class="in">
+    <div style="display:flex;gap:9px;align-items:center"><span class="chip">Energy</span><span class="meta">6 min read</span></div>
+    <h4>Inside the petrochemical expansion nobody is talking about</h4>
+    <p>Capacity is being added quietly across the Gulf. The question is who buys the output.</p>
+    <div class="ft"><b>Youssef Nasser</b><span class="tnum">Oct 19, 2026</span><span class="arrow arrow-dark" style="margin-left:auto;width:28px;height:28px">→</span></div>
+  </div></article>
+  <article class="acard"><a class="img ph img-boardroom"></a><div class="in">
+    <div style="display:flex;gap:9px;align-items:center"><span class="chip">Governance</span><span class="meta">5 min read</span></div>
+    <h4>What family businesses get wrong about succession</h4>
+    <p>A generational transfer is under way across the region, and most boards are not ready.</p>
+    <div class="ft"><b>Fatima Al-Youssef</b><span class="tnum">Oct 18, 2026</span><span class="arrow arrow-dark" style="margin-left:auto;width:28px;height:28px">→</span></div>
+  </div></article>
+  <article class="acard"><a class="img ph img-refinery-aerial"></a><div class="in">
+    <div style="display:flex;gap:9px;align-items:center"><span class="chip">Industry</span><span class="meta">7 min read</span></div>
+    <h4>Logistics is becoming the Kingdom's quiet advantage</h4>
+    <p>Ports, rail and bonded zones are reshaping the cost of doing business.</p>
+    <div class="ft"><b>Majed Al-Otaibi</b><span class="tnum">Oct 17, 2026</span><span class="arrow arrow-dark" style="margin-left:auto;width:28px;height:28px">→</span></div>
+  </div></article>
+</section>
+
+<!-- ================= OPPORTUNITIES ================= -->
+<div class="rule"><h2>Opportunities</h2><i></i><a>Opportunity radar →</a></div>
+<section class="opps">
+  <a class="opp ph img-solar-wind"><div class="ov"></div><span class="badge">High potential</span><h5>Renewable energy</h5><span>Clean-energy transition · Kingdom-wide</span></a>
+  <a class="opp ph img-wind-farm"><div class="ov"></div><span class="badge">High potential</span><h5>Grid &amp; storage</h5><span>Infrastructure · Central region</span></a>
+  <a class="opp ph img-jeddah-balad"><div class="ov"></div><span class="badge med">Medium potential</span><h5>Heritage tourism</h5><span>Hospitality · Western region</span></a>
+  <a class="opp ph img-coast-fireworks"><div class="ov"></div><span class="badge">High potential</span><h5>Events &amp; entertainment</h5><span>Growing domestic demand</span></a>
+  <a class="opp ph img-refinery-green"><div class="ov"></div><span class="badge med">Medium potential</span><h5>Industrial services</h5><span>Maintenance &amp; localisation</span></a>
+  <a class="opp ph img-waterfront-park"><div class="ov"></div><span class="badge">High potential</span><h5>Coastal real estate</h5><span>New ownership rules</span></a>
+</section>
+
+<!-- ================= MASAR INTELLIGENCE ================= -->
+<div class="rule"><h2>Masar Intelligence</h2><i></i><a>View all →</a></div>
+<section class="intel">
+  <div>
+    <nav class="tabs"><a class="on">Market Pulse</a><a>Trending Sectors</a><a>Opportunity Radar</a><a>Key Numbers</a></nav>
+    <div class="pulsebox">
+      <div>
+        <div class="mrow"><span><i></i>Saudi Arabia</span><b class="tnum" style="color:var(--up)">+1.24%</b></div>
+        <div class="mrow"><span><i></i>UAE</span><b class="tnum" style="color:var(--up)">+0.63%</b></div>
+        <div class="mrow"><span><i style="background:var(--down)"></i>Egypt</span><b class="tnum" style="color:var(--down)">−0.18%</b></div>
+        <div class="mrow"><span><i></i>Global</span><b class="tnum" style="color:var(--up)">+0.41%</b></div>
+        <a class="meta" style="display:inline-block;margin-top:14px;color:var(--g-600);font-weight:600">Explore the interactive map →</a>
+      </div>
+      <div class="map">
+        <svg viewBox="0 0 400 170" aria-hidden="true" style="width:100%;opacity:.55">
+          <path fill="#C9D3C6" d="M40 60q22-18 46-12t38 4 30-10 34 6 40-4 46 10 56 6v50q-30 8-58 2t-52 6-44-8-38 10-40-6-36 4-32-10z"/>
+        </svg>
+        <span class="pin" style="left:47%;top:52%"></span><span class="pin" style="left:53%;top:60%"></span><span class="pin" style="left:41%;top:46%"></span>
+      </div>
+    </div>
+  </div>
+  <a class="oppweek ph img-energy-aramco">
+    <div class="ov"></div>
+    <span class="eyebrow eyebrow-mint">Opportunity of the week</span>
+    <h4>Energy localisation is opening a supplier gap.</h4>
+    <p>As operators raise local-content targets, mid-sized suppliers face the widest opening in a decade.</p>
+    <span class="btn btn-outline" style="align-self:flex-start;margin-top:8px">Explore opportunities →</span>
+  </a>
+</section>
+
+<!-- ================= INSIGHTS ================= -->
+<div class="rule"><h2>Insights &amp; Analysis</h2><i></i><a href="masar-insights.html">View all →</a></div>
+<section class="split4">
+  <article class="acard"><a class="img ph img-riyadh-dusk-office"></a><div class="in">
+    <span class="chip">Analysis</span><h4 style="font-size:16px">What foreign ownership really changes</h4>
+    <div class="ft"><span class="tnum">Oct 20</span><span class="arrow arrow-dark" style="margin-left:auto;width:26px;height:26px">→</span></div></div></article>
+  <article class="acard"><a class="img ph img-mountains-sunset"></a><div class="in">
+    <span class="chip">Opinion</span><h4 style="font-size:16px">Diversification is a supply-chain question</h4>
+    <div class="ft"><span class="tnum">Oct 19</span><span class="arrow arrow-dark" style="margin-left:auto;width:26px;height:26px">→</span></div></div></article>
+  <article class="acard"><a class="img ph img-heritage"></a><div class="in">
+    <span class="chip">Explainer</span><h4 style="font-size:16px">How the craft economy is being formalised</h4>
+    <div class="ft"><span class="tnum">Oct 18</span><span class="arrow arrow-dark" style="margin-left:auto;width:26px;height:26px">→</span></div></div></article>
+  <article class="acard"><a class="img ph img-flag"></a><div class="in">
+    <span class="chip">Policy</span><h4 style="font-size:16px">Reading the new regulations properly</h4>
+    <div class="ft"><span class="tnum">Oct 17</span><span class="arrow arrow-dark" style="margin-left:auto;width:26px;height:26px">→</span></div></div></article>
+</section>
+
+<!-- ================= SUCCESS STORIES + MOST READ ================= -->
+<section class="split" style="margin-top:52px">
+  <div>
+    <div class="rule" style="margin-top:0"><h2>Success Stories</h2><i></i></div>
+    <a class="story"><div class="img ph img-tower-lights"></div><div><span class="chip">Founders</span><h4>From a single warehouse to a regional network</h4><p>How one logistics operator turned a bottleneck into a business model.</p></div></a>
+    <a class="story"><div class="img ph img-office-window"></div><div><span class="chip">Scale-up</span><h4>The fintech that grew by saying no</h4><p>A narrow product, a patient roadmap, and a lesson in focus.</p></div></a>
+    <a class="story"><div class="img ph img-jeddah-corniche"></div><div><span class="chip">Hospitality</span><h4>Building a hotel brand on a single coastline</h4><p>Why the founder refused to expand before the second season.</p></div></a>
+  </div>
+  <div>
+    <div class="rule" style="margin-top:0"><h2>Most Read</h2><i></i></div>
+    <div class="most">
+      <a><span class="n tnum">01</span><h5>Saudi non-oil economy grows 4.6% in Q2 2026</h5></a>
+      <a><span class="n tnum">02</span><h5>Ten Saudi startups to watch this year</h5></a>
+      <a><span class="n tnum">03</span><h5>How Riyadh became a regional real-estate hub</h5></a>
+      <a><span class="n tnum">04</span><h5>Global markets react to new US rate signals</h5></a>
+      <a><span class="n tnum">05</span><h5>Five investment opportunities in tourism</h5></a>
+    </div>
+    <div class="rule"><h2>Editor's Picks</h2><i></i></div>
+    <div class="most">
+      <a><span class="n">◆</span><h5>The quiet reform that will reshape hiring</h5></a>
+      <a><span class="n">◆</span><h5>What the logistics data actually shows</h5></a>
+      <a><span class="n">◆</span><h5>A field guide to the new investment rules</h5></a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= VIDEO ================= -->
+<div class="rule"><h2>Masar Video</h2><i></i><a>All videos →</a></div>
+<section class="split">
+  <a class="vhero ph img-riyadh-night-purple" data-vid>
+    <div class="ov"></div><div class="play">▶</div>
+    <div class="cap"><span class="chip chip-dark">Documentary</span><h3 class="serif" style="margin-top:10px">The rise of a new Saudi Arabia</h3>
+      <span style="font-size:11.5px;color:#A9BCB0" class="tnum">8:24</span></div>
+  </a>
+  <div class="vlist">
+    <a data-vid><div class="th ph img-jeddah-corniche"><span>▶</span></div><div><h5>Saudi tourism: a new era</h5><em class="tnum">6:10</em></div></a>
+    <a data-vid><div class="th ph img-office-window"><span>▶</span></div><div><h5>Inside the region's startup boom</h5><em class="tnum">5:42</em></div></a>
+    <a data-vid><div class="th ph img-trading-desk"><span>▶</span></div><div><h5>The future of global markets</h5><em class="tnum">4:30</em></div></a>
+    <a data-vid><div class="th ph img-solar-wind"><span>▶</span></div><div><h5>Energy transition, explained</h5><em class="tnum">7:05</em></div></a>
+    <a data-vid><div class="th ph img-riyadh-kafd"><span>▶</span></div><div><h5>Riyadh: a city of opportunity</h5><em class="tnum">6:48</em></div></a>
+  </div>
+</section>
+
+<!-- ================= PODCAST + REPORTS ================= -->
+<section class="split3" style="margin-top:52px">
+  <div>
+    <div class="rule" style="margin-top:0"><h2>Podcast</h2><i></i></div>
+    <a class="pod"><div class="art ph img-riyadh-kafd-2"></div><div><h5>Episode 12 — Reading the market like an operator</h5><span class="meta tnum">38 min</span></div><span class="arrow">▶</span></a>
+    <a class="pod"><div class="art ph img-boardroom"></div><div><h5>Episode 11 — The succession conversation</h5><span class="meta tnum">42 min</span></div><span class="arrow">▶</span></a>
+    <a class="pod"><div class="art ph img-desert-camels"></div><div><h5>Episode 10 — Outside the capital</h5><span class="meta tnum">35 min</span></div><span class="arrow">▶</span></a>
+  </div>
+  <div>
+    <div class="rule" style="margin-top:0"><h2>Reports</h2><i></i></div>
+    <a class="rep"><span class="ic">▤</span><div><b>Saudi Economic Outlook 2026</b><span class="meta tnum">PDF · 12 MB</span></div><span>↓</span></a>
+    <a class="rep"><span class="ic">▤</span><div><b>Energy Transition Tracker</b><span class="meta tnum">PDF · 9 MB</span></div><span>↓</span></a>
+    <a class="rep"><span class="ic">▤</span><div><b>Investment Opportunities Index</b><span class="meta tnum">PDF · 10 MB</span></div><span>↓</span></a>
+    <a class="rep"><span class="ic">▤</span><div><b>Logistics &amp; Trade Review</b><span class="meta tnum">PDF · 7 MB</span></div><span>↓</span></a>
+  </div>
+  <div>
+    <div class="rule" style="margin-top:0"><h2>Data</h2><i></i></div>
+    <div class="mk">
+      <div><div class="l">Non-oil GDP</div><div class="n tnum">+4.6%</div></div>
+      <div><div class="l">FDI inflow</div><div class="n tnum">$34B</div></div>
+      <div><div class="l">New licences</div><div class="n tnum">3,210</div></div>
+      <div><div class="l">Unemployment</div><div class="n tnum">6.9%</div></div>
+    </div>
+    <a class="btn btn-outline-dark" style="margin-top:16px;width:100%;justify-content:center">Open data hub →</a>
+  </div>
+</section>
+
+<!-- ================= ISSUE ================= -->
+<div class="rule"><h2>Masar Issue 001</h2><i></i><a>All issues →</a></div>
+<section class="issue">
+  <div>
+    <span class="eyebrow">Special digital issue</span>
+    <h2>The New<br>Riyadh</h2>
+    <p class="d">A special issue exploring how Riyadh is becoming a global capital for business, innovation and opportunity.</p>
+    <div class="istats">
+      <div><div class="n tnum">24</div><div class="l">Stories</div></div>
+      <div><div class="n tnum">8</div><div class="l">Interviews</div></div>
+      <div><div class="n tnum">15</div><div class="l">Companies</div></div>
+      <div><div class="n tnum">6</div><div class="l">Opportunities</div></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <a class="btn">Read the issue →</a>
+      <a class="btn btn-outline-dark" data-vid>Watch the trailer</a>
+    </div>
+  </div>
+  <div class="cover"><div class="bk ph img-riyadh-night">
+    <div class="ov"></div><div class="spine"></div>
+    <div class="tx"><span class="serif" style="font-size:22px;letter-spacing:.1em">MASAR</span>
+      <div><h5>THE NEW<br>RIYADH</h5><div class="tnum serif" style="font-size:15px;margin-top:8px;opacity:.85">001</div></div></div>
+  </div></div>
+</section>
+
+<!-- ================= COMPANIES ================= -->
+<div class="rule"><h2>Companies in the news</h2><i></i><a>Directory →</a></div>
+<section class="cos">
+  <a class="co"><div class="mk2">aramco</div><span>Energy</span></a>
+  <a class="co"><div class="mk2">NEOM</div><span>Mega project</span></a>
+  <a class="co"><div class="mk2">SABIC</div><span>Chemicals</span></a>
+  <a class="co"><div class="mk2">stc</div><span>Telecom</span></a>
+  <a class="co"><div class="mk2">SAB</div><span>Banking</span></a>
+  <a class="co"><div class="mk2">Red Sea</div><span>Tourism</span></a>
+  <a class="co"><div class="mk2">Qiddiya</div><span>Entertainment</span></a>
+  <a class="co"><div class="mk2">Maaden</div><span>Mining</span></a>
+</section>
+
+</div>
+
+<!-- ================= NEWSLETTER ================= -->
+<section class="band" style="margin-top:56px"><div class="wrap">
+  <div><h3 class="serif">Stay ahead<br>with Masar</h3><p>Get the latest stories, insights and opportunities delivered to your inbox.</p></div>
+  <div><div class="subform"><input placeholder="Your email address"><button class="btn btn-light">Subscribe →</button></div>
+    <p>Join a growing community of business leaders, investors and change makers.</p></div>
+  <div class="q serif">“Information today.<br>Opportunities tomorrow.”<span>— MASAR</span></div>
+</div></section>
+
+<footer><div class="wrap">
+  <div class="cols">
+    <div><div class="logo" style="margin-bottom:10px"><span class="lat">MASAR</span><span class="ar">مسار</span></div>
+      <p style="margin:0;font-size:12.5px;color:var(--ink-3)">Business. Economy. Markets. Opportunities.</p></div>
+    <div><h6>Explore</h6><div class="two"><div><a href="masar-saudi-arabia.html">Saudi Arabia</a><a>Economy</a><a>Markets</a><a>Business</a><a>Startups</a></div><div><a>Opportunities</a><a href="masar-insights.html">Insights</a><a>Video</a><a>Podcast</a><a>Reports</a></div></div></div>
+    <div><h6>Company</h6><a href="masar-about.html">About</a><a>Our Team</a><a>Careers</a><a>Advertise</a><a>Contact</a></div>
+    <div><h6>Legal</h6><a>Privacy Policy</a><a>Terms of Use</a><a>Cookie Policy</a><a>Editorial Standards</a></div>
+    <div class="say">A global perspective.<br>A regional advantage.<i></i></div>
+  </div>
+  <div class="end"><span class="tnum">© 2026 Masar. All rights reserved.</span><span>EN / عربي &nbsp;·&nbsp; Back to top ↑</span></div>
+</div></footer>
+
+</body>
+</html>

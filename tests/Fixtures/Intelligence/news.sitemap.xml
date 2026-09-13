@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
+  <url>
+    <loc>https://paper.test/business/new-investment-rules</loc>
+    <lastmod>2026-09-14T07:00:00Z</lastmod>
+    <news:news>
+      <news:publication_date>2026-09-14T07:00:00Z</news:publication_date>
+      <news:title>قواعد استثمار جديدة تدخل حيّز التنفيذ</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://paper.test/business/quiet-growth-story</loc>
+    <lastmod>2026-09-13T18:00:00Z</lastmod>
+  </url>
+</urlset>

@@ -1,0 +1,75 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The New Riyadh — Masar Issue 001</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="masar.css">
+<link rel="stylesheet" href="prototype-images.css">
+<style>
+.back{font-size:12.5px;color:var(--ink-3);padding:18px 0}
+.itop{display:grid;grid-template-columns:1fr .9fr;gap:40px;align-items:center;padding-bottom:40px;border-bottom:1px solid var(--line)}
+.itop h1{font-family:"Playfair Display",serif;font-size:62px;line-height:.98;margin:14px 0 16px}
+.itop .d{font-size:14.5px;color:var(--ink-2);line-height:1.8;max-width:44ch;margin-bottom:24px}
+.istats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);padding-top:18px;margin-bottom:24px}
+.istats .n{font-family:"Playfair Display",serif;font-size:28px}
+.istats .l{font-size:10.5px;color:var(--ink-3)}
+.cover{display:flex;align-items:center;justify-content:center}
+.cover .bk{width:280px;aspect-ratio:3/4.1;position:relative;box-shadow:26px 26px 54px rgba(20,24,26,.32);transform:perspective(1000px) rotateY(-13deg);overflow:hidden}
+.cover .bk .ov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,18,12,.18),rgba(6,18,12,.93));z-index:0}
+.cover .bk .spine{position:absolute;left:0;top:0;bottom:0;width:11px;background:linear-gradient(90deg,rgba(0,0,0,.55),transparent);z-index:1}
+.cover .bk .tx{position:absolute;inset:0;padding:22px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;z-index:1}
+.cover .bk h5{font-family:"Playfair Display",serif;font-size:27px;line-height:1.12}
+.inside{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:18px}
+.ic2{position:relative;overflow:hidden;aspect-ratio:4/3;display:flex;flex-direction:column;justify-content:flex-end;padding:16px;color:#fff}
+.ic2 .ov{position:absolute;inset:0;background:linear-gradient(0deg,rgba(6,18,12,.94) 14%,rgba(6,18,12,.08) 74%);z-index:0}
+.ic2 .n{font-family:"Playfair Display",serif;font-size:14px;color:var(--mint);margin-bottom:5px}
+.ic2 h5{font-size:14.5px;line-height:1.4;font-weight:600}
+.ic2 em{font-style:normal;font-size:10.5px;color:#9FB3A7}
+.chapters{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-top:18px}
+.ch{border-top:2px solid var(--g-900);padding-top:14px}
+.ch b{font-size:14px;display:block;margin-bottom:6px}
+.ch p{font-size:12.5px;color:var(--ink-2);line-height:1.7;margin:0}
+@media(max-width:1000px){.itop,.inside,.chapters{grid-template-columns:1fr 1fr}.itop{grid-template-columns:1fr}}
+@media(max-width:640px){.itop h1{font-size:40px}.inside,.chapters{grid-template-columns:1fr}.istats{grid-template-columns:1fr 1fr;gap:14px 0}}
+</style></head><body>
+<!--HEADER-->
+<div class="wrap">
+<div class="back">← Back to issues</div>
+<section class="itop">
+  <div>
+    <span class="eyebrow">Issue 001 · Special digital issue</span>
+    <h1>The New<br>Riyadh</h1>
+    <p class="d">How a capital becomes a global city: the projects, the capital flows, the people building it, and the opportunities that appear while it happens.</p>
+    <div class="istats">
+      <div><div class="n tnum">24</div><div class="l">Stories</div></div>
+      <div><div class="n tnum">8</div><div class="l">Interviews</div></div>
+      <div><div class="n tnum">15</div><div class="l">Companies</div></div>
+      <div><div class="n tnum">6</div><div class="l">Opportunities</div></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn">Read the issue →</a><a class="btn btn-outline-dark" data-vid>Watch the trailer</a></div>
+  </div>
+  <div class="cover"><div class="bk ph img-riyadh-night"><div class="ov"></div><div class="spine"></div>
+    <div class="tx"><span class="serif" style="font-size:24px;letter-spacing:.1em">MASAR</span>
+      <div><h5>THE NEW<br>RIYADH</h5><div class="serif tnum" style="font-size:16px;margin-top:10px;opacity:.85">001</div></div></div></div></div>
+</section>
+
+<div style="display:flex;align-items:center;gap:18px;margin:40px 0 4px"><h2 style="font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase">Inside this issue</h2><i style="flex:1;height:1px;background:var(--line)"></i><a style="font-size:12px;color:var(--ink-3)">View all →</a></div>
+<section class="inside">
+  <a class="ic2 ph img-riyadh-vision"><div class="ov"></div><div class="n tnum">01</div><h5>Riyadh's global ambitions</h5><em class="tnum">5 min read</em></a>
+  <a class="ic2 ph img-riyadh-kafd"><div class="ov"></div><div class="n tnum">02</div><h5>The new economy sectors</h5><em class="tnum">7 min read</em></a>
+  <a class="ic2 ph img-boardroom"><div class="ov"></div><div class="n tnum">03</div><h5>Voices from the Kingdom</h5><em class="tnum">9 min read</em></a>
+  <a class="ic2 ph img-solar-wind"><div class="ov"></div><div class="n tnum">04</div><h5>Opportunities to watch</h5><em class="tnum">6 min read</em></a>
+  <a class="ic2 ph img-riyadh-tower-dusk"><div class="ov"></div><div class="n tnum">05</div><h5>Building at speed</h5><em class="tnum">8 min read</em></a>
+  <a class="ic2 ph img-park-sunset"><div class="ov"></div><div class="n tnum">06</div><h5>Liveability as strategy</h5><em class="tnum">5 min read</em></a>
+  <a class="ic2 ph img-office-window"><div class="ov"></div><div class="n tnum">07</div><h5>The talent question</h5><em class="tnum">7 min read</em></a>
+  <a class="ic2 ph img-trading-desk"><div class="ov"></div><div class="n tnum">08</div><h5>Where the capital comes from</h5><em class="tnum">6 min read</em></a>
+</section>
+
+<div style="display:flex;align-items:center;gap:18px;margin:46px 0 4px"><h2 style="font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase">Chapters</h2><i style="flex:1;height:1px;background:var(--line)"></i></div>
+<section class="chapters">
+  <div class="ch"><b>I · The plan</b><p>What was decided, when, and how the timeline has shifted since.</p></div>
+  <div class="ch"><b>II · The build</b><p>Contractors, capital and the logistics of building a city inside a city.</p></div>
+  <div class="ch"><b>III · The opening</b><p>Who arrives next, what they need, and which gaps remain unfilled.</p></div>
+</section>
+</div>
+<!--BAND--><!--FOOTER-->
+</body></html>

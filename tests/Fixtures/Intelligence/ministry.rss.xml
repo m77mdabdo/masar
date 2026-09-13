@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>وزارة الصناعة والثروة المعدنية</title>
+    <link>https://example.gov.test</link>
+    <item>
+      <title>الوزارة تعتمد تعديلات على لوائح التراخيص الصناعية</title>
+      <link>https://example.gov.test/news/licensing-update?utm_source=rss&amp;utm_medium=feed</link>
+      <guid>gov-2026-0914-001</guid>
+      <pubDate>Mon, 14 Sep 2026 08:30:00 +0300</pubDate>
+      <description>تعديلات تدخل حيّز التنفيذ مع بداية الربع المقبل وتشمل منشآت لم تكن خاضعة للإطار السابق.</description>
+      <author>المركز الإعلامي</author>
+    </item>
+    <item>
+      <title>طرح مناقصة عامة لتطوير بنية تحتية لوجستية</title>
+      <link>https://example.gov.test/news/logistics-tender</link>
+      <guid>gov-2026-0914-002</guid>
+      <pubDate>Mon, 14 Sep 2026 09:15:00 +0300</pubDate>
+      <description>كراسة الشروط متاحة عبر البوابة الوطنية للمنافسات.</description>
+    </item>
+    <item>
+      <title></title>
+      <link>https://example.gov.test/news/untitled</link>
+    </item>
+  </channel>
+</rss>

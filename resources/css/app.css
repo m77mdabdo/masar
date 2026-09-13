@@ -1,11 +1,299 @@
 @import 'tailwindcss';
+@import './masar-fonts.css';
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+@source '../views';
+@source '../../app/View';
 
+/*
+ * MASAR design tokens — CLAUDE.md §2.
+ *
+ * Components consume these names and never a hex value, so a palette change is
+ * one edit here rather than a search across every template.
+ */
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --color-g-950: #071A10;
+    --color-g-900: #0E2A1C;
+    --color-g-700: #1A4531;
+    --color-g-600: #1E5E3F;
+    --color-mint:  #7FB69A;
+    --color-cream: #F6F4EF;
+    --color-line:  #E2DED4;
+    --color-ink:   #14181A;
+    --color-gold:  #C9A063;
+    /* Gold as *text on a light ground*: #C9A063 measures 2.42 on white and fails.
+       This is 5.03 on white, 4.57 on cream. Fills stay --color-gold. */
+    --color-gold-ink: #8F6828;
+    --color-ink-3: #61696F;
+
+    --font-display: 'Readex Pro', 'Readex Fallback', system-ui, sans-serif;
+    --font-sans: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+
+    /* Arabic body text needs more size and leading than Latin at the same rank. */
+    --text-body: 1.125rem;
+    --text-body--line-height: 1.95;
+}
+
+@layer base {
+    :root {
+        color-scheme: light;
+    }
+
+    html {
+        /*
+         * Western Arabic numerals everywhere — a locked "never" in the brief,
+         * and some Arabic faces default to Arabic-Indic without this.
+         */
+        font-variant-numeric: lining-nums;
+        font-feature-settings: 'lnum' 1;
+    }
+
+    body {
+        background-color: var(--color-cream);
+        color: var(--color-ink);
+        font-family: var(--font-sans);
+        font-size: var(--text-body);
+        line-height: 1.95;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, h4, .font-display {
+        font-family: var(--font-display);
+        line-height: 1.4;
+        letter-spacing: -0.01em;
+        /* Explicit, so no heading falls back to a 400 face we no longer ship. */
+        font-weight: 600;
+    }
+
+    /* Visible focus is an accessibility floor, not a style choice. */
+    :focus-visible {
+        outline: 2px solid var(--color-g-600);
+        outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+        }
+    }
+}
+
+@layer utilities {
+    /*
+     * Latin runs inside Arabic text — tickers, company names, URLs, dates.
+     * Without isolation the surrounding line reorders around them.
+     */
+    .ltr-isolate {
+        direction: ltr;
+        unicode-bidi: isolate;
+        display: inline-block;
+    }
+
+    /* Data tables align on the digit, not the glyph. */
+    .nums-tabular {
+        font-variant-numeric: lining-nums tabular-nums;
+        font-feature-settings: 'lnum' 1, 'tnum' 1;
+    }
+
+    /*
+     * The six crops, enforced in CSS rather than left to whatever width and
+     * height a template happened to pass. `App\Support\AspectRatio` holds the
+     * same six names and the same six numbers; a template names the role and
+     * never the ratio.
+     *
+     * `overflow: hidden` belongs here and not at the call site: object-cover on
+     * the child only crops if the parent actually clips.
+     */
+    .ratio-hero,
+    .ratio-inline,
+    .ratio-card,
+    .ratio-portrait,
+    .ratio-square,
+    .ratio-cover {
+        display: block;
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .ratio-hero     { aspect-ratio: 16 / 9; }    /* hero and featured */
+    .ratio-inline   { aspect-ratio: 16 / 8; }    /* article inline imagery */
+    .ratio-card     { aspect-ratio: 16 / 10; }   /* card thumbnails */
+    .ratio-portrait { aspect-ratio: 4 / 5; }     /* portrait imagery */
+    .ratio-square   { aspect-ratio: 1 / 1; }     /* square thumbs, avatars, logos */
+    .ratio-cover    { aspect-ratio: 30 / 41; }   /* magazine cover, 3:4.1 */
+
+    /*
+     * Sections below the fold are laid out when they are scrolled to, not while
+     * the browser is still trying to paint the hero.
+     *
+     * The front page is nineteen sections and ~90 cards, and Style & Layout was
+     * measured at 474ms on a throttled phone — more than half of LCP, spent
+     * laying out content nobody has scrolled to. `auto` on contain-intrinsic-size
+     * means the placeholder height is the section's last real height, so the
+     * scrollbar settles after first render instead of jumping.
+     *
+     * Known cost: Lighthouse's bundled axe run reports colour-contrast and
+     * target-size failures inside these sections, because it reads computed
+     * styles from a subtree the browser has not painted. Measured both ways —
+     * with this rule a11y scores 93 and LCP is 3.8s, without it a11y scores 100
+     * and LCP is 4.3s, and axe run on its own reports zero violations either
+     * way. The failures are the audit's, not the page's. Deleting the two
+     * declarations below is the whole revert if that trade stops being worth it.
+     */
+    /*
+     * The article hero's scrim.
+     *
+     * Load-bearing, not decorative: the headline is cream text sitting on an
+     * arbitrary photograph, and only this gradient guarantees a dark ground
+     * under it whatever the crop. The angle mirrors with the text — the dark
+     * end has to be on the side the headline is on.
+     */
+    .hero-scrim {
+        background-image: linear-gradient(
+            288deg,
+            color-mix(in srgb, var(--color-g-950) 95%, transparent) 20%,
+            color-mix(in srgb, var(--color-g-950) 58%, transparent) 60%,
+            color-mix(in srgb, var(--color-g-950) 12%, transparent) 100%
+        );
+    }
+
+    [dir='ltr'] .hero-scrim {
+        background-image: linear-gradient(
+            72deg,
+            color-mix(in srgb, var(--color-g-950) 95%, transparent) 20%,
+            color-mix(in srgb, var(--color-g-950) 58%, transparent) 60%,
+            color-mix(in srgb, var(--color-g-950) 12%, transparent) 100%
+        );
+    }
+
+    /* A bottom-weighted scrim for cards that carry a headline over an image. */
+    .card-scrim {
+        background-image: linear-gradient(
+            0deg,
+            color-mix(in srgb, var(--color-g-950) 94%, transparent) 14%,
+            color-mix(in srgb, var(--color-g-950) 10%, transparent) 72%
+        );
+    }
+
+    /*
+     * The magazine cover. A real rotation in perspective, mirrored in RTL so
+     * the spine falls on the side the reader opens from — the prototype's
+     * -14deg is a left-hand spine, which is the wrong hand for Arabic.
+     */
+    .issue-cover {
+        transform: perspective(950px) rotateY(14deg);
+        filter: drop-shadow(-18px 22px 34px color-mix(in srgb, var(--color-ink) 26%, transparent));
+    }
+
+    [dir='ltr'] .issue-cover {
+        transform: perspective(950px) rotateY(-14deg);
+        filter: drop-shadow(18px 22px 34px color-mix(in srgb, var(--color-ink) 26%, transparent));
+    }
+
+    .issue-spine {
+        background-image: linear-gradient(
+            to left,
+            color-mix(in srgb, #000 55%, transparent),
+            transparent
+        );
+    }
+
+    [dir='ltr'] .issue-spine {
+        background-image: linear-gradient(
+            to right,
+            color-mix(in srgb, #000 55%, transparent),
+            transparent
+        );
+    }
+
+    /* The section rhythm the prototype runs: 52px above a rule, 20px below. */
+    .mt-13 { margin-top: 3.25rem; }
+
+    .defer-paint {
+        content-visibility: auto;
+        contain-intrinsic-size: auto 600px;
+        /* An explicit ground so a contrast checker reading an unpainted subtree
+           resolves a real colour instead of blending its way up the tree. */
+        background-color: var(--color-cream);
+    }
+
+    .ratio-hero > img,
+    .ratio-inline > img,
+    .ratio-card > img,
+    .ratio-portrait > img,
+    .ratio-square > img,
+    .ratio-cover > img,
+    .ratio-hero > video,
+    .ratio-inline > video {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+/*
+ * Article body typography.
+ *
+ * Written by hand rather than pulled from a plugin: Arabic needs more leading
+ * and a larger base than the Latin defaults every prose preset ships with, and
+ * overriding all of that costs more than writing the nine rules we actually use.
+ */
+@layer components {
+    .prose-masar {
+        max-width: 68ch;
+        font-size: var(--text-body);
+        line-height: 1.95;
+    }
+
+    .prose-masar > p {
+        margin-block: 1.4em;
+    }
+
+    .prose-masar > h2 {
+        margin-block: 1.8em 0.6em;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--color-g-900);
+        scroll-margin-top: 6rem;
+    }
+
+    .prose-masar > h3 {
+        margin-block: 1.5em 0.5em;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--color-g-900);
+        scroll-margin-top: 6rem;
+    }
+
+    .prose-masar > h4 {
+        margin-block: 1.3em 0.4em;
+        font-size: 1.1rem;
+        font-weight: 600;
+        scroll-margin-top: 6rem;
+    }
+
+    .prose-masar a {
+        color: var(--color-g-700);
+        text-decoration: underline;
+        text-underline-offset: 4px;
+        text-decoration-color: var(--color-line);
+    }
+
+    .prose-masar a:hover {
+        text-decoration-color: var(--color-g-600);
+    }
+
+    .prose-masar > ul,
+    .prose-masar > ol {
+        margin-block: 1.4em;
+        padding-inline-start: 1.5em;
+    }
+
+    .prose-masar > ul { list-style: disc; }
+    .prose-masar > ol { list-style: decimal; }
+    .prose-masar li { margin-block: 0.5em; }
 }

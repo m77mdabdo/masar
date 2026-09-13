@@ -1,4 +1,2 @@
-import axios from 'axios';
-window.axios = axios;
-
-window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+// Intentionally minimal: no axios, no HTTP client. The public site makes no
+// XHR calls — every page is rendered on the server.

@@ -10,9 +10,11 @@ use App\Actions\Articles\SyncArticleEntities;
 use App\Actions\Articles\SyncArticleTopics;
 use App\Enums\ArticleStatus;
 use App\Enums\CompanyType;
+use App\Enums\ContentType;
 use App\Enums\EntityRole;
 use App\Enums\OpportunityPotential;
 use App\Models\Article;
+use App\Models\ArticleBlock;
 use App\Models\Category;
 use App\Models\Company;
 use App\Models\Country;
@@ -240,7 +242,19 @@ class DemoContentSeeder extends Seeder
 
         // A realistic pipeline, not 40 published articles.
         $plan = [
-            ['target' => 'published', 'count' => 22],
+            // 72 published is the floor for this design, not a preference.
+            //
+            // The front page has nineteen sections. Counted, they want 68
+            // distinct articles: 79 slots less the 6 that `tiles` and the 5
+            // that `data` used to consume before both became static. No
+            // article appears twice on the page, so anything under 68 leaves
+            // the lower rails empty — which is the same supply problem that
+            // once put the same headline in three rails, just further down.
+            //
+            // Trimming this number without also cutting sections will quietly
+            // empty the bottom third of the front page. If that is the
+            // intention, change the section list first.
+            ['target' => 'published', 'count' => 70],
             ['target' => 'scheduled', 'count' => 4],
             ['target' => ArticleStatus::Writing, 'count' => 6],
             ['target' => 'workflow', 'count' => 8],
@@ -296,7 +310,45 @@ class DemoContentSeeder extends Seeder
 
         $this->seedSponsoredArticles($categories, $topics, $companies, $people, $staff);
 
-        Article::query()->published()->inRandomOrder()->take(4)->update(['is_featured' => true]);
+        // Two sections draw on featured articles (tiles, editors_picks); the
+        // pool has to cover both or the second renders empty.
+        Article::query()->published()->inRandomOrder()->take(14)->update(['is_featured' => true]);
+
+        // A mix of content types, so type-filtered sections have something to
+        // show. Four sections filter by type — intelligence, podcast, reports,
+        // data — and each needs its own pool after global dedup has taken its
+        // cut, which is why these are sized well above each section's limit.
+        $byType = [
+            ContentType::Analysis->value => 9,
+            ContentType::Interview->value => 9,
+            ContentType::Report->value => 9,
+            ContentType::Explainer->value => 9,
+        ];
+
+        $pool = Article::query()->published()->inRandomOrder()->limit(array_sum($byType))->pluck('id');
+        $offset = 0;
+
+        foreach ($byType as $type => $count) {
+            Article::query()
+                ->whereIn('id', $pool->slice($offset, $count)->all())
+                ->update(['content_type' => $type]);
+
+            $offset += $count;
+        }
+
+        // Opinion and story pieces are not four questions. Their bodies are
+        // flattened after the content types settle, so the article page has
+        // real examples of both shapes — the sectioned one and the stream —
+        // rather than one shape and an untested branch.
+        $flatTypes = [ContentType::Opinion->value, ContentType::Story->value];
+
+        Article::query()->published()->inRandomOrder()->limit(8)->update(['content_type' => ContentType::Opinion->value]);
+
+        $flatIds = Article::query()
+            ->whereIn('content_type', $flatTypes)
+            ->pluck('id');
+
+        ArticleBlock::query()->whereIn('article_id', $flatIds)->update(['section' => null]);
     }
 
     /**
@@ -377,6 +429,18 @@ class DemoContentSeeder extends Seeder
 
         app(SyncArticleEntities::class)($article->refresh(), $mentions);
         app(SyncArticleTopics::class)($article, $topics->random(random_int(2, 4))->pluck('id')->all());
+
+        // The expert insight names its person explicitly rather than the page
+        // pairing a loose quote with whoever happens to be the most prominent
+        // mention. An attribution nobody chose is a fabricated one.
+        $article->blocks()->create([
+            'type' => 'expert',
+            'data' => [
+                'person_id' => $person->getKey(),
+                'text' => fake()->randomElement(ArabicContent::EXPERT_NOTES),
+            ],
+            'sort_order' => (int) $article->blocks()->max('sort_order') + 1,
+        ]);
     }
 
     /**
@@ -559,31 +623,47 @@ class DemoContentSeeder extends Seeder
     }
 
     /**
-     * The homepage as designed: one active layout, thirteen ordered sections.
+     * The homepage as designed: one active layout, nineteen ordered sections.
      *
      * `source` decides who fills each one — manual (an editor pinned content),
      * auto (a query in `config`), or mixed (pinned first, query fills the rest).
      */
     private function seedHomepage(): void
     {
+        // Manual sections are meaningless without picks: an empty big_story makes
+        // the composer look broken rather than unconfigured.
+        $picks = Article::query()
+            ->published()
+            ->whereNotNull('hero_media_id')
+            ->orderByDesc('published_at')
+            ->limit(12)
+            ->pluck('id')
+            ->all();
+
         $layout = HomepageLayout::firstOrCreate(
             ['name' => 'التخطيط الافتراضي'],
             ['is_active' => true, 'starts_at' => null, 'ends_at' => null],
         );
 
         $sections = [
-            ['type' => 'big_story', 'title' => 'القصة الكبرى', 'source' => 'manual', 'config' => ['limit' => 1, 'article_ids' => []]],
-            ['type' => 'leads', 'title' => 'الأبرز', 'source' => 'mixed', 'config' => ['limit' => 4, 'article_ids' => []]],
-            ['type' => 'tiles', 'title' => 'مختارات', 'source' => 'auto', 'config' => ['limit' => 6, 'only_featured' => true]],
-            ['type' => 'saudi', 'title' => 'السعودية والأسواق', 'source' => 'auto', 'config' => ['limit' => 5, 'category_slug' => 'saudi']],
-            ['type' => 'markets', 'title' => 'الأسواق', 'source' => 'auto', 'config' => ['limit' => 4, 'category_slug' => 'saudi', 'topic_slug' => null]],
-            ['type' => 'business', 'title' => 'الأعمال والشركات', 'source' => 'auto', 'config' => ['limit' => 5, 'category_slug' => 'business']],
-            ['type' => 'opportunities', 'title' => 'فرص', 'source' => 'auto', 'config' => ['limit' => 4, 'potential' => 'high']],
-            ['type' => 'intelligence', 'title' => 'رصد وتحليل', 'source' => 'auto', 'config' => ['limit' => 4, 'content_type' => 'analysis']],
-            ['type' => 'insights', 'title' => 'رؤى وفرص', 'source' => 'auto', 'config' => ['limit' => 5, 'category_slug' => 'insights']],
-            ['type' => 'stories', 'title' => 'قصص نجاح', 'source' => 'auto', 'config' => ['limit' => 4, 'category_slug' => 'stories']],
-            ['type' => 'video', 'title' => 'مرئيات', 'source' => 'manual', 'config' => ['limit' => 3, 'article_ids' => []]],
-            ['type' => 'issue', 'title' => 'ملف العدد', 'source' => 'manual', 'config' => ['limit' => 6, 'article_ids' => []]],
+            ['type' => 'big_story', 'title' => 'القصة الكبرى', 'source' => 'manual', 'config' => ['limit' => 1, 'article_ids' => array_slice($picks, 0, 1)]],
+            ['type' => 'leads', 'title' => 'الأبرز', 'source' => 'mixed', 'config' => ['limit' => 3, 'article_ids' => array_slice($picks, 1, 2)]],
+            ['type' => 'tiles', 'title' => 'استكشف مسار', 'source' => 'auto', 'config' => ['limit' => 6, 'only_featured' => true]],
+            ['type' => 'saudi', 'title' => 'السعودية', 'source' => 'auto', 'config' => ['limit' => 6, 'category_slug' => 'saudi']],
+            ['type' => 'markets', 'title' => 'الأسواق', 'source' => 'auto', 'config' => ['limit' => 5]],
+            ['type' => 'business', 'title' => 'الأعمال والشركات', 'source' => 'auto', 'config' => ['limit' => 3, 'category_slug' => 'business']],
+            ['type' => 'opportunities', 'title' => 'فرص', 'source' => 'auto', 'config' => ['limit' => 6]],
+            ['type' => 'intelligence', 'title' => 'مسار الاستخباري', 'source' => 'auto', 'config' => ['limit' => 4, 'content_type' => 'analysis']],
+            ['type' => 'insights', 'title' => 'رؤى وتحليلات', 'source' => 'auto', 'config' => ['limit' => 4, 'category_slug' => 'insights']],
+            ['type' => 'stories', 'title' => 'قصص نجاح', 'source' => 'auto', 'config' => ['limit' => 5, 'category_slug' => 'stories']],
+            ['type' => 'most_read', 'title' => 'الأكثر قراءة', 'source' => 'auto', 'config' => ['limit' => 10]],
+            ['type' => 'editors_picks', 'title' => 'اختيارات المحرر', 'source' => 'auto', 'config' => ['limit' => 5]],
+            ['type' => 'video', 'title' => 'مسار مرئي', 'source' => 'mixed', 'config' => ['limit' => 6, 'article_ids' => array_slice($picks, 3, 3)]],
+            ['type' => 'podcast', 'title' => 'بودكاست', 'source' => 'auto', 'config' => ['limit' => 5, 'content_type' => 'interview']],
+            ['type' => 'reports', 'title' => 'تقارير', 'source' => 'auto', 'config' => ['limit' => 5, 'content_type' => 'report']],
+            ['type' => 'data', 'title' => 'بيانات', 'source' => 'auto', 'config' => ['limit' => 5, 'content_type' => 'explainer']],
+            ['type' => 'issue', 'title' => 'عدد مسار 001', 'source' => 'manual', 'config' => ['limit' => 6, 'article_ids' => array_slice($picks, 6, 6)]],
+            ['type' => 'companies', 'title' => 'شركات في الأخبار', 'source' => 'auto', 'config' => ['limit' => 8]],
             ['type' => 'newsletter', 'title' => 'النشرة البريدية', 'source' => 'manual', 'config' => ['variant' => 'inline']],
         ];
 
