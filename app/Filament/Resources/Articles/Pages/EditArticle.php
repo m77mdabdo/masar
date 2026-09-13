@@ -6,9 +6,11 @@ namespace App\Filament\Resources\Articles\Pages;
 
 use App\Actions\Articles\CreateArticleRevision;
 use App\Actions\Articles\EvaluatePublishGate;
+use App\Actions\Articles\SyncArticleBlocks;
 use App\Actions\Articles\SyncArticleEntities;
 use App\Actions\Articles\SyncArticleHeroMedia;
 use App\Actions\Articles\SyncArticleTopics;
+use App\Actions\Articles\UpdateGateFailuresCount;
 use App\Filament\Resources\Articles\ArticleResource;
 use App\Filament\Resources\Articles\Support\ArticleTransitionActions;
 use App\Filament\Resources\Articles\Support\GateTabMap;
@@ -50,6 +52,11 @@ class EditArticle extends EditRecord
         /** @var Article $article */
         $article = $this->getRecord();
 
+        // The Builder wants an array; `blocks` is a relation. Lifted in on fill
+        // and written back by its Action on save — without this the body tab
+        // loads empty and silently discards whatever an editor types into it.
+        $data['blocks'] = SyncArticleBlocks::toFormState($article);
+
         $data['topic_ids'] = $article->topics()->pluck('topics.id')->all();
         $data['entities'] = [];
 
@@ -69,9 +76,10 @@ class EditArticle extends EditRecord
         $this->deferred = [
             'topic_ids' => $data['topic_ids'] ?? [],
             'entities' => $data['entities'] ?? [],
+            'blocks' => $data['blocks'] ?? [],
         ];
 
-        unset($data['topic_ids'], $data['entities']);
+        unset($data['topic_ids'], $data['entities'], $data['blocks']);
 
         return $data;
     }
@@ -88,11 +96,16 @@ class EditArticle extends EditRecord
         $article = $this->getRecord();
 
         app(SyncArticleHeroMedia::class)($article);
+        app(SyncArticleBlocks::class)($article, $this->deferred['blocks'] ?? []);
 
         app(SyncArticleEntities::class)($article, self::flattenEntities($this->deferred['entities'] ?? []));
         app(SyncArticleTopics::class)($article, array_map('intval', $this->deferred['topic_ids'] ?? []));
 
         $article->forceFill(['updated_content_at' => now()])->save();
+
+        // Summary, sources and hero all live on this form, so every save can
+        // change the gate result.
+        app(UpdateGateFailuresCount::class)($article);
     }
 
     /**

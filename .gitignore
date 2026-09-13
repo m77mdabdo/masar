@@ -25,3 +25,27 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Media does not live in the repository. CLAUDE.md §5 says a photograph the
+# site can use is a Media Library record on object storage, not a file on disk,
+# and the same is true of video: a 4K master is a master, not something a
+# browser should ever download. `public/images/` holds web-delivery renditions
+# only — named `<id>-web-<width>x<height>.mp4` so the name says what the file
+# is — and the masters they came from sit in storage, untracked.
+/storage/app/video-masters
+/storage/app/seed-video
+
+# Master containers and master-shaped names, wherever they land. A rendition is
+# never called any of these, so nothing shippable matches.
+*.mov
+*.mkv
+*.avi
+*.mxf
+*-uhd_*.mp4
+*_3840_2160_*.mp4
+*_2880_1440_*.mp4
+*_2160p*.mp4
+*-master.mp4
+
+# There is no size rule in gitignore, so the size limit is a test:
+# tests/Feature/RepositoryWeightTest.php fails if any tracked file passes it.

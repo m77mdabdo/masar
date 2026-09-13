@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Actions\Articles\UpdateGateFailuresCount;
 use App\Models\Article;
 use App\Models\User;
 use Database\Seeders\RoleSeeder;
@@ -56,6 +57,14 @@ function publishableArticle(array $attributes = []): Article
     if ($attributes !== []) {
         $article->forceFill($attributes)->save();
     }
+
+    $article = $article->fresh();
+
+    // Every real save path evaluates the gate, so the fixture does too —
+    // otherwise gate_failures_count stays NULL ("never evaluated") and the
+    // article is invisible to the blocked queue, which is correct behaviour but
+    // not what a test arranging a blocked article means.
+    app(UpdateGateFailuresCount::class)($article);
 
     return $article->fresh();
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Articles\Schemas;
 
+use App\Enums\ArticleSection;
 use Filament\Forms\Components\Builder\Block;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
@@ -45,6 +46,25 @@ class ArticleBlocks
     }
 
     /**
+     * Which of the four questions this block answers.
+     *
+     * A property of the block rather than a group the editor drags blocks into:
+     * reordering the body then cannot silently move a paragraph from "what
+     * happened" to "why it matters". Leaving it empty is a real choice — an
+     * opinion piece renders as one stream, and the four questions are not
+     * imposed on writing that does not take that shape.
+     */
+    private static function sectionField(): Select
+    {
+        return Select::make('section')
+            ->label('القسم')
+            ->options(ArticleSection::options())
+            ->placeholder('بلا قسم — يظهر في المتن العام')
+            ->native(false)
+            ->columnSpanFull();
+    }
+
+    /**
      * A short, content-derived preview for the collapsed state.
      */
     private static function preview(?string $text, string $fallback, int $length = 55): string
@@ -60,6 +80,7 @@ class ArticleBlocks
             ->label('فقرة')
             ->icon('heroicon-o-bars-3-bottom-right')
             ->schema([
+                self::sectionField(),
                 Textarea::make('text')->label('النص')->rows(5)->required(),
             ])
             ->label(fn (?array $state): string => self::preview($state['text'] ?? null, 'فقرة'));
@@ -71,6 +92,7 @@ class ArticleBlocks
             ->label('عنوان فرعي')
             ->icon('heroicon-o-hashtag')
             ->schema([
+                self::sectionField(),
                 Select::make('level')->label('المستوى')->options([2 => 'H2', 3 => 'H3', 4 => 'H4'])->default(2)->required(),
                 TextInput::make('text')->label('النص')->required(),
             ])
@@ -84,6 +106,7 @@ class ArticleBlocks
             ->label('صورة')
             ->icon('heroicon-o-photo')
             ->schema([
+                self::sectionField(),
                 FileUpload::make('path')
                     ->label('الصورة')
                     ->image()
@@ -107,6 +130,7 @@ class ArticleBlocks
             ->label('اقتباس')
             ->icon('heroicon-o-chat-bubble-bottom-center-text')
             ->schema([
+                self::sectionField(),
                 Textarea::make('text')->label('نص الاقتباس')->rows(3)->required(),
                 TextInput::make('attribution')->label('القائل')
                     ->helperText('شخص حقيقي وافق على النشر. لا تنسب اقتباسًا لم يُقل.'),
@@ -121,6 +145,7 @@ class ArticleBlocks
             ->label('اقتباس بارز')
             ->icon('heroicon-o-sparkles')
             ->schema([
+                self::sectionField(),
                 Textarea::make('text')->label('النص')->rows(2)->required(),
             ])
             ->label(fn (?array $state): string => 'بارز · '.self::preview($state['text'] ?? null, '—', 40));
@@ -132,6 +157,7 @@ class ArticleBlocks
             ->label('أرقام')
             ->icon('heroicon-o-calculator')
             ->schema([
+                self::sectionField(),
                 Repeater::make('items')
                     ->label('الأرقام')
                     ->schema([
@@ -151,6 +177,7 @@ class ArticleBlocks
             ->label('جدول')
             ->icon('heroicon-o-table-cells')
             ->schema([
+                self::sectionField(),
                 TextInput::make('caption')->label('عنوان الجدول'),
                 Textarea::make('csv')->label('البيانات (CSV)')->rows(6)->required()
                     ->helperText('صف لكل سطر، والأعمدة مفصولة بفاصلة.')
@@ -165,6 +192,7 @@ class ArticleBlocks
             ->label('تضمين')
             ->icon('heroicon-o-code-bracket')
             ->schema([
+                self::sectionField(),
                 TextInput::make('url')->label('الرابط')->url()->required()
                     ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
                 TextInput::make('caption')->label('التعليق'),
@@ -178,6 +206,7 @@ class ArticleBlocks
             ->label('فيديو')
             ->icon('heroicon-o-play-circle')
             ->schema([
+                self::sectionField(),
                 TextInput::make('url')->label('الرابط')->url()->required()
                     ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
                 TextInput::make('title')->label('العنوان'),
@@ -193,6 +222,7 @@ class ArticleBlocks
             ->label('تنبيه')
             ->icon('heroicon-o-information-circle')
             ->schema([
+                self::sectionField(),
                 Select::make('tone')->label('النبرة')->options([
                     'insight' => 'رؤية',
                     'warning' => 'تحذير',
@@ -209,6 +239,7 @@ class ArticleBlocks
             ->label('فرصة')
             ->icon('heroicon-o-flag')
             ->schema([
+                self::sectionField(),
                 Textarea::make('text')->label('النص')->rows(3)->required(),
                 TextInput::make('cta_label')->label('نص الزر'),
                 TextInput::make('cta_url')->label('رابط الزر')->url()
@@ -223,6 +254,7 @@ class ArticleBlocks
             ->label('شرح')
             ->icon('heroicon-o-academic-cap')
             ->schema([
+                self::sectionField(),
                 TextInput::make('term')->label('المصطلح')->required(),
                 Textarea::make('text')->label('الشرح')->rows(3)->required(),
             ])
@@ -235,6 +267,7 @@ class ArticleBlocks
             ->label('فاصل')
             ->icon('heroicon-o-minus')
             ->schema([
+                self::sectionField(),
                 Toggle::make('spacious')->label('مسافة إضافية')->default(false),
             ])
             ->label('فاصل');

@@ -1,0 +1,72 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Business — MASAR</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="masar.css">
+<link rel="stylesheet" href="prototype-images.css">
+<style>
+.chero{position:relative;overflow:hidden;min-height:280px;display:flex;flex-direction:column;justify-content:flex-end;padding:34px;color:#fff;margin:22px 0 0}
+.chero .ov{position:absolute;inset:0;background:linear-gradient(72deg,rgba(6,18,12,.95) 24%,rgba(6,18,12,.5) 70%,rgba(6,18,12,.1) 100%);z-index:0}
+.chero h1{font-family:"Playfair Display",serif;font-size:50px;line-height:1.04}
+.chero p{font-size:15px;color:#C4D2C9;max-width:52ch;margin:12px 0 0}
+.subnav{display:flex;gap:8px;flex-wrap:wrap;padding:20px 0;border-bottom:1px solid var(--line)}
+.lead{display:grid;grid-template-columns:1.3fr .7fr;gap:30px;margin:28px 0 0;align-items:start}
+.feat{position:relative;overflow:hidden;min-height:400px;display:flex;flex-direction:column;justify-content:flex-end;padding:28px;color:#fff}
+.feat .ov{position:absolute;inset:0;background:linear-gradient(0deg,rgba(6,18,12,.95) 12%,rgba(6,18,12,.08) 74%);z-index:0}
+.feat h3{font-family:"Playfair Display",serif;font-size:32px;line-height:1.16;margin:12px 0 10px;max-width:20ch}
+.feat p{font-size:13.5px;color:#BCCCC2;max-width:46ch;line-height:1.7}
+.lrow{display:grid;grid-template-columns:84px 1fr;gap:14px;padding:14px 0;border-bottom:1px solid var(--line-2);align-items:center}
+.lrow:last-child{border-bottom:0}
+.lrow .th{aspect-ratio:1}
+.lrow h5{font-size:14px;line-height:1.5;font-weight:600;margin-top:5px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:16px}
+.ac{border:1px solid var(--line);background:#fff;display:flex;flex-direction:column}
+.ac .img{aspect-ratio:16/9}
+.ac .in{padding:14px 15px 16px;display:flex;flex-direction:column;flex:1}
+.ac h4{font-family:"Playfair Display",serif;font-size:18px;line-height:1.3;margin:8px 0}
+.ac p{font-size:12.5px;color:var(--ink-2);line-height:1.65;margin:0 0 12px}
+.ac .ft{display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:10px;border-top:1px solid var(--line-2);font-size:11px;color:var(--ink-3)}
+@media(max-width:1000px){.lead,.g3{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.chero h1{font-size:32px}.g3{grid-template-columns:1fr}}
+</style></head><body>
+<!--HEADER-->
+<div class="wrap">
+<section class="chero ph img-riyadh-kafd"><div class="ov"></div>
+  <span class="eyebrow eyebrow-mint">Business</span>
+  <h1 style="margin-top:10px">Companies, deals<br>and the industries behind them.</h1>
+  <p>Who is expanding, who is consolidating, and what the numbers say about where each sector is heading.</p>
+</section>
+<nav class="subnav"><span class="pill on">All</span><span class="pill">Companies</span><span class="pill">Deals</span><span class="pill">Industry</span><span class="pill">Leadership</span><span class="pill">Governance</span><span class="pill">Logistics</span></nav>
+
+<section class="lead">
+  <a class="feat ph img-refinery-blue"><div class="ov"></div>
+    <span class="chip chip-dark" style="align-self:flex-start">Energy</span>
+    <h3>Inside the petrochemical expansion nobody is talking about</h3>
+    <p>Capacity is being added quietly across the Gulf. The real question is who buys the output, and at what margin.</p>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px">
+      <span style="font-size:11.5px;color:#A9BCB0">6 min read</span>
+      <span class="arrow arrow-lg" style="background:#fff;color:var(--g-900);border:0">→</span></div></a>
+  <div>
+    <a class="lrow"><div class="th ph img-boardroom"></div><div><span class="cat">Governance</span><h5>What family businesses get wrong about succession</h5></div></a>
+    <a class="lrow"><div class="th ph img-refinery-aerial"></div><div><span class="cat">Logistics</span><h5>Ports, rail and the cost of doing business</h5></div></a>
+    <a class="lrow"><div class="th ph img-riyadh-kafd-2"></div><div><span class="cat">Deals</span><h5>A merger in logistics: who actually wins</h5></div></a>
+    <a class="lrow"><div class="th ph img-office-window"></div><div><span class="cat">Leadership</span><h5>The hiring reform that changes middle management</h5></div></a>
+    <a class="lrow"><div class="th ph img-heritage"></div><div><span class="cat">Industry</span><h5>How the craft economy is being formalised</h5></div></a>
+  </div>
+</section>
+
+<div style="display:flex;align-items:center;gap:18px;margin:46px 0 4px"><h2 style="font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase">Latest in business</h2><i style="flex:1;height:1px;background:var(--line)"></i><a style="font-size:12px;color:var(--ink-3)">View all →</a></div>
+<section class="g3">
+  <article class="ac"><a class="img ph img-refinery-sunset"></a><div class="in"><div style="display:flex;gap:9px;align-items:center"><span class="chip">Energy</span><span class="meta">5 min</span></div>
+    <h4>Refining margins and the new arithmetic</h4><p>Why the spread matters more than the barrel price this quarter.</p>
+    <div class="ft"><b>Youssef Nasser</b><span class="tnum">Oct 19</span><span class="arrow arrow-dark" style="margin-left:auto;width:28px;height:28px">→</span></div></div></article>
+  <article class="ac"><a class="img ph img-waterfront-park"></a><div class="in"><div style="display:flex;gap:9px;align-items:center"><span class="chip">Real estate</span><span class="meta">6 min</span></div>
+    <h4>Coastal developments enter the delivery phase</h4><p>The announcements are done. Now the contractors decide the timeline.</p>
+    <div class="ft"><b>Lama Alharbi</b><span class="tnum">Oct 18</span><span class="arrow arrow-dark" style="margin-left:auto;width:28px;height:28px">→</span></div></div></article>
+  <article class="ac"><a class="img ph img-tower-lights"></a><div class="in"><div style="display:flex;gap:9px;align-items:center"><span class="chip">Companies</span><span class="meta">7 min</span></div>
+    <h4>From one warehouse to a regional network</h4><p>How a logistics operator turned a bottleneck into a business model.</p>
+    <div class="ft"><b>Majed Al-Otaibi</b><span class="tnum">Oct 17</span><span class="arrow arrow-dark" style="margin-left:auto;width:28px;height:28px">→</span></div></div></article>
+</section>
+</div>
+<!--BAND--><!--FOOTER-->
+</body></html>

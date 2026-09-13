@@ -231,6 +231,12 @@ class ArticleForm
             ->badge(fn (Get $get): ?string => blank($get('why_it_matters')) ? '!' : null)
             ->badgeColor('danger')
             ->schema([
+                Textarea::make('what_happened')
+                    ->label('ما الذي حدث؟')
+                    ->rows(4)
+                    ->helperText('الواقعة نفسها في فقرة واحدة: ماذا حدث، ومتى، ومن أعلنه.')
+                    ->columnSpanFull(),
+
                 Textarea::make('why_it_matters')
                     ->label('لماذا يهم هذا؟')
                     ->required()

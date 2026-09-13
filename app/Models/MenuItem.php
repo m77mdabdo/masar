@@ -28,6 +28,8 @@ class MenuItem extends Model
         'is_active',
         'show_desktop',
         'show_mobile',
+        'is_mega',
+        'column_group',
         'starts_at',
         'ends_at',
     ];
@@ -40,6 +42,7 @@ class MenuItem extends Model
             'is_active' => 'boolean',
             'show_desktop' => 'boolean',
             'show_mobile' => 'boolean',
+            'is_mega' => 'boolean',
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
         ];

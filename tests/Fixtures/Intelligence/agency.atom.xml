@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>وكالة أنباء</title>
+  <entry>
+    <title>تعيين رئيس تنفيذي جديد لشركة مدرجة</title>
+    <link rel="alternate" href="https://agency.test/2026/09/appointment"/>
+    <id>tag:agency.test,2026:appointment-1</id>
+    <published>2026-09-14T06:00:00Z</published>
+    <summary>القرار يسري اعتبارًا من مطلع الشهر المقبل.</summary>
+    <author><name>التحرير</name></author>
+  </entry>
+</feed>

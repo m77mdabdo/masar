@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>About Masar — A clearer path to a brighter tomorrow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="masar.css">
+<link rel="stylesheet" href="prototype-images.css">
+<style>
+.ahero{display:grid;grid-template-columns:1fr 1.05fr;min-height:340px;align-items:stretch}
+.ahero .tx{padding:40px 44px 44px 0;display:flex;flex-direction:column;justify-content:center}
+.ahero h1{font-family:"Playfair Display",serif;font-size:56px;line-height:1.03;margin:14px 0 18px}
+.ahero h1 em{font-style:italic;color:var(--g-600)}
+.ahero p{font-size:14.5px;line-height:1.85;color:var(--ink-2);max-width:46ch;margin-bottom:24px}
+.ahero .img{position:relative}
+.ahero .img .lbl{position:absolute;right:30px;top:50%;transform:translateY(-50%);font-size:11px;letter-spacing:.2em;line-height:2.4;color:#fff;text-align:right}
+.ahero .img .lbl i{display:block;width:44px;height:1px;background:rgba(255,255,255,.5);margin:0 0 14px auto}
+
+.mv{display:grid;grid-template-columns:.85fr 1fr 1fr;gap:0;border-top:1px solid var(--line);background:#fff}
+.mv .pic{position:relative;min-height:290px}
+.mv .pic .tx{position:absolute;left:22px;bottom:24px;color:#fff;font-size:12px;letter-spacing:.18em;line-height:2.1}
+.mv .c{padding:30px 30px;border-left:1px solid var(--line-2)}
+.mv .c h3{font-family:"Playfair Display",serif;font-size:26px;line-height:1.22;margin:10px 0 14px}
+.mv .c p{font-size:13px;line-height:1.8;color:var(--ink-2);margin:0}
+
+.values{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line-2);background:#fff}
+.values div{padding:22px 22px;border-left:1px solid var(--line-2)}
+.values div:first-child{border-left:0}
+.values .ic{font-size:19px;color:var(--g-600);margin-bottom:10px}
+.values b{display:block;font-size:11px;letter-spacing:.09em;text-transform:uppercase;margin-bottom:6px}
+.values p{font-size:11.5px;line-height:1.6;color:var(--ink-3);margin:0}
+
+.impact{background:var(--g-900);color:#fff;position:relative;overflow:hidden;padding:44px 0}
+.impact::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(7,20,13,.98),rgba(20,53,38,.88))}
+.impact .wrap{position:relative;display:grid;grid-template-columns:1fr .9fr 1fr;gap:40px;align-items:center}
+.impact h3{font-family:"Playfair Display",serif;font-size:30px;line-height:1.18}
+.impact h3 em{font-style:italic;color:var(--mint)}
+.impact p{font-size:13px;line-height:1.8;color:#B4C6BB;margin:14px 0 0;max-width:40ch}
+.ig{display:grid;grid-template-columns:1fr 1fr;border:1px solid rgba(255,255,255,.18)}
+.ig div{padding:20px;border-left:1px solid rgba(255,255,255,.14);border-top:1px solid rgba(255,255,255,.14)}
+.ig div:nth-child(-n+2){border-top:0}
+.ig div:nth-child(odd){border-left:0}
+.ig .n{font-family:"Playfair Display",serif;font-size:29px}
+.ig .l{font-size:11px;color:var(--mint-2);margin-top:4px}
+.reach{font-size:13px;letter-spacing:.16em;line-height:2.1;color:#DCE7E0}
+.reach svg{opacity:.28;margin-bottom:12px}
+
+.team{padding:40px 0}
+.team .hd{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px}
+.team h3{font-family:"Playfair Display",serif;font-size:30px;margin:8px 0 10px}
+.team .hd p{font-size:13px;color:var(--ink-2);max-width:52ch;margin:0}
+.tgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.tm .pic{aspect-ratio:3/3.4;position:relative}
+.tm .pic i{position:absolute;right:8px;bottom:8px;width:22px;height:22px;background:rgba(255,255,255,.9);color:var(--g-900);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:10px;font-weight:700}
+.tm b{display:block;font-size:12.5px;margin-top:9px}
+.tm span{font-size:10.5px;color:var(--ink-3)}
+
+@media(max-width:1100px){
+  .ahero,.mv,.impact .wrap{grid-template-columns:1fr}
+  .ahero .tx{padding:26px 0 30px}
+  .values{grid-template-columns:1fr 1fr 1fr}
+  .tgrid{grid-template-columns:repeat(3,1fr)}
+  .mv .c{border-left:0;border-top:1px solid var(--line-2)}
+}
+@media(max-width:640px){
+  .ahero h1{font-size:36px}.values{grid-template-columns:1fr 1fr}
+  .tgrid{grid-template-columns:1fr 1fr}.impact h3{font-size:24px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="wrap">
+  <div>Business. Economy. Markets. Opportunities.</div>
+  <nav><a class="on">About</a><a>Our Team</a><a>Careers</a><a>Contact</a><span>⌕</span>
+    <span class="lang"><b>EN</b> / عربي</span><button class="btn">Subscribe</button></nav>
+</div></div>
+
+<header class="masthead"><div class="wrap">
+  <a class="logo" href="index.html"><span class="lat">MASAR</span><span class="ar">مسار</span></a>
+  <div class="logo-tag">A clearer path to a brighter tomorrow</div>
+  <nav class="mainnav">
+    <a href="saudi-arabia.html">Saudi Arabia</a><a>Economy</a><a>Markets</a><a>Business</a>
+    <a>Startups</a><a>Opportunities</a><a href="insights.html">Insights</a><a>Video</a>
+  </nav>
+  <div class="burger"><i></i><i></i><i></i></div>
+</div></header>
+
+<div class="ticker"><div class="wrap">
+  <div class="tk"><svg viewBox="0 0 32 15"><polyline points="0,11 6,8 12,10 18,4 24,6 32,2" fill="none" stroke="#6FD39D" stroke-width="1.3"/></svg><div><div class="l">Tadawul</div><div class="v tnum">11,234.56</div></div><div class="c up tnum">▲ 1.24%</div></div>
+  <div class="tk"><svg viewBox="0 0 32 15"><polyline points="0,9 7,11 14,6 21,8 32,4" fill="none" stroke="#6FD39D" stroke-width="1.3"/></svg><div><div class="l">S&amp;P 500</div><div class="v tnum">5,487.21</div></div><div class="c up tnum">▲ 0.63%</div></div>
+  <div class="tk"><svg viewBox="0 0 32 15"><polyline points="0,4 7,6 14,5 21,9 32,12" fill="none" stroke="#E98880" stroke-width="1.3"/></svg><div><div class="l">Brent Oil</div><div class="v tnum">82.14</div></div><div class="c down tnum">▼ 0.31%</div></div>
+  <div class="tk"><svg viewBox="0 0 32 15"><polyline points="0,10 7,8 14,9 21,5 32,3" fill="none" stroke="#C9A063" stroke-width="1.3"/></svg><div><div class="l">Gold</div><div class="v tnum">2,328.50</div></div><div class="c up tnum">▲ 0.82%</div></div>
+  <div class="tk"><svg viewBox="0 0 32 15"><polyline points="0,8 16,8 32,8" fill="none" stroke="#8EA398" stroke-width="1.3"/></svg><div><div class="l">USD/SAR</div><div class="v tnum">3.75</div></div><div class="c flat tnum">0.00%</div></div>
+  <div class="pulse">Market Pulse →</div>
+</div></div>
+
+<div class="wrap">
+  <section class="ahero">
+    <div class="tx">
+      <span class="eyebrow">About Masar</span>
+      <h1>A clearer path<br>to a brighter<br><em>tomorrow.</em></h1>
+      <p>Masar is a digital media platform that delivers trusted insights on business, economy, markets and opportunities — with a special focus on Saudi Arabia and the region, and a global perspective on what's next.</p>
+      <a class="btn" style="align-self:flex-start">Our story →</a>
+    </div>
+    <div class="img ph ph img-riyadh-vision" data-ph="Hero photo — licensed image required">
+      <div class="lbl"><i></i>INSIGHTS<br>PEOPLE<br>OPPORTUNITIES<br>A BRIGHTER<br>TOMORROW</div>
+    </div>
+  </section>
+</div>
+
+<div class="wrap">
+  <section class="mv">
+    <div class="pic ph ph img-desert-camels" data-ph="">
+      <div class="tx">ROOTED<br>IN THE REGION.<br>CONNECTED<br>TO THE WORLD.</div>
+    </div>
+    <div class="c">
+      <span class="eyebrow">Our mission</span>
+      <h3>To inform, inspire and unlock opportunities.</h3>
+      <p>We provide clear, reliable and actionable insights that help business leaders, investors, entrepreneurs and curious minds understand what's happening today — and what it means for tomorrow.</p>
+    </div>
+    <div class="c">
+      <span class="eyebrow">Our vision</span>
+      <h3>A more prosperous and connected region.</h3>
+      <p>We envision a future where information leads to understanding, understanding leads to better decisions, and better decisions create a more prosperous Saudi Arabia and a more connected world.</p>
+    </div>
+  </section>
+
+  <section class="values">
+    <div><div class="ic">⛨</div><b>Independent</b><p>We deliver unbiased, fact-based journalism.</p></div>
+    <div><div class="ic">▦</div><b>Insight-driven</b><p>We go beyond the news to explain what it means.</p></div>
+    <div><div class="ic">◍</div><b>People-focused</b><p>We highlight the people shaping change.</p></div>
+    <div><div class="ic">✦</div><b>Opportunity-led</b><p>We connect insights to real opportunities.</p></div>
+    <div><div class="ic">◎</div><b>Global perspective</b><p>We look at the region with a global lens.</p></div>
+  </section>
+</div>
+
+<section class="impact"><div class="wrap">
+  <div>
+    <span class="eyebrow eyebrow-mint">Our impact</span>
+    <h3 style="margin-top:12px">Information today. Opportunities <em>tomorrow.</em></h3>
+    <p>From market trends to investment opportunities, from startup stories to policy analysis, Masar is the trusted source for those who want to stay ahead.</p>
+  </div>
+  <div class="ig">
+    <div><div class="n tnum">1M+</div><div class="l">Monthly readers</div></div>
+    <div><div class="n tnum">50+</div><div class="l">Expert contributors</div></div>
+    <div><div class="n tnum">10+</div><div class="l">Key sectors covered</div></div>
+    <div><div class="n tnum">100+</div><div class="l">In-depth reports</div></div>
+  </div>
+  <div class="reach">
+    <svg viewBox="0 0 220 90" width="100%" aria-hidden="true">
+      <path fill="#9FC2AF" d="M14 30q16-12 32-8t28 2 22-8 24 5 30-3 32 8 34 4v34q-22 6-42 1t-38 5-32-6-28 7-28-4-26 3-22-7z"/>
+      <circle cx="76" cy="48" r="3.5" fill="#7FB69A"/><circle cx="168" cy="56" r="3.5" fill="#7FB69A"/>
+      <path d="M76 48 Q122 20 168 56" stroke="#7FB69A" stroke-width="1" fill="none" opacity=".8"/>
+    </svg>
+    A<br>REGIONAL<br>VOICE<br>WITH A<br>GLOBAL REACH.
+  </div>
+</div></section>
+
+<div class="wrap">
+  <section class="team">
+    <div class="hd">
+      <div>
+        <span class="eyebrow">Meet our team</span>
+        <h3>The people behind Masar.</h3>
+        <p>A diverse team of journalists, analysts and industry experts, united by a shared belief in the power of information to create a better tomorrow.</p>
+      </div>
+      <a class="meta" style="white-space:nowrap">View all team members →</a>
+    </div>
+    <div class="tgrid">
+      <a class="tm"><div class="pic ph ph-person" data-ph=""><i>in</i></div><b>Ahmed Mostafa</b><span>Editor-in-Chief</span></a>
+      <a class="tm"><div class="pic ph ph-person" data-ph=""><i>in</i></div><b>Fatima Al-Youssef</b><span>Managing Editor</span></a>
+      <a class="tm"><div class="pic ph ph-person" data-ph=""><i>in</i></div><b>Khaled Ibrahim</b><span>Head of Research</span></a>
+      <a class="tm"><div class="pic ph ph-person" data-ph=""><i>in</i></div><b>Lama Alharbi</b><span>Business Editor</span></a>
+      <a class="tm"><div class="pic ph ph-person" data-ph=""><i>in</i></div><b>Youssef Nasser</b><span>Markets Analyst</span></a>
+      <a class="tm"><div class="pic ph ph-person" data-ph=""><i>in</i></div><b>Sara Khalid</b><span>Content Editor</span></a>
+    </div>
+  </section>
+</div>
+
+<section class="band"><div class="wrap">
+  <div><span class="eyebrow eyebrow-mint">Join our journey</span><h3 class="serif" style="margin-top:10px">Be part of what's next.</h3><p>Subscribe for the latest insights, stories and opportunities.</p></div>
+  <div><div class="subform"><input placeholder="Your email address"><button class="btn btn-light">Subscribe →</button></div></div>
+  <div class="q serif">“A better informed region<br>builds a brighter tomorrow.”<span>— MASAR</span></div>
+</div></section>
+
+<footer><div class="wrap">
+  <div class="cols">
+    <div><div class="logo" style="margin-bottom:10px"><span class="lat">MASAR</span><span class="ar">مسار</span></div>
+      <p style="margin:0;font-size:12.5px;color:var(--ink-3)">Business. Economy. Markets. Opportunities.</p></div>
+    <div><h6>Explore</h6><div class="two"><div><a href="saudi-arabia.html">Saudi Arabia</a><a>Economy</a><a>Markets</a><a>Business</a><a>Opportunities</a></div><div><a href="insights.html">Insights</a><a>Video</a></div></div></div>
+    <div><h6>Company</h6><a>About</a><a>Our Team</a><a>Careers</a><a>Contact</a></div>
+    <div><h6>Legal</h6><a>Privacy Policy</a><a>Terms of Use</a><a>Cookie Policy</a><a>Editorial Standards</a></div>
+    <div class="say">A global perspective.<br>A regional advantage.<i></i></div>
+  </div>
+  <div class="end"><span class="tnum">© 2026 Masar. All rights reserved.</span><span>EN / عربي &nbsp;·&nbsp; Back to top ↑</span></div>
+</div></footer>
+
+</body>
+</html>

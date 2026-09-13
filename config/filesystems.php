@@ -47,6 +47,37 @@ return [
             'report' => false,
         ],
 
+        /*
+         | Media lives on its own disk so the storage decision is one line, not
+         | a grep. Locally it is a folder under storage/app/public that
+         | `storage:link` exposes; in production MEDIA_DISK=r2 and the same
+         | records resolve to object storage with no code change.
+         */
+        'media' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/media'),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage/media',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
+        // Cloudflare R2 speaks S3. Credentials come from the environment only —
+        // CLAUDE.md §5: no keys in code.
+        'r2' => [
+            'driver' => 's3',
+            'key' => env('R2_ACCESS_KEY_ID'),
+            'secret' => env('R2_SECRET_ACCESS_KEY'),
+            'region' => env('R2_DEFAULT_REGION', 'auto'),
+            'bucket' => env('R2_BUCKET'),
+            'url' => env('R2_URL'),
+            'endpoint' => env('R2_ENDPOINT'),
+            'use_path_style_endpoint' => env('R2_USE_PATH_STYLE_ENDPOINT', false),
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

@@ -134,7 +134,7 @@ it('applies the 2FA middleware to resource routes', function (): void {
 
 it('applies the 2FA middleware to custom pages too', function (): void {
     $route = collect(app('router')->getRoutes())
-        ->first(fn ($r): bool => $r->getName() === 'filament.admin.pages.editorial-pipeline');
+        ->first(fn ($r): bool => $r->getName() === 'filament.admin.pages.pipeline');
 
     expect($route)->not->toBeNull()
         ->and($route->gatherMiddleware())->toContain(EnsurePublishersUseTwoFactor::class);

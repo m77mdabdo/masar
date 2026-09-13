@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Actions\Articles\EvaluatePublishGate;
 use App\Enums\ArticleStatus;
 use App\Enums\ContentType;
+use App\Support\MediaConversions;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -44,6 +45,7 @@ class Article extends Model implements HasMedia
         'slug',
         'summary',
         'body',
+        'what_happened',
         'why_it_matters',
         'business_impact',
         'opportunity',
@@ -66,6 +68,7 @@ class Article extends Model implements HasMedia
         'updated_content_at',
         'fact_checked_at',
         'views_count',
+        'gate_failures_count',
     ];
 
     protected function casts(): array
@@ -81,6 +84,7 @@ class Article extends Model implements HasMedia
             'noindex' => 'boolean',
             'reading_time' => 'integer',
             'views_count' => 'integer',
+            'gate_failures_count' => 'integer',
             'published_at' => 'datetime',
             'scheduled_for' => 'datetime',
             'updated_content_at' => 'datetime',
@@ -136,16 +140,28 @@ class Article extends Model implements HasMedia
         $this->addMediaCollection('hero')
             ->singleFile()
             ->acceptsMimeTypes(config('masar.media.accepted'));
+
+        // Images used inside the body. Separate from `hero` because the hero is
+        // one image the gate asks about and these are many the editor places.
+        $this->addMediaCollection('inline')
+            ->acceptsMimeTypes(config('masar.media.accepted'));
+
+        // Self-hosted video and its poster are two records, not one file the
+        // browser has to open before it can show anything: the poster is a real
+        // image with real conversions, which is what lets <video preload="none">
+        // cost a thumbnail instead of a download.
+        $this->addMediaCollection('video')
+            ->singleFile()
+            ->acceptsMimeTypes(config('masar.media.accepted_video'));
+
+        $this->addMediaCollection('video_poster')
+            ->singleFile()
+            ->acceptsMimeTypes(config('masar.media.accepted'));
     }
 
     public function registerMediaConversions(?Media $media = null): void
     {
-        foreach (config('masar.media.conversions') as $name => $width) {
-            $this->addMediaConversion($name)
-                ->width($width)
-                ->format('webp')
-                ->nonQueued();
-        }
+        MediaConversions::register($this, 'hero', 'inline', 'video_poster');
     }
 
     public function heroMedia(): BelongsTo

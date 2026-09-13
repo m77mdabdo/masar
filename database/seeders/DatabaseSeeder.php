@@ -14,6 +14,14 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             CategorySeeder::class,
             DemoContentSeeder::class,
+
+            // After the demo content: the image library needs the homepage
+            // layout to exist before it can promise that no hero repeats
+            // inside one of its sections.
+            ImageLibrarySeeder::class,
+            VideoLibrarySeeder::class,
+            MarketFiguresSeeder::class,
+            IntelligenceSeeder::class,
         ]);
     }
 }

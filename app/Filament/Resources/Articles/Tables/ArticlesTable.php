@@ -137,33 +137,22 @@ class ArticlesTable
                         ->when($data['until'] ?? null, fn (Builder $q, $d): Builder => $q->whereDate('published_at', '<=', $d))),
 
                 /*
-                 * The queue an editor-in-chief actually works from: everything
-                 * that has been declared finished but cannot go out.
+                 * The queue an editor-in-chief actually works from.
                  *
-                 * The gate is PHP, not SQL, so this narrows in the database to
-                 * the only statuses that can be blocked and then filters in
-                 * memory. That is a deliberate trade — see the task report.
+                 * Pure SQL against the denormalised count. NULL is excluded on
+                 * purpose: it means "never evaluated", not "blocked", and
+                 * masar:recount is what turns NULLs into real numbers.
                  */
                 Filter::make('blocked_by_gate')
                     ->label('محجوبة ببوابة النشر')
                     ->toggle()
                     ->query(fn (Builder $query): Builder => $query
+                        ->where('gate_failures_count', '>', 0)
                         ->whereIn('status', [
                             ArticleStatus::Ready->value,
                             ArticleStatus::Scheduled->value,
                             ArticleStatus::Seo->value,
-                        ])
-                        ->whereIn('id', Article::query()
-                            ->whereIn('status', [
-                                ArticleStatus::Ready->value,
-                                ArticleStatus::Scheduled->value,
-                                ArticleStatus::Seo->value,
-                            ])
-                            ->with('sources')
-                            ->get()
-                            ->filter(fn (Article $a): bool => $a->isPublishable() !== [])
-                            ->pluck('id')
-                            ->all() ?: [0])),
+                        ])),
             ])
             ->recordActions([
                 EditAction::make()->label('تحرير'),

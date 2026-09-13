@@ -35,6 +35,8 @@ class EditorialPipeline extends Page
 
     protected static ?int $navigationSort = 2;
 
+    protected static ?string $slug = 'pipeline';
+
     protected string $view = 'filament.pages.editorial-pipeline';
 
     /**

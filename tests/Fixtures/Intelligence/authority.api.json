@@ -1,0 +1,20 @@
+{
+  "status": "ok",
+  "data": {
+    "results": [
+      {
+        "id": "AUTH-991",
+        "headline": "الهيئة تعلن نتائج الربع الثالث للسوق الموازية",
+        "links": { "self": "https://authority.test/releases/991" },
+        "date": "2026-09-14T05:00:00Z",
+        "abstract": "ارتفاع في أحجام التداول مقارنة بالفترة المماثلة."
+      },
+      {
+        "id": "AUTH-992",
+        "headline": "",
+        "links": { "self": "https://authority.test/releases/992" },
+        "date": "2026-09-14T05:30:00Z"
+      }
+    ]
+  }
+}
