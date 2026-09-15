@@ -1,5 +1,5 @@
 @props(['media' => null, 'eyebrow' => null, 'title', 'body' => null, 'href' => null, 'cta' => null, 'wordmark' => false])
-{{-- contrast-safe: renders on the card scrim, which guarantees a g-950 ground. Mint is 2.11:1 on cream and 7.78:1 on g-950. --}}
+{{-- contrast-safe: renders on the card scrim, which guarantees a g-950 ground. Mint is 2.07:1 on cream and 7.63:1 on g-950. --}}
 {{-- The rail's dark photo card — used for "explore" and for the sponsored slot.
      Mint and cream are correct foregrounds here because the scrim guarantees a
      g-950 ground under them whatever the photograph is. --}}

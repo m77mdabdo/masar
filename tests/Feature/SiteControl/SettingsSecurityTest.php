@@ -86,7 +86,7 @@ it('knows which keys are secret', function (): void {
     $settings = new Settings;
 
     expect($settings->isEncrypted('integrations.newsletter_key'))->toBeTrue()
-        ->and($settings->isEncrypted('integrations.analytics_id'))->toBeTrue()
+        ->and($settings->isEncrypted('seo.verification_tags'))->toBeTrue()
         ->and($settings->isEncrypted('identity.site_name'))->toBeFalse();
 });
 

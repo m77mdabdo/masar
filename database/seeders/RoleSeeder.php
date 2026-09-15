@@ -36,6 +36,7 @@ class RoleSeeder extends Seeder
         'users.manage',
         'roles.manage',
         'intelligence.configure',
+        'intelligence.triage',
         'audit.view',
     ];
 
@@ -50,13 +51,14 @@ class RoleSeeder extends Seeder
             'article.view', 'article.create', 'article.update.own', 'article.update.any',
             'article.delete', 'article.transition', 'article.publish', 'article.factcheck',
             'article.seo', 'media.manage', 'navigation.manage', 'homepage.manage',
-            'settings.manage', 'users.manage', 'intelligence.configure', 'audit.view',
+            'settings.manage', 'users.manage', 'intelligence.configure',
+            'intelligence.triage', 'audit.view',
         ],
 
         'editor' => [
             'article.view', 'article.create', 'article.update.own', 'article.update.any',
             'article.transition', 'article.publish', 'article.seo', 'media.manage',
-            'homepage.manage', 'audit.view',
+            'homepage.manage', 'intelligence.triage', 'audit.view',
         ],
 
         'writer' => [
@@ -66,6 +68,7 @@ class RoleSeeder extends Seeder
 
         'researcher' => [
             'article.view', 'article.create', 'article.update.own', 'article.transition',
+            'intelligence.triage',
         ],
 
         'fact_checker' => [

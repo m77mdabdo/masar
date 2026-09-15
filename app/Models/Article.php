@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Actions\Articles\EvaluatePublishGate;
 use App\Enums\ArticleStatus;
 use App\Enums\ContentType;
+use App\Exceptions\IllustrativeMediaRejected;
 use App\Support\MediaConversions;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,7 +22,7 @@ use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\MediaLibrary\MediaCollections\Models\Media as SpatieMedia;
 
 class Article extends Model implements HasMedia
 {
@@ -99,6 +100,25 @@ class Article extends Model implements HasMedia
         static::creating(function (self $article): void {
             $article->translation_group_id ??= (string) Str::uuid();
         });
+
+        // The hero is the image a reader takes as a photograph of the story, so
+        // an illustrative one never becomes it. Guarded here rather than only in
+        // the admin form, because `hero_media_id` is written by several paths —
+        // the media sync action, the library seeder, a future import — and a
+        // rule enforced at one entry point is enforced at none.
+        static::saving(function (self $article): void {
+            if (! $article->isDirty('hero_media_id') || $article->hero_media_id === null) {
+                return;
+            }
+
+            $illustrative = Media::query()
+                ->whereKey($article->hero_media_id)
+                ->value('is_illustrative');
+
+            if ((bool) $illustrative) {
+                throw IllustrativeMediaRejected::forArticle();
+            }
+        });
     }
 
     // ------------------------------------------------------------------
@@ -159,7 +179,7 @@ class Article extends Model implements HasMedia
             ->acceptsMimeTypes(config('masar.media.accepted'));
     }
 
-    public function registerMediaConversions(?Media $media = null): void
+    public function registerMediaConversions(?SpatieMedia $media = null): void
     {
         MediaConversions::register($this, 'hero', 'inline', 'video_poster');
     }

@@ -5,11 +5,14 @@ declare(strict_types=1);
 use App\Actions\Homepage\ActivateLayout;
 use App\Actions\Homepage\DuplicateLayout;
 use App\Enums\ArticleStatus;
+use App\Filament\Pages\HomepageComposer;
 use App\Models\Article;
 use App\Models\Category;
 use App\Models\HomepageLayout;
 use App\Queries\ComposeHomepage;
 use Illuminate\Support\Collection;
+
+use function Pest\Livewire\livewire;
 
 function layoutWith(array $sections): HomepageLayout
 {
@@ -194,4 +197,55 @@ it('orders sections by sort order', function (): void {
     $page = app(ComposeHomepage::class)($layout->refresh(), 'ar');
 
     expect($page->pluck('type')->all())->toBe(['stories', 'tiles', 'leads']);
+});
+
+it('moves a section from the keyboard, not only by dragging', function (): void {
+    $layout = HomepageLayout::factory()->create(['is_active' => true]);
+
+    foreach (['big_story', 'tiles', 'leads'] as $i => $type) {
+        $layout->sections()->create([
+            'type' => $type, 'title' => ['ar' => $type], 'source' => 'auto',
+            'config' => ['limit' => 3], 'sort_order' => $i + 1, 'is_visible' => true,
+        ]);
+    }
+
+    $leads = $layout->sections()->where('type', 'leads')->first();
+
+    $this->actingAs(admin());
+
+    // HTML5 drag-and-drop cannot be driven from a keyboard, so the page had no
+    // reorder an editor without a pointer could reach at all.
+    livewire(HomepageComposer::class)->call('moveSection', $leads->id, -1);
+
+    expect($layout->sections()->orderBy('sort_order')->pluck('type')->all())
+        ->toBe(['big_story', 'leads', 'tiles']);
+});
+
+it('refuses to move a section past either end or out of its layout', function (): void {
+    $layout = HomepageLayout::factory()->create(['is_active' => true]);
+    $other = HomepageLayout::factory()->create(['is_active' => false]);
+
+    $first = $layout->sections()->create([
+        'type' => 'big_story', 'title' => ['ar' => 'أ'], 'source' => 'auto',
+        'config' => ['limit' => 1], 'sort_order' => 1, 'is_visible' => true,
+    ]);
+    $layout->sections()->create([
+        'type' => 'tiles', 'title' => ['ar' => 'ب'], 'source' => 'auto',
+        'config' => ['limit' => 6], 'sort_order' => 2, 'is_visible' => true,
+    ]);
+    $foreign = $other->sections()->create([
+        'type' => 'leads', 'title' => ['ar' => 'ج'], 'source' => 'auto',
+        'config' => ['limit' => 3], 'sort_order' => 1, 'is_visible' => true,
+    ]);
+
+    $this->actingAs(admin());
+
+    livewire(HomepageComposer::class)
+        ->call('moveSection', $first->id, -1)        // already first
+        ->call('moveSection', $first->id, 5)         // not a direction
+        ->call('moveSection', $foreign->id, 1);      // someone else's layout
+
+    expect($layout->sections()->orderBy('sort_order')->pluck('type')->all())
+        ->toBe(['big_story', 'tiles'])
+        ->and($foreign->fresh()->sort_order)->toBe(1);
 });

@@ -1,5 +1,5 @@
 @props(['article', 'tone' => 'light'])
-{{-- contrast-safe: mint only under tone=dark, which the hero scrim backs. Mint is 2.11:1 on cream and 7.78:1 on g-950. --}}
+{{-- contrast-safe: mint only under tone=dark, which the hero scrim backs. Mint is 2.07:1 on cream and 7.63:1 on g-950. --}}
 @if ($article->fact_checked_at)
     {{-- On a photograph the g-600 fill has no reliable contrast, so the dark
          variant uses the mint accent on the scrim, which the hero guarantees. --}}

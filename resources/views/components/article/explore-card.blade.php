@@ -1,6 +1,6 @@
 @props(['category'])
-{{-- contrast-safe: renders on g-900. Mint is 2.11:1 on cream and 7.78:1 on g-950. --}}
-{{-- Renders on g-900. Mint is correct as a foreground here (7.78:1) and wrong
+{{-- contrast-safe: renders on g-900. Mint is 2.07:1 on cream and 7.63:1 on g-950. --}}
+{{-- Renders on g-900. Mint is correct as a foreground here (7.63:1) and wrong
      on cream (2.11) — which is why this is its own file: the contrast test
      allows the token by component, not by page. --}}
 <a href="{{ app(App\Support\EntityUrl::class)->for($category) }}"

@@ -9,7 +9,7 @@
 
         @if ($lead)
             <section class="mb-12">
-                <x-article.card-overlay :article="$lead" size="lg" :level="2" />
+                <x-article.card-overlay :article="$lead" size="lg" :level="2" :eager="true" />
             </section>
         @endif
 

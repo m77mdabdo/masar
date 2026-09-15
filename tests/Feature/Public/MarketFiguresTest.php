@@ -125,3 +125,95 @@ it('never claims a precision the chart cannot support', function (): void {
     expect($markup)->not->toContain('<text')
         ->and($markup)->toContain('aria-hidden="true"');
 });
+
+/**
+ * The sparkline's failure mode is silence: a chart drawn from points nobody
+ * entered looks exactly like a chart drawn from points somebody did. So the
+ * mechanism is tested, not only the picture.
+ */
+it('carries each ticker row its own shape points', function (): void {
+    writeFigures([
+        'market.as_of' => '2026-09-13 16:00',
+        'market.ticker' => [
+            ['label' => 'تاسي', 'value' => '11,234.56', 'change' => 1.24, 'series' => '41,36,47,43,55,51,63'],
+        ],
+    ]);
+
+    expect(figures()->ticker()->first()['series'])->toBe([41.0, 36.0, 47.0, 43.0, 55.0, 51.0, 63.0]);
+});
+
+it('gives a row with no points an empty series rather than inventing one', function (): void {
+    writeFigures([
+        'market.as_of' => '2026-09-13 16:00',
+        'market.ticker' => [
+            ['label' => 'تاسي', 'value' => '11,234.56', 'change' => 1.24],
+            ['label' => 'برنت', 'value' => '82.14', 'change' => -0.31, 'series' => ''],
+            // One point is not a line.
+            ['label' => 'الذهب', 'value' => '2,328.50', 'change' => 0.82, 'series' => '44'],
+        ],
+    ]);
+
+    expect(figures()->ticker()->pluck('series')->all())->toBe([[], [], []]);
+});
+
+it('renders no chart for a row that has no points', function (): void {
+    writeFigures([
+        'market.as_of' => '2026-09-13 16:00',
+        'market.ticker' => [
+            ['label' => 'تاسي', 'value' => '11,234.56', 'change' => 1.24, 'series' => '41,36,47,43,55,51,63'],
+            ['label' => 'برنت', 'value' => '82.14', 'change' => -0.31],
+        ],
+    ]);
+
+    $html = view('components.layout.ticker', [
+        'figures' => figures(),
+        'href' => null,
+        'attributes' => new ComponentAttributeBag,
+    ])->render();
+
+    // One row has points and one does not, so exactly one chart is drawn. The
+    // element is a <path> since the line became a curve; what is asserted is
+    // that a row with no points gets no chart, not which tag draws it.
+    expect(substr_count($html, '<path d="M'))->toBe(1)
+        ->and($html)->toContain('82.14');
+});
+
+it('keeps a flat series on the centre line instead of the floor', function (): void {
+    $html = view('components.data.sparkline', [
+        'points' => [50, 50, 50, 50],
+        'height' => 15,
+        'width' => 32,
+        'stroke' => 1.3,
+        'area' => false,
+        'attributes' => new ComponentAttributeBag,
+    ])->render();
+
+    // A pegged currency has no span to scale against. Falling back to a divisor
+    // of 1 pinned it to the bottom of the box, which reads as a collapse.
+    expect($html)->toContain('0,7.5')->toContain('32,7.5');
+});
+
+it('carries the date and the source inside the ticker band itself', function (): void {
+    writeFigures([
+        'market.as_of' => '2026-09-13 16:00',
+        'market.source' => 'جهة النشر',
+        'market.ticker' => [
+            ['label' => 'تاسي', 'value' => '11,234.56', 'change' => 1.24, 'series' => '41,36,47,43,55,51,63'],
+        ],
+    ]);
+
+    // Rendering the as-of component on its own only proves the component works.
+    // It did exactly that while the ticker had quietly lost its caption in a
+    // refactor, and the suite stayed green: a figure was on the page with no
+    // visible date beside it, which is the one thing the gate forbids. So the
+    // assertion is on the surface that shows the figure, not on the partial.
+    $html = view('components.layout.ticker', [
+        'figures' => figures(),
+        'href' => null,
+        'attributes' => new ComponentAttributeBag,
+    ])->render();
+
+    expect($html)->toContain('11,234.56')
+        ->and($html)->toContain('2026-09-13 16:00')
+        ->and($html)->toContain('جهة النشر');
+});

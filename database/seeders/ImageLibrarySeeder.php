@@ -70,6 +70,8 @@ class ImageLibrarySeeder extends Seeder
             return;
         }
 
+        $this->registerBackdrop();
+
         $masters = $this->buildMasters($catalogue);
         $conversions = $this->buildConversionCache($catalogue, $masters);
         $assignments = $this->assign($catalogue);
@@ -81,6 +83,55 @@ class ImageLibrarySeeder extends Seeder
             $catalogue->count(),
             $assignments->count(),
         ));
+    }
+
+    /**
+     * The decorative backdrop behind the big story.
+     *
+     * Registered separately from the catalogue, and deliberately not on an
+     * article: it is generated imagery, so it may carry mood behind a headline
+     * and may never illustrate a story, a company or a place. The
+     * `is_illustrative` flag is what enforces that — a model guard rejects it
+     * anywhere a reader would take it for reportage.
+     *
+     * Its alt text describes the scene and names no city. The frame reads as
+     * Riyadh; the arrangement of towers is not a real one, and captioning it as
+     * a real place would turn a mood image into a false claim about a location.
+     */
+    private function registerBackdrop(): void
+    {
+        $file = public_path('images/home.jpg');
+
+        if (! File::isFile($file)) {
+            $this->command?->warn('Backdrop skipped: public/images/home.jpg not found.');
+
+            return;
+        }
+
+        $layout = HomepageLayout::query()->where('is_active', true)->first();
+
+        if ($layout === null) {
+            return;
+        }
+
+        $layout->clearMediaCollection('backdrop');
+
+        $media = $layout->addMedia($file)
+            ->preservingOriginal()
+            ->usingFileName('home-backdrop.jpg')
+            ->withCustomProperties([
+                'alt' => 'أفق مدينة عند الغروب، تنخفض الشمس عند الأفق وتضيء الأبراج من الداخل وتسير حركة المرور على الطرق أدناه.',
+                'credit' => 'صورة تعبيرية',
+                'source_file' => 'home.jpg',
+            ])
+            ->toMediaCollection('backdrop');
+
+        // Set after the record exists: the guard on Media rejects an
+        // illustrative image owned by an article, and this one is owned by the
+        // layout, so the flag is safe to write here.
+        $media->forceFill(['is_illustrative' => true])->save();
+
+        $this->command?->info('Backdrop: home.jpg registered as illustrative.');
     }
 
     /**

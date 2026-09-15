@@ -15,20 +15,49 @@
                 </p>
             </header>
 
-            <form method="GET" class="rounded-xl border border-line bg-white p-6">
-                <label for="subscribe-email" class="mb-2 block text-sm font-medium">البريد الإلكتروني</label>
-                <div class="flex flex-col gap-2 sm:flex-row">
-                    <input
-                        id="subscribe-email" name="email" type="email" required dir="ltr"
-                        placeholder="name@example.com"
-                        class="ltr-isolate min-w-0 flex-1 rounded-lg border border-line px-4 py-3 focus:border-g-600 focus:outline-none"
-                    />
-                    <x-ui.button type="submit" size="lg">اشترك</x-ui.button>
-                </div>
-                <p class="mt-3 text-xs text-ink-3">
-                    رسالة واحدة أسبوعيًا. يمكنك إلغاء الاشتراك في أي وقت.
+            @php
+                $result = session('newsletter');
+                $mine = is_array($result) && ($result['source'] ?? null) === 'page';
+            @endphp
+
+            @if ($mine)
+                <p class="flex items-start gap-3 rounded-xl border border-g-600 bg-white p-6 text-g-950" role="status">
+                    <span class="text-g-600" aria-hidden="true">✓</span>
+                    <span>{{ $result['message'] }}</span>
                 </p>
-            </form>
+            @else
+                <form method="POST" action="{{ route('web.newsletter.subscribe', $locale) }}" class="rounded-xl border border-line bg-white p-6">
+                    @csrf
+                    <input type="hidden" name="source" value="page" />
+
+                    {{-- The honeypot. See the band component. --}}
+                    <div class="hidden" aria-hidden="true">
+                        <label for="page-company-website">لا تملأ هذا الحقل</label>
+                        <input id="page-company-website" type="text" name="company_website" tabindex="-1" autocomplete="off" />
+                    </div>
+
+                    <label for="subscribe-email" class="mb-2 block text-sm font-medium">البريد الإلكتروني</label>
+                    <div class="flex flex-col gap-2 sm:flex-row">
+                        <input
+                            id="subscribe-email" name="email" type="email" required dir="ltr"
+                            value="{{ old('email') }}"
+                            placeholder="name@example.com"
+                            autocomplete="email"
+                            @error('email') aria-invalid="true" aria-describedby="subscribe-email-error" @enderror
+                            class="ltr-isolate min-w-0 flex-1 rounded-lg border border-line px-4 py-3 focus:border-g-600 focus:outline-none"
+                        />
+                        <x-ui.button type="submit" size="lg">اشترك</x-ui.button>
+                    </div>
+
+                    @error('email')
+                        <p id="subscribe-email-error" class="mt-2 text-xs text-coral-ink">{{ $message }}</p>
+                    @enderror
+
+                    <p class="mt-3 text-xs text-ink-3">
+                        رسالة واحدة أسبوعيًا. يمكنك إلغاء الاشتراك في أي وقت.
+                    </p>
+                </form>
+            @endif
 
             @if ($issues->isNotEmpty())
                 <section class="mt-12">

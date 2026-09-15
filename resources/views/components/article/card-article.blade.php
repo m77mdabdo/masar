@@ -1,4 +1,8 @@
-@props(['article', 'compact' => false])
+@props(['article', 'compact' => false, 'eager' => false])
+{{-- `eager` is for the first card above the fold on a listing page. A listing's
+     own LCP element is one of these cards, and lazy-loading it costs the browser
+     a whole layout pass before it even asks for the file — measured at 2,521ms
+     of load delay against 114ms to actually fetch it. --}}
 @php $url = app(App\Support\EntityUrl::class)->for($article); @endphp
 {{-- The workhorse of the section grids: a bordered card with a 16:9 crop, a
      category chip, a serif headline, and a footer rule carrying the byline.
@@ -9,6 +13,7 @@
             scale="card"
             :media="$article->heroMedia"
             :alt="$article->hero_alt ?? ''"
+            :eager="$eager"
             ratio="hero"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 30vw"
             class="transition duration-700 group-hover:scale-[1.03]"

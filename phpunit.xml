@@ -18,26 +18,38 @@
         </include>
     </source>
     <php>
-        <env name="APP_ENV" value="testing"/>
+        <env name="APP_ENV" value="testing" force="true"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="APP_LOCALE" value="ar"/>
         <env name="APP_FALLBACK_LOCALE" value="ar"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
-        <env name="CACHE_STORE" value="array"/>
+        <env name="CACHE_STORE" value="array" force="true"/>
         <!-- Tests run against MySQL 8, not SQLite: the schema uses native enum
              columns and composite indexes whose behaviour SQLite does not
-             reproduce, and a green suite on the wrong engine is worse than none. -->
-        <env name="DB_CONNECTION" value="mysql"/>
-        <env name="DB_HOST" value="127.0.0.1"/>
-        <env name="DB_PORT" value="3307"/>
-        <env name="DB_DATABASE" value="masar_test"/>
-        <env name="DB_USERNAME" value="root"/>
-        <env name="DB_PASSWORD" value=""/>
-        <env name="DB_URL" value=""/>
-        <env name="MAIL_MAILER" value="array"/>
-        <env name="QUEUE_CONNECTION" value="sync"/>
-        <env name="SESSION_DRIVER" value="array"/>
+             reproduce, and a green suite on the wrong engine is worse than none.
+
+             force="true" is defence in depth and NOT the protection. Measured:
+             under `php artisan test` a DB_DATABASE set in the real environment
+             still wins over a forced value here, because Laravel resolves env
+             through its own immutable repository before PHPUnit's value is
+             consulted. That is how `php artisan test` launched as a subprocess
+             inherited DB_DATABASE=masar and RefreshDatabase wiped the
+             development database — once, for real.
+
+             What actually stops it is the guard in Tests\TestCase, which
+             refuses to run against any database whose name does not contain
+             "test". Do not remove it on the strength of these attributes. -->
+        <env name="DB_CONNECTION" value="mysql" force="true"/>
+        <env name="DB_HOST" value="127.0.0.1" force="true"/>
+        <env name="DB_PORT" value="3307" force="true"/>
+        <env name="DB_DATABASE" value="masar_test" force="true"/>
+        <env name="DB_USERNAME" value="root" force="true"/>
+        <env name="DB_PASSWORD" value="" force="true"/>
+        <env name="DB_URL" value="" force="true"/>
+        <env name="MAIL_MAILER" value="array" force="true"/>
+        <env name="QUEUE_CONNECTION" value="sync" force="true"/>
+        <env name="SESSION_DRIVER" value="array" force="true"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>

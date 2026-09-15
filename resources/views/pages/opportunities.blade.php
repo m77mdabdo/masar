@@ -11,8 +11,12 @@
         </header>
 
         {{-- Filters are GET parameters applied in SQL. The list is paginated, so
-             filtering in PHP would page over the wrong set. --}}
-        <form method="GET" class="mb-8 space-y-4 rounded-xl border border-line bg-white p-4">
+             filtering in PHP would page over the wrong set.
+
+             The action is named even though GET-to-self would work, because
+             "every form states where it goes" is the rule that lets the decay
+             check find a form that goes nowhere without reading each one. --}}
+        <form method="GET" action="{{ route('web.opportunities.index', $locale) }}" class="mb-8 space-y-4 rounded-xl border border-line bg-white p-4">
             <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
                     <label for="sector" class="mb-1 block text-xs text-ink-3">القطاع</label>

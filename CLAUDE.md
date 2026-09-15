@@ -51,28 +51,34 @@ say so explicitly and wait — do not silently implement an alternative.
 | Database | MySQL 8 |
 | Cache / queue / session | Redis (required — we rely on cache tags) |
 | Search | Laravel Scout + Meilisearch, with an Arabic normalisation layer |
-| Hosting | VPS (Ubuntu 24.04). Nginx + **PHP-FPM 8.4** (latest patch) + Supervisor + Horizon. 8.3 is not an option: `spatie/laravel-activitylog` requires `^8.4`. Provision the server to match the pin, never the reverse. |
+| Hosting | VPS (Ubuntu 24.04). Nginx + **PHP-FPM 8.4** (latest patch) + Supervisor + Horizon (installed). The dashboard is gated on `viewHorizon` → `super_admin` in **every** environment: Horizon's packaged gate is `Gate::check(...) || app()->environment('local')`, which opens it to anyone who can reach the port on a dev machine, and job payloads here contain subscriber email addresses. `HorizonServiceProvider` replaces the callback to drop that escape hatch. 8.3 is not an option: `spatie/laravel-activitylog` requires `^8.4`. Provision the server to match the pin, never the reverse. |
 | Object storage | S3-compatible (Cloudflare R2) from day one. Never store media on the app server |
 | Timezone | `Asia/Riyadh` |
 | Currency | SAR primary, USD secondary |
 | Numerals | Western Arabic numerals (0-9), never Eastern Arabic-Indic (٠-٩) |
 | Fonts | Readex Pro (display) + IBM Plex Sans Arabic (body), self-hosted, subset |
-| Reader accounts | Deferred. Separate `reader` guard is scaffolded but unused |
+| Reader accounts | Deferred and **not scaffolded**. There is no `reader` guard in `config/auth.php` — this row previously claimed one existed, and an audit found it did not. When reader accounts are built, the guard is the first thing to add |
 | Testing | Pest |
 
 ### Brand tokens
 ```
---g-950 #071A10   --g-900 #0E2A1C (primary)   --g-700 #1A4531   --g-600 #1E5E3F
+--g-950 #001D17   --g-900 #002E24 (primary)   --g-700 #0F4A3B   --g-600 #14614C
 --mint  #7FB69A (accent — used sparingly, never as a button fill, and never as text on a
-        light ground: 2.11:1 on cream. Fine as a foreground on g-900/g-950, or as a fill
+        light ground: 2.07:1 on cream. Fine as a foreground on g-900/g-950, or as a fill
         behind dark text.)
---cream #F6F4EF (page)   --line #E2DED4   --ink #14181A
---gold  #C9A063 (semantic FILL only: badge grounds, borders, gold-on-dark. 7.47:1 on g-950.
-        As text on white it measures 2.42:1 and fails — use --gold-ink instead.)
---gold-ink #8F6828 (gold as text on a light ground: 5.03:1 on white, 4.57:1 on cream)
---ink-3 #61696F (tertiary text: metadata, timestamps, captions — 5.08:1 on cream; the
-        original #7C848A measured 3.46:1 and failed AA for normal text)
+--cream #F5F2E9 (page, warm ivory)   --line #E4DFD1   --ink #0D1C17 (very dark green,
+        never pure black — 15.69:1 on cream)
+--gold  #C9A063 (semantic FILL only: badge grounds, borders, gold-on-dark. 7.32:1 on g-950.
+        As text on cream it measures 2.16:1 and fails — use --gold-ink instead.)
+--gold-ink #8A6526 (gold as text on a light ground: 5.29:1 on white, 4.73:1 on cream)
+--ink-3 #5E6A63 (tertiary text: metadata, timestamps, captions — 5.05:1 on cream)
+--mint-2 #A8D4BC · --coral #E98880 (market surfaces, foregrounds on the dark band only:
+        10.78:1 and 6.98:1 on g-950)
+--g-850 #0A3D30 (one step lighter than the band, for the cell that terminates it)
 ```
+
+Every ratio above is measured, and the suite re-measures them. Change a token and
+the contrast test tells you what broke.
 
 ---
 
@@ -94,6 +100,8 @@ Route → Middleware → Form Request (validation) → Controller (thin) → Act
 - **Policies** on every editable model. Ownership matters: a writer edits their own draft, not someone else's.
 - **An Action checks permission and business rules separately; a Policy may fuse them for the UI.** If the gate check lives inside the policy call, a missing summary is reported to the editor as a permissions error. Actions throw the specific failure. Policies answer the single question Filament needs to enable or disable a button.
 - **Jobs** for anything slow: media conversions, source polling, campaign sends, metric aggregation.
+- **A queued job must not carry a model it may outlive.** A serialised model is stored as an id and re-fetched by the worker, so any job that outlives its row dies on `ModelNotFoundException` — and the queue is not rebuilt by `migrate:fresh`, so every job already in Redis is orphaned the moment the schema is reseeded. The first drain of a real backlog produced 45 of exactly these. Compute what the job needs while the row is certainly there and queue the scalars: `FlushArticleCaches` resolves its cache tags inline and hands `FlushCacheTags` a list of strings.
+- **`$deleteWhenMissingModels` does not work on a queued listener.** The queue reflects on the resolved job class, which for a listener is Laravel's `CallQueuedListener`, never yours — so the flag is read off the wrong class and silently ignored. It is a guard for queued *jobs* only. This is why the rule above says remove the model rather than flag it.
 
 ### Folder structure
 ```
@@ -217,6 +225,15 @@ settings, and carries a date and a source.
   views for thousands-separated numbers and signed percentages sitting in markup.
 - The chart is drawn **without a value axis**, because the points are an editor-entered
   shape and an axis would present them as measured.
+- **A chart must not exaggerate.** Scale a series against its own level, not the
+  height of its box. A stable instrument has to look stable: normalising a pegged
+  rate to the full box draws the steadiest thing on the page as the most volatile,
+  which is a false picture in the same class as an invented figure, expressed as
+  geometry instead of a number. `App\Support\Sparkline` damps amplitude by
+  range-over-level.
+- **Smoothing may pass through the data, never move it.** The rendered line is the
+  series that was entered. A curve that approximates its points is drawing a
+  different series from the one an editor typed.
 - **A direction glyph accompanies every colour.** Red/green alone fails WCAG 1.4.1 and is
   the pairing most readers cannot distinguish.
 
@@ -285,6 +302,35 @@ that looks correct: assert that the thing actually ran, on the input you think
 it ran on.
 
 
+**After an edit that should change rendered output, verify the output changed.**
+An edit tool that anchors on exact text fails by matching nothing, and a silent
+no-match produces the same console output as a successful edit. A hero's
+`object-position` was reported as shifted for a whole pass while it sat at the
+default, because the anchor had 24 spaces of indentation and the call site had
+20. Read the computed value back, not your own diff.
+
+
+**Every task ends with a five-minute decay check, reported in `REPORT.md`.**
+Not an audit — a pulse. Detail work crowds out the question of whether anything
+behind it has quietly stopped working: a newsletter form sat on every page of
+the public site as `method="GET"` with no action for six sessions, while the
+attention went to a scrim and a sparkline. Nobody was wrong to care about the
+scrim; the mistake was never asking what had decayed while we did.
+
+Run `php artisan test`, then `php artisan masar:decay`, and paste both into
+`REPORT.md`. They are two commands on purpose — see the pipe note in §9 for why
+the suite is not launched from inside another process. The decay check covers:
+
+1. **Suite green** — recorded from your own `php artisan test` run.
+2. **Queue drained** — depth, failed count, and whether a worker is actually running.
+3. **`migrate:fresh --seed` clean** — against a scratch database, never the dev one. Opt-in with `--with-seed`: the seed transcodes video and normalises every demo photograph and takes ~15 minutes, so it belongs before a release or after a migration, not in every pulse.
+4. **The seven end-to-end flows** still pass (the list in `tasks/STATUS.md` §2).
+5. **Every public form still posts where it claims to** — method, action, and a
+   route that exists. This is the specific check that would have caught the one
+   that started it.
+
+A red line is not a reason to stop; it is a reason to say so in the report
+rather than discover it six sessions later.
 
 A task is not complete until all of these are true:
 
@@ -326,12 +372,13 @@ A task is not complete until all of these are true:
 | Search | LIKE-based over a normalised expression, not an index. Arabic folding happens in `ArabicNormaliser` on both the query and the stored text. **Swap to Scout/Meilisearch inside `SearchArticlesQuery` when published articles pass ~2,000** — the caller does not change. |
 | **Edge compression is required** | The Core Web Vitals targets are met *only* with gzip/brotli at the edge. Measured on a mobile 4G profile: with compression LCP 1.8–2.2s (passes); without it 2.7–4.1s (fails). Nginx must compress `text/*`, `application/javascript`, `application/json`, `image/svg+xml`. This is a deployment requirement, not an application concern — do not add compression middleware to Laravel to paper over a misconfigured edge. |
 | `APP_URL` | **`http://127.0.0.1:8000`**, matching `php artisan serve`. Media URLs are absolute and built from it, so leaving it at `http://localhost` points every image at XAMPP's Apache on port 80 and the whole site renders with alt text where the photographs should be. |
-| **Homepage LCP: 3685 ms. Known and accepted.** | Measured on Lighthouse's mobile slow-4G profile with compression at the edge. The LCP element is the big-story hero photograph — `div.grid > div.relative > picture.block > img.h-full` — and the phases are **TTFB 12% · Load Delay 29% · Load Time 2% · Render Delay 57%**. Load Time is 2%: the image is not the problem. FCP is 2270 ms and is LCP's floor, because 512 KB on that profile is ~2.6 s of transfer before anything paints. Every free lever has been pulled — narrowed srcset ladders, `font-display` per face, a metric-matched fallback, deferred off-screen paint. All eight font faces were checked and are genuinely used. **The remaining levers all cost design: fewer font weights, a smaller hero crop, or fewer sections. Nineteen sections with real photography is the product — do not cut sections to move this number.** Home CLS is 0.041, accepted as a trade for `font-display: optional` on the body face (no reflow mid-read) against a previous 0.013. |
+| **Homepage LCP: 3685 ms — SUPERSEDED, pending a clean re-measure.** | Measured on Lighthouse's mobile slow-4G profile with compression at the edge. The LCP element is the big-story hero photograph — `div.grid > div.relative > picture.block > img.h-full` — and the phases are **TTFB 12% · Load Delay 29% · Load Time 2% · Render Delay 57%**. Load Time is 2%: the image is not the problem. FCP is 2270 ms and is LCP's floor, because 512 KB on that profile is ~2.6 s of transfer before anything paints. Every free lever has been pulled — narrowed srcset ladders, `font-display` per face, a metric-matched fallback, deferred off-screen paint. All eight font faces were checked and are genuinely used. **The remaining levers all cost design: fewer font weights, a smaller hero crop, or fewer sections. Nineteen sections with real photography is the product — do not cut sections to move this number.** Home CLS is 0.041, accepted as a trade for `font-display: optional` on the body face (no reflow mid-read) against a previous 0.013. **The 3685 ms figure is no longer trusted.** A re-measure on 2026-09-14, with the `uses-text-compression` audit checked on every run, read home 2053 ms / CLS 0.061, article 2238, markets 2832 and **category 3725** — the category page being both the slowest and the one nobody has examined. The likeliest explanation for the gap is that the original was taken on a harness where compression was not actually on, a mistake made and caught during that same audit. Do not quote either number as settled until one clean run replaces this row; the *reasoning* above (render delay dominates, remaining levers cost design, do not cut sections) still stands. |
 | Media storage | `MEDIA_DISK` selects it. Local is `media` (`storage/app/public/media`, served through `storage:link`); production is `r2` with the `R2_*` credentials from the environment. `config/media-library.php` reads that one key, so nothing else in the app names a disk. |
 | Demo imagery | `ImageLibrarySeeder` turns `public/images/` into real media records. It normalises each source to a 2400px master once and generates each conversion once per **image**, not once per article — the same 28 photographs behind 130 articles is 704 identical conversions otherwise, which measured at ten minutes of `migrate:fresh --seed` against 4 seconds now. `MediaConversions::withoutGenerating()` is what makes that safe; a caller that uses it and forgets to write the files leaves records whose conversions 404. |
 | **No media master in the repository** | GitHub rejects any file over 100 MB, and two 4K stock clips — 167 MB and 101 MB — did exactly that. Deleting them from the working tree does not fix it: the blob is already in the pack and the push fails on the same object. `public/images/` holds **web-delivery renditions only**, named `<id>-web-<width>x<height>.mp4` so the name states what the file is, 1080p on the long edge, H.264, and **under `masar.media.max_video_kb`** (10 MB). Masters live in `storage/app/video-masters/`, which is untracked. `.gitignore` cannot express a size rule, so the size rule is a test: `tests/Feature/RepositoryWeightTest.php` fails on any tracked file over the budget and on any tracked name with a master's shape. A clip that is still over budget after transcoding is not committed at all — it is re-sourced. |
 | Demo video | `VideoLibrarySeeder` transcodes each source to 1080p H.264 once into `storage/app/seed-video` and caches it there, so the first run on a fresh checkout takes minutes and every later run takes seconds. It needs `ffmpeg` on `PATH` and skips with a warning without it. |
 | Looking at the page | **After any visual change, open the rendered page and look at it.** A suite cannot tell you every photograph on the site is missing, that a section is blank, or that an Arabic figure is rendering backwards — all three shipped past green tests. Screenshot the app, not the prototype. `content-visibility: auto` means a full-page capture of off-screen sections comes back blank, so scroll each slice into the viewport and capture that. |
+| **`php artisan test` must not be piped** | Piping it (`php artisan test \| tail`) hangs indefinitely *after the suite has already passed*. Measured: Pest reports `679 passed · Duration 50.22s`, then the process sits at 0% CPU — one run was left for two hours and one minute. Something spawned during the run inherits stdout and outlives Pest, so the reader never sees EOF. Redirect to a file instead — `php artisan test > /tmp/suite.txt 2>&1` exits in 0s with the same result. This is also why nothing shells out to the suite: Laravel's `Process::run()` captures output through the same pipe and hangs identically, which cost hours of chasing an imaginary Pest deadlock. If the suite looks hung, check Pest's own reported duration before believing it. |
 | Test-suite concurrency | Two runs against the single `masar_test` schema truncate each other via `RefreshDatabase`, producing scattered failures that look like real bugs. `Tests\TestCase` takes an exclusive `flock` on `masar-test-suite.lock` and refuses the second run with an explanatory message. The lock is held by the OS, so a killed run never leaves a stale one. Opt out with `MASAR_ALLOW_CONCURRENT_TESTS=1`; Pest `--parallel` is detected and exempt because it gives each process its own schema. |
 
 **Never** change these without saying so. A silent environment change is the hardest

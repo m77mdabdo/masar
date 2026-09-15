@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+use App\Models\Media;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +18,11 @@ declare(strict_types=1);
 
 return [
     'disk_name' => env('MEDIA_DISK', 'media'),
+
+    // Ours, so `is_illustrative` is a real column with real scopes. A generated
+    // image that could be selected as an article hero is a rule enforced by
+    // hope; a column the picker filters on is a rule enforced by the database.
+    'media_model' => Media::class,
 
     // Conversions are generated inline by the seeder and by the admin upload
     // path; there is no queue worker in local and a hero without a conversion

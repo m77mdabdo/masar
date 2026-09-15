@@ -11,6 +11,7 @@ use App\Models\HomepageLayout;
 use App\Models\Menu;
 use App\Models\MenuItem;
 use App\Models\User;
+use App\Support\MarketFigures;
 
 use function Pest\Livewire\livewire;
 
@@ -156,4 +157,27 @@ it('renders the redirects and 404 pages', function (): void {
     $this->actingAs(admin())
         ->get(NotFoundLog::getUrl())
         ->assertOk();
+});
+
+it('round-trips a ticker row including its chart points', function (): void {
+    $this->actingAs(admin());
+
+    // The settings screen is the only place these numbers come from. A field
+    // that renders but writes nowhere fails silently — the page keeps showing
+    // yesterday's chart and nobody is told.
+    livewire(ManageSettings::class)
+        ->fillForm([
+            'market__as_of' => '2026-09-13 16:00',
+            'market__source' => 'هيئة السوق المالية',
+            'market__ticker' => [
+                ['label' => 'تاسي', 'value' => '11,234.56', 'change' => 1.24, 'series' => '41,36,47,43,55,51,63'],
+            ],
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $row = app(MarketFigures::class)->ticker()->first();
+
+    expect($row['label'])->toBe('تاسي')
+        ->and($row['series'])->toBe([41.0, 36.0, 47.0, 43.0, 55.0, 51.0, 63.0]);
 });

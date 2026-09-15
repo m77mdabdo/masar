@@ -1,6 +1,6 @@
 @props(['section', 'href' => null, 'mediaPool' => null])
 {{-- contrast-safe: each card renders on the card scrim, which guarantees a
-     g-950 ground. Mint is 2.11:1 on cream and 7.78:1 on g-950. --}}
+     g-950 ground. Mint is 2.07:1 on cream and 7.63:1 on g-950. --}}
 <section class="mb-0" aria-labelledby="opportunities-heading">
     <x-ui.section-rule :title="$section['title']" :href="$href" more="رادار الفرص" id="opportunities-heading" />
 

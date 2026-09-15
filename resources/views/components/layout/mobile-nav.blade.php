@@ -1,11 +1,15 @@
 @props(['menu' => null, 'locale'])
 @php $items = $menu ?? collect(); @endphp
-<div x-data="{ open: false }" class="lg:hidden">
-    <button type="button" @click="open = true" class="rounded-lg p-2 text-g-700 transition hover:bg-line/60"
+{{-- The drawer is the whole navigation; the bar shows eight of it. That is
+     as true at 1440px as at 390px, so the burger is not a small-screen
+     affordance here — it is the way to the rest of the menu. --}}
+<div x-data="{ open: false }">
+    <button type="button" @click="open = true"
+            class="grid w-[1.375rem] gap-[5px] py-3 text-ink transition hover:opacity-70"
             aria-label="فتح القائمة" :aria-expanded="open.toString()">
-        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-        </svg>
+        <span class="block h-[1.5px] w-full bg-current" aria-hidden="true"></span>
+        <span class="block h-[1.5px] w-full bg-current" aria-hidden="true"></span>
+        <span class="block h-[1.5px] w-full bg-current" aria-hidden="true"></span>
     </button>
 
     <div x-show="open" x-cloak @keydown.escape.window="open = false" class="fixed inset-0 z-50">

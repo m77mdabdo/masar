@@ -98,7 +98,7 @@ final class MarketFigures
     }
 
     /**
-     * @return Collection<int, array{label: string, value: string, change: ?float}>
+     * @return Collection<int, array{label: string, value: string, change: ?float, series: array<int, float>}>
      */
     private function rows(string $key): Collection
     {
@@ -112,6 +112,10 @@ final class MarketFigures
                 'label' => (string) $row['label'],
                 'value' => (string) $row['value'],
                 'change' => isset($row['change']) && $row['change'] !== '' ? (float) $row['change'] : null,
+                // The sparkline's shape. Editor-entered like everything else
+                // here: a line drawn from nothing would be a picture of a trend
+                // nobody recorded.
+                'series' => $this->series($row['series'] ?? null),
             ])
             ->values();
     }

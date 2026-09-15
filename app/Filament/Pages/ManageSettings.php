@@ -105,7 +105,10 @@ class ManageSettings extends Page implements HasSchemas
     {
         return Tab::make('الهوية')->id('identity')->schema([
             TextInput::make('identity__site_name')->label('اسم الموقع')->required(),
-            TextInput::make('identity__tagline')->label('الشعار النصي'),
+            TextInput::make('identity__tagline')->label('الشعار النصي')
+                ->helperText('يظهر بجوار الشعار في الترويسة. ثلاثة أسطر قصيرة.'),
+            TextInput::make('identity__descriptor')->label('وصف التغطية')
+                ->helperText('يظهر في الشريط العلوي.'),
             FileUpload::make('identity__logo_path')->label('الشعار')->image()->disk('public')->directory('site'),
             FileUpload::make('identity__favicon_path')->label('أيقونة الموقع')->image()->disk('public')->directory('site'),
             FileUpload::make('identity__og_image_path')->label('صورة المشاركة الافتراضية')->image()->disk('public')->directory('site')
@@ -166,12 +169,15 @@ class ManageSettings extends Page implements HasSchemas
     private function integrationsTab(): Tab
     {
         return Tab::make('التكاملات')->id('integrations')->schema([
-            TextInput::make('integrations__analytics_id')->label('معرّف التحليلات')
-                ->password()->revealable()
-                ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
+            // Wired to nothing on purpose, pending the provider choice. The
+            // helper text says so out loud: a filled-in key that nothing reads
+            // would let an editor believe sending is configured when the only
+            // thing that works today is collecting addresses.
             TextInput::make('integrations__newsletter_key')->label('مفتاح مزوّد النشرة')
                 ->password()->revealable()
-                ->helperText('يُخزّن مشفّرًا ولا يظهر في سجل التدقيق.')
+                ->helperText('غير مستخدم حاليًا: لم يُختر مزوّد الإرسال بعد، ولا تُرسل النشرة من النظام. '
+                    .'الاشتراك والتأكيد وإلغاء الاشتراك تعمل، أما الإرسال فينتظر هذا القرار. '
+                    .'يُخزّن مشفّرًا ولا يظهر في سجل التدقيق.')
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
         ])->columns(2);
     }
@@ -209,7 +215,15 @@ class ManageSettings extends Page implements HasSchemas
 
             Repeater::make('market__ticker')
                 ->label('الشريط العلوي')
-                ->schema($figure('ticker', 'مؤشر'))
+                ->schema([
+                    ...$figure('ticker', 'مؤشر'),
+                    Textarea::make('series')
+                        ->label('نقاط المنحنى')
+                        ->rows(2)
+                        ->helperText('١٠ إلى ١٤ رقمًا مفصولة بفواصل، في سطر واحد. شكل الحركة فقط — بلا محور قيمة. بدونها لا يُرسم منحنى.')
+                        ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr'])
+                        ->columnSpanFull(),
+                ])
                 ->columns(3)->maxItems(5)->collapsed()
                 ->itemLabel(fn (array $state): ?string => $state['label'] ?? null)
                 ->columnSpanFull(),
