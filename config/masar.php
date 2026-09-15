@@ -103,7 +103,6 @@ return [
         'cache_ttl' => 86400,
 
         'encrypted' => [
-            'integrations.analytics_id',
             'integrations.newsletter_key',
             'seo.verification_tags',
         ],
@@ -111,6 +110,10 @@ return [
         'defaults' => [
             'identity.site_name' => 'مسار',
             'identity.tagline' => 'من المعلومة إلى الفرصة',
+            // The strip above the masthead says what MASAR covers; the tagline
+            // beside the wordmark says what it is for. They were the same
+            // string, printed twice, eighty pixels apart.
+            'identity.descriptor' => 'أعمال · اقتصاد · أسواق · فرص',
             'identity.logo_path' => null,
             'identity.favicon_path' => null,
             'identity.og_image_path' => null,
@@ -129,7 +132,6 @@ return [
             'seo.robots' => "User-agent: *\nAllow: /\n",
             'seo.verification_tags' => null,
 
-            'integrations.analytics_id' => null,
             'integrations.newsletter_key' => null,
 
             // Market figures. Every one is typed in by an editor and carries a

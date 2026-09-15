@@ -11,19 +11,44 @@
  * one edit here rather than a search across every template.
  */
 @theme {
-    --color-g-950: #071A10;
-    --color-g-900: #0E2A1C;
-    --color-g-700: #1A4531;
-    --color-g-600: #1E5E3F;
+    /*
+     * Deep teal-green, not the blue-green it was. Every ratio below is measured,
+     * not assumed, and the suite re-checks them: see the contrast test.
+     */
+    --color-g-950: #001D17;   /* cream 15.79 · mint 7.63 · gold 7.32 · coral 6.98 */
+    --color-g-900: #002E24;   /* cream 13.25 · mint 6.40 · gold 6.14 · coral 5.86 */
+    --color-g-700: #0F4A3B;   /* 9.09 on cream */
+    --color-g-600: #14614C;   /* 6.60 on cream, 7.38 on white */
     --color-mint:  #7FB69A;
-    --color-cream: #F6F4EF;
-    --color-line:  #E2DED4;
-    --color-ink:   #14181A;
+    --color-cream: #F5F2E9;   /* warm ivory */
+    --color-line:  #E4DFD1;
+    /* Very dark green rather than black: 15.69 on cream. */
+    --color-ink:   #0D1C17;
     --color-gold:  #C9A063;
-    /* Gold as *text on a light ground*: #C9A063 measures 2.42 on white and fails.
-       This is 5.03 on white, 4.57 on cream. Fills stay --color-gold. */
-    --color-gold-ink: #8F6828;
-    --color-ink-3: #61696F;
+    /* Gold as *text on a light ground*: #C9A063 measures 2.16 on cream and
+       fails. This is 4.73 on cream, 5.29 on white. Fills stay --color-gold. */
+    --color-gold-ink: #8A6526;
+    /* Tertiary text — metadata, timestamps, captions. 5.05 on cream. */
+    --color-ink-3: #5E6A63;
+
+    /* Ticker and market surfaces. All four are foregrounds on the dark band
+       only, and all four measure well above AA there: mint-2 10.78, coral 6.98,
+       mint 7.63, gold 7.32 on g-950. Neither mint nor gold is a foreground on
+       cream — 2.07 and 2.16 — which is what --color-gold-ink exists for. */
+    --color-mint-2: #A8D4BC;
+    --color-coral:  #E98880;
+    /* Coral as *text on a light ground*: #E98880 measures 2.26 on cream and
+       fails, the same trap --color-gold-ink exists for. This is 5.30 on cream
+       and 5.93 on white, for form errors and anything else that must read as
+       wrong on the page rather than on the band. */
+    --color-coral-ink: #B23A30;
+
+    /* One step lighter than the band, for the cell that terminates it. */
+    --color-g-850: #0A3D30;
+
+    /* The market band. Near-black with the brand's green in it rather than the
+       lighter g-950: the band is the darkest surface on the page. */
+    --color-band: #04110D;
 
     --font-display: 'Readex Pro', 'Readex Fallback', system-ui, sans-serif;
     --font-sans: 'IBM Plex Sans Arabic', system-ui, sans-serif;
@@ -48,6 +73,7 @@
     }
 
     body {
+        overflow-x: clip;
         background-color: var(--color-cream);
         color: var(--color-ink);
         font-family: var(--font-sans);
@@ -150,22 +176,134 @@
      * under it whatever the crop. The angle mirrors with the text — the dark
      * end has to be on the side the headline is on.
      */
+    /*
+     * Neutral black, and only over the headline.
+     *
+     * It was built out of `--color-g-950`, a dark green, and spread across the
+     * whole width with a second dark zone under the questions column. Over a
+     * photograph a coloured scrim does not darken it, it recolours it: the
+     * sunset went muted, the towers flattened into one teal mass and the whole
+     * frame read as tinted rather than lit. Black darkens. Green tints.
+     *
+     * It is also confined now: solid at the headline edge, gone by 45%, and
+     * nothing at all after that. The remaining 55% is the photograph at full
+     * saturation, which is the composition — the questions column sits over
+     * sky that is dark in the picture itself.
+     */
     .hero-scrim {
         background-image: linear-gradient(
-            288deg,
-            color-mix(in srgb, var(--color-g-950) 95%, transparent) 20%,
-            color-mix(in srgb, var(--color-g-950) 58%, transparent) 60%,
-            color-mix(in srgb, var(--color-g-950) 12%, transparent) 100%
+            270deg,
+            rgb(0 0 0 / 0.90) 0%,
+            rgb(0 0 0 / 0.84) 16%,
+            rgb(0 0 0 / 0.66) 28%,
+            rgb(0 0 0 / 0.38) 37%,
+            rgb(0 0 0 / 0.12) 42%,
+            transparent 45%
         );
     }
 
     [dir='ltr'] .hero-scrim {
         background-image: linear-gradient(
-            72deg,
-            color-mix(in srgb, var(--color-g-950) 95%, transparent) 20%,
-            color-mix(in srgb, var(--color-g-950) 58%, transparent) 60%,
-            color-mix(in srgb, var(--color-g-950) 12%, transparent) 100%
+            90deg,
+            rgb(0 0 0 / 0.90) 0%,
+            rgb(0 0 0 / 0.84) 16%,
+            rgb(0 0 0 / 0.66) 28%,
+            rgb(0 0 0 / 0.38) 37%,
+            rgb(0 0 0 / 0.12) 42%,
+            transparent 45%
         );
+    }
+
+    /*
+     * A local scrim for the questions column only.
+     *
+     * With the main scrim confined to the headline edge, the questions sit over
+     * the bare photograph — fine on a night skyline, 1.10:1 on a slide whose
+     * sky is blown out. This darkens that column alone and fades to nothing
+     * before it reaches the picture, rather than tinting the whole frame to
+     * rescue three lines of text.
+     */
+    .steps-scrim {
+        background-image: linear-gradient(
+            270deg,
+            transparent 0%,
+            rgb(0 0 0 / 0.22) 10%,
+            rgb(0 0 0 / 0.52) 22%,
+            rgb(0 0 0 / 0.72) 34%,
+            rgb(0 0 0 / 0.80) 60%,
+            rgb(0 0 0 / 0.82) 100%
+        );
+    }
+
+    [dir='ltr'] .steps-scrim {
+        background-image: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgb(0 0 0 / 0.22) 10%,
+            rgb(0 0 0 / 0.52) 22%,
+            rgb(0 0 0 / 0.72) 34%,
+            rgb(0 0 0 / 0.80) 60%,
+            rgb(0 0 0 / 0.82) 100%
+        );
+    }
+
+    /*
+     * Below lg the stage is one column and the type runs the full width, so it
+     * passes straight through the horizontal gradient's clear window. Measured
+     * at 400px before this existed: the headline sat at 1.39:1 and the step
+     * text at 1.02:1. A flat wash is the honest shape for a layout with no
+     * empty side to leave alone.
+     */
+    @media (width < 64rem) {
+        .hero-scrim,
+        [dir='ltr'] .hero-scrim {
+            background-image: none;
+            background-color: color-mix(in srgb, var(--color-g-950) 78%, transparent);
+        }
+    }
+
+    /*
+     * The opportunity feature's slanted seam. A clip-path does not mirror on
+     * its own, so RTL and LTR each get their own polygon: the dark content area
+     * is the wider half at the bottom in both, which is the composition in the
+     * reference rather than a blind mirror of it.
+     */
+    .diagonal-edge {
+        clip-path: polygon(0 0, 100% 0, 84% 100%, 0 100%);
+    }
+
+    [dir='ltr'] .diagonal-edge {
+        clip-path: polygon(16% 0, 100% 0, 100% 100%, 0 100%);
+    }
+
+    /* Softens the seam so the photograph reads as bleeding into the green
+       rather than being pasted onto it. */
+    .diagonal-fade {
+        background-image: linear-gradient(
+            to left,
+            var(--color-g-950) 0%,
+            color-mix(in srgb, var(--color-g-950) 55%, transparent) 34%,
+            transparent 62%
+        );
+    }
+
+    [dir='ltr'] .diagonal-fade {
+        background-image: linear-gradient(
+            to right,
+            var(--color-g-950) 0%,
+            color-mix(in srgb, var(--color-g-950) 55%, transparent) 34%,
+            transparent 62%
+        );
+    }
+
+    /*
+     * Escapes the page container to the viewport edges. `overflow-x: clip` on
+     * the body rather than `hidden`: `hidden` would make the body a scroll
+     * container and the sticky masthead would stop sticking.
+     */
+    .full-bleed {
+        width: 100vw;
+        margin-inline: calc(50% - 50vw);
     }
 
     /* A bottom-weighted scrim for cards that carry a headline over an image. */

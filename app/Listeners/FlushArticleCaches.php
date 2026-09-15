@@ -6,26 +6,29 @@ namespace App\Listeners;
 
 use App\Events\ArticlePublished;
 use App\Events\ArticleUnpublished;
+use App\Jobs\FlushCacheTags;
 use App\Models\Article;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Cache;
 
 /**
  * Invalidates every cached surface an article appears on.
  *
- * Queued: a publish must not wait on cache invalidation, and a Redis hiccup
- * must not fail the publish request. Worst case the reader sees a stale list
- * for a few seconds.
+ * The listener itself runs inline and does almost nothing: it reads the tags
+ * off the article — two small queries, while the row is certainly still there —
+ * and hands a list of strings to a queued job. The flush is what is slow and
+ * what must not fail a publish, so the flush is what is queued.
+ *
+ * It is deliberately not a queued listener. That shape serialises the Article
+ * and re-fetches it in the worker, which turns "the article was deleted" and
+ * "the database was rebuilt" into permanently failed jobs — and the usual guard,
+ * $deleteWhenMissingModels, is read off Laravel's CallQueuedListener rather than
+ * off this class, so it never fires. Computing the tags here means the job can
+ * never be orphaned, because there is nothing left in it to orphan.
  */
-class FlushArticleCaches implements ShouldQueue
+class FlushArticleCaches
 {
     public function handle(ArticlePublished|ArticleUnpublished $event): void
     {
-        $article = $event->article;
-
-        foreach ($this->tagsFor($article) as $tag) {
-            Cache::tags($tag)->flush();
-        }
+        FlushCacheTags::dispatch($this->tagsFor($event->article));
     }
 
     /**

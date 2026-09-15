@@ -636,7 +636,7 @@ class DemoContentSeeder extends Seeder
             ->published()
             ->whereNotNull('hero_media_id')
             ->orderByDesc('published_at')
-            ->limit(12)
+            ->limit(16)
             ->pluck('id')
             ->all();
 
@@ -646,9 +646,11 @@ class DemoContentSeeder extends Seeder
         );
 
         $sections = [
-            ['type' => 'big_story', 'title' => 'القصة الكبرى', 'source' => 'manual', 'config' => ['limit' => 1, 'article_ids' => array_slice($picks, 0, 1)]],
-            ['type' => 'leads', 'title' => 'الأبرز', 'source' => 'mixed', 'config' => ['limit' => 3, 'article_ids' => array_slice($picks, 1, 2)]],
+            // Three slides, and the carousel's controls only exist because there
+            // are three. A layout pinned to one renders without them.
+            ['type' => 'big_story', 'title' => 'القصة الكبرى', 'source' => 'manual', 'config' => ['limit' => 3, 'article_ids' => array_slice($picks, 0, 3)]],
             ['type' => 'tiles', 'title' => 'استكشف مسار', 'source' => 'auto', 'config' => ['limit' => 6, 'only_featured' => true]],
+            ['type' => 'leads', 'title' => 'الأبرز', 'source' => 'mixed', 'config' => ['limit' => 3, 'article_ids' => array_slice($picks, 3, 2)]],
             ['type' => 'saudi', 'title' => 'السعودية', 'source' => 'auto', 'config' => ['limit' => 6, 'category_slug' => 'saudi']],
             ['type' => 'markets', 'title' => 'الأسواق', 'source' => 'auto', 'config' => ['limit' => 5]],
             ['type' => 'business', 'title' => 'الأعمال والشركات', 'source' => 'auto', 'config' => ['limit' => 3, 'category_slug' => 'business']],
@@ -658,11 +660,11 @@ class DemoContentSeeder extends Seeder
             ['type' => 'stories', 'title' => 'قصص نجاح', 'source' => 'auto', 'config' => ['limit' => 5, 'category_slug' => 'stories']],
             ['type' => 'most_read', 'title' => 'الأكثر قراءة', 'source' => 'auto', 'config' => ['limit' => 10]],
             ['type' => 'editors_picks', 'title' => 'اختيارات المحرر', 'source' => 'auto', 'config' => ['limit' => 5]],
-            ['type' => 'video', 'title' => 'مسار مرئي', 'source' => 'mixed', 'config' => ['limit' => 6, 'article_ids' => array_slice($picks, 3, 3)]],
+            ['type' => 'video', 'title' => 'مسار مرئي', 'source' => 'mixed', 'config' => ['limit' => 6, 'article_ids' => array_slice($picks, 5, 3)]],
             ['type' => 'podcast', 'title' => 'بودكاست', 'source' => 'auto', 'config' => ['limit' => 5, 'content_type' => 'interview']],
             ['type' => 'reports', 'title' => 'تقارير', 'source' => 'auto', 'config' => ['limit' => 5, 'content_type' => 'report']],
             ['type' => 'data', 'title' => 'بيانات', 'source' => 'auto', 'config' => ['limit' => 5, 'content_type' => 'explainer']],
-            ['type' => 'issue', 'title' => 'عدد مسار 001', 'source' => 'manual', 'config' => ['limit' => 6, 'article_ids' => array_slice($picks, 6, 6)]],
+            ['type' => 'issue', 'title' => 'عدد مسار 001', 'source' => 'manual', 'config' => ['limit' => 6, 'article_ids' => array_slice($picks, 8, 6)]],
             ['type' => 'companies', 'title' => 'شركات في الأخبار', 'source' => 'auto', 'config' => ['limit' => 8]],
             ['type' => 'newsletter', 'title' => 'النشرة البريدية', 'source' => 'manual', 'config' => ['variant' => 'inline']],
         ];

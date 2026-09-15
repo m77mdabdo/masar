@@ -103,6 +103,20 @@
                         @endif
 
                         <div class="ms-auto flex items-center gap-1">
+                            {{-- The drag handles are pointer-only; these are the
+                                 same reorder from a keyboard. --}}
+                            <button type="button" wire:click="moveSection({{ $section->id }}, -1)"
+                                    @disabled($loop->first)
+                                    aria-label="نقل {{ $section->title(app()->getLocale()) ?? $section->type }} لأعلى"
+                                    class="rounded p-1 hover:bg-gray-100 disabled:opacity-30 dark:hover:bg-white/10">
+                                <x-filament::icon icon="heroicon-o-arrow-up" class="h-4 w-4 text-gray-500" />
+                            </button>
+                            <button type="button" wire:click="moveSection({{ $section->id }}, 1)"
+                                    @disabled($loop->last)
+                                    aria-label="نقل {{ $section->title(app()->getLocale()) ?? $section->type }} لأسفل"
+                                    class="rounded p-1 hover:bg-gray-100 disabled:opacity-30 dark:hover:bg-white/10">
+                                <x-filament::icon icon="heroicon-o-arrow-down" class="h-4 w-4 text-gray-500" />
+                            </button>
                             <button type="button" wire:click="toggleSection({{ $section->id }})"
                                     class="rounded p-1 hover:bg-gray-100 dark:hover:bg-white/10">
                                 <x-filament::icon :icon="$section->is_visible ? 'heroicon-o-eye' : 'heroicon-o-eye-slash'"

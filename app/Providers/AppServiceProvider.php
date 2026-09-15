@@ -8,6 +8,7 @@ use App\Models\Article;
 use App\Models\Category;
 use App\Models\Company;
 use App\Models\Country;
+use App\Models\HomepageLayout;
 use App\Models\Industry;
 use App\Models\Market;
 use App\Models\MenuItem;
@@ -27,8 +28,11 @@ use App\Services\Ai\NullAiProvider;
 use App\Support\Settings;
 use App\View\Composers\NavigationComposer;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -72,6 +76,7 @@ class AppServiceProvider extends ServiceProvider
             'menu_item' => MenuItem::class,
             'setting' => Setting::class,
             'source' => Source::class,
+            'homepage_layout' => HomepageLayout::class,
 
             // Spatie's activity log (causer) and permission tables store User
             // morphs, so it must be mapped or enforceMorphMap() will reject them.
@@ -84,6 +89,7 @@ class AppServiceProvider extends ServiceProvider
         Paginator::defaultSimpleView('vendor.pagination.masar');
 
         $this->registerPolicies();
+        $this->registerRateLimiters();
 
         // Navigation is needed by the public layout and nothing else, so it is
         // composed onto those views rather than shared globally.
@@ -91,6 +97,27 @@ class AppServiceProvider extends ServiceProvider
             ['components.layout.public'],
             NavigationComposer::class,
         );
+    }
+
+    /**
+     * Rate limits that protect a person rather than the server.
+     *
+     * The newsletter limiter is the one that matters: double opt-in means an
+     * unauthenticated stranger can cause mail to be sent to an address they do
+     * not own, so the cost of abuse lands on a third party. Keyed by IP because
+     * there is no account to key on, and deliberately low — a human subscribes
+     * once, not five times a minute.
+     */
+    private function registerRateLimiters(): void
+    {
+        RateLimiter::for('newsletter', fn (Request $request) => [
+            Limit::perMinute(5)->by($request->ip()),
+            Limit::perDay(20)->by($request->ip()),
+        ]);
+
+        // Search is a read, so this is a capacity control, not a safety one:
+        // every query is a LIKE scan until Scout replaces it.
+        RateLimiter::for('search', fn (Request $request) => Limit::perMinute(30)->by($request->ip()));
     }
 
     /**

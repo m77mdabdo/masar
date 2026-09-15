@@ -90,12 +90,13 @@ enum HomepageSectionType: string
 
     public function defaultLimit(): int
     {
-        // These are the counts the front page is designed around: a big story
-        // alone, three secondary leads, six tiles, a feature plus five rows.
+        // These are the counts the front page is designed around: three big
+        // stories in the carousel, three secondary leads, six tiles, a feature
+        // plus five rows.
         // A section that resolves more than its template renders is content an
         // editor placed and no reader ever sees.
         return match ($this) {
-            self::BigStory => 1,
+            self::BigStory => 3,
             self::Leads, self::Business => 3,
             self::Insights, self::Intelligence => 4,
             self::Markets, self::Stories, self::EditorsPicks,

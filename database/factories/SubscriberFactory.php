@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\SubscriberStatus;
 use App\Models\Subscriber;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -20,7 +21,7 @@ class SubscriberFactory extends Factory
         return [
             'email' => $this->faker->unique()->safeEmail(),
             'locale' => 'ar',
-            'status' => 'pending',
+            'status' => SubscriberStatus::Pending,
             'verified_at' => null,
             'preferences' => ['frequency' => 'weekly', 'categories' => []],
             'visitor_id' => (string) Str::uuid(),
@@ -32,7 +33,7 @@ class SubscriberFactory extends Factory
     public function confirmed(): static
     {
         return $this->state([
-            'status' => 'confirmed',
+            'status' => SubscriberStatus::Confirmed,
             'verified_at' => now()->subDays($this->faker->numberBetween(1, 120)),
         ]);
     }
@@ -40,7 +41,7 @@ class SubscriberFactory extends Factory
     public function unsubscribed(): static
     {
         return $this->state([
-            'status' => 'unsubscribed',
+            'status' => SubscriberStatus::Unsubscribed,
             'unsubscribed_at' => now()->subDays($this->faker->numberBetween(1, 30)),
         ]);
     }

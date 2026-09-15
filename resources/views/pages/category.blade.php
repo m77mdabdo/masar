@@ -11,7 +11,8 @@
             <x-ui.section-rule title="مختارات" />
             <x-ui.grid :cols="3" class="mb-12">
                 @foreach ($featured as $article)
-                    <x-article.card-article :article="$article" />
+                    {{-- The first card is this page's LCP element. --}}
+                    <x-article.card-article :article="$article" :eager="$loop->first" />
                 @endforeach
             </x-ui.grid>
         @endif

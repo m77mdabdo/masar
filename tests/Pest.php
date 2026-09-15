@@ -12,6 +12,15 @@ use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
+/*
+ * The suite builds real images through the media pipeline, and the memory that
+ * costs accumulates across a full run rather than per test. At 667 tests it
+ * crossed PHP's default 128M CLI limit and died mid-run in a file that passes
+ * on its own — a failure that reads as a bug in whatever test happened to be
+ * last. Raised here so the suite does not depend on the machine's php.ini.
+ */
+ini_set('memory_limit', '512M');
+
 uses(TestCase::class, RefreshDatabase::class)->in('Feature');
 uses(TestCase::class)->in('Unit');
 

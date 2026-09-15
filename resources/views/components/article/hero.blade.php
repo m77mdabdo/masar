@@ -1,5 +1,5 @@
 @props(['article', 'url', 'quote' => null, 'sizes' => '100vw'])
-{{-- contrast-safe: renders on the hero scrim, which guarantees a g-950 ground. Mint is 2.11:1 on cream and 7.78:1 on g-950. --}}
+{{-- contrast-safe: renders on the hero scrim, which guarantees a g-950 ground. Mint is 2.07:1 on cream and 7.63:1 on g-950. --}}
 @php
     $urls = app(App\Support\EntityUrl::class);
     $locale = app()->getLocale();

@@ -1,6 +1,6 @@
-@props(['article', 'size' => 'sm', 'ratio' => null, 'play' => false, 'meta' => null, 'level' => 3])
+@props(['article', 'size' => 'sm', 'ratio' => null, 'play' => false, 'meta' => null, 'level' => 3, 'eager' => false])
 {{-- contrast-safe: renders on the card scrim, which guarantees a g-950 ground.
-     Mint is 2.11:1 on cream and 7.78:1 on g-950. --}}
+     Mint is 2.07:1 on cream and 7.63:1 on g-950. --}}
 @php
     $url = app(App\Support\EntityUrl::class)->for($article);
 
@@ -22,6 +22,7 @@
             scale="card"
             :media="$article->heroMedia"
             :alt="$article->hero_alt ?? ''"
+            :eager="$eager"
             :ratio="$box"
             :fill="true"
             sizes="{{ $size === 'sm' ? '(max-width: 640px) 100vw, 25vw' : '(max-width: 1024px) 100vw, 60vw' }}"

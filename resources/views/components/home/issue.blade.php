@@ -1,6 +1,6 @@
 @props(['section', 'stats' => []])
 {{-- contrast-safe: mint appears only on the cover, which paints g-950 under its
-     own scrim. Mint is 2.11:1 on cream and 7.78:1 on g-950. --}}
+     own scrim. Mint is 2.07:1 on cream and 7.63:1 on g-950. --}}
 @php
     $items = $section['items'];
     $cover = $items->first();

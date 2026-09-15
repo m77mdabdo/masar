@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Subscribers;
 
 use App\Filament\Resources\Subscribers\Pages\ListSubscribers;
+use App\Enums\SubscriberStatus;
 use App\Models\Subscriber;
 use BackedEnum;
 use Filament\Actions\BulkAction;
@@ -70,16 +71,14 @@ class SubscriberResource extends Resource
                 TextColumn::make('status')
                     ->label('الحالة')
                     ->badge()
-                    ->formatStateUsing(fn (string $s): string => match ($s) {
-                        'confirmed' => 'مؤكَّد',
-                        'pending' => 'بانتظار التأكيد',
-                        'unsubscribed' => 'ألغى الاشتراك',
-                        default => $s,
-                    })
-                    ->color(fn (string $s): string => match ($s) {
-                        'confirmed' => 'success',
-                        'pending' => 'warning',
-                        default => 'gray',
+                    // `$state`, not a name of our own: evaluate() resolves by
+                    // name first, and an unrecognised one silently resolves
+                    // from the container instead of failing (CLAUDE.md §6).
+                    ->formatStateUsing(fn (SubscriberStatus $state): string => $state->label())
+                    ->color(fn (SubscriberStatus $state): string => match ($state) {
+                        SubscriberStatus::Confirmed => 'success',
+                        SubscriberStatus::Pending => 'warning',
+                        SubscriberStatus::Unsubscribed => 'gray',
                     }),
                 TextColumn::make('locale')->label('اللغة')->badge(),
                 TextColumn::make('source')->label('المصدر')->badge()->placeholder('—'),
@@ -87,11 +86,11 @@ class SubscriberResource extends Resource
                 TextColumn::make('created_at')->label('الاشتراك')->dateTime('Y-m-d')->sortable(),
             ])
             ->filters([
-                SelectFilter::make('status')->label('الحالة')->options([
-                    'pending' => 'بانتظار التأكيد',
-                    'confirmed' => 'مؤكَّد',
-                    'unsubscribed' => 'ألغى الاشتراك',
-                ])->multiple(),
+                SelectFilter::make('status')->label('الحالة')
+                    ->options(fn (): array => collect(SubscriberStatus::cases())
+                        ->mapWithKeys(fn (SubscriberStatus $case): array => [$case->value => $case->label()])
+                        ->all())
+                    ->multiple(),
                 SelectFilter::make('locale')->label('اللغة')->options(
                     fn (): array => collect(config('masar.locales'))->map(fn (array $l): string => $l['name'])->all(),
                 ),

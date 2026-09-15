@@ -14,7 +14,16 @@
     $has = fn (string $type): bool => ($byType[$type]['items'] ?? collect())->isNotEmpty();
 
     $bigStory = collect($byType['big_story']['items'] ?? [])->first();
-    $lcpSizes = '(max-width: 1024px) 100vw, 62vw';
+
+    // Decorative backdrop, set on the layout rather than on the story. Falls
+    // back to the story's own hero when no editor has set one.
+    $backdrop = $layout?->backdrop();
+    $lcpMedia = $backdrop ?? $bigStory?->heroMedia;
+    // The big story is full bleed, so the hero is the viewport's full width at
+    // every size. It read 62vw while the stage was container-width, which had
+    // the browser picking a candidate for 62% of the screen and stretching it
+    // across all of it.
+    $lcpSizes = '100vw';
 @endphp
 
 <x-layout.public
@@ -22,7 +31,7 @@
     :description="setting('identity.tagline')"
     :ticker="$figures"
     :topbarLinks="$topbarLinks"
-    :preload="$bigStory?->heroMedia ? App\Support\MediaConversions::srcset($bigStory->heroMedia) : null"
+    :preload="$lcpMedia ? App\Support\MediaConversions::srcset($lcpMedia) : null"
     :preloadSizes="$lcpSizes"
 >
     @push('schema')
@@ -43,6 +52,13 @@
                 $type = $section['type'];
                 $items = $section['items'];
                 $deferPaint = ! in_array($type, ['big_story', 'leads'], true);
+
+                // The 52px rule rhythm is for a section following other
+                // sections. Directly under the full-bleed hero it reads as a
+                // gap between the photograph and the strip, so the first
+                // section after the big story closes it up.
+                $afterHero = ($previousType ?? null) === 'big_story';
+                $previousType = $type;
             @endphp
 
             {{-- A section with nothing in it renders nothing: an empty rail with
@@ -84,13 +100,13 @@
                 @endforeach
 
             @elseif ($type === 'big_story')
-                <x-home.big-story :section="$section" :sizes="$lcpSizes" />
+                <x-home.big-story :section="$section" :backdrop="$backdrop" :sizes="$lcpSizes" />
 
             @elseif ($type === 'leads')
                 <x-home.leads :section="$section" />
 
             @elseif ($type === 'tiles')
-                <x-home.tiles :section="$section" :categories="$categoryTiles" :href="route('web.home', $locale)" />
+                <x-home.tiles :section="$section" :categories="$categoryTiles" :href="route('web.home', $locale)" :tight="$afterHero" />
 
             @elseif ($type === 'saudi')
                 <x-home.feature-rows

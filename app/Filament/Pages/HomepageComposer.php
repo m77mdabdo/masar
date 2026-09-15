@@ -147,6 +147,50 @@ class HomepageComposer extends Page
         Notification::make()->success()->title('أُعيد ترتيب الأقسام')->send();
     }
 
+    /**
+     * Keyboard path to the same reordering the drag handles do.
+     *
+     * HTML5 drag-and-drop cannot be operated from a keyboard at all, so for the
+     * life of this page an editor who does not use a pointer could hide a
+     * section and delete one but not move one. §5 makes keyboard navigation a
+     * floor, and TASK 04's whole point is that the owner changes the site
+     * without a developer — which has to include an owner using a keyboard.
+     */
+    public function moveSection(int $sectionId, int $direction): void
+    {
+        $section = $this->ownedSection($sectionId);
+
+        if ($section === null || ! in_array($direction, [-1, 1], true)) {
+            return;
+        }
+
+        $ordered = $this->currentLayout()?->sections()->orderBy('sort_order')->get();
+
+        if ($ordered === null) {
+            return;
+        }
+
+        $index = $ordered->search(fn (HomepageSection $s): bool => $s->is($section));
+        $target = $ordered->get($index + $direction);
+
+        if ($target === null) {
+            return;
+        }
+
+        // Rewrite the whole run rather than swapping two values: seeded rows can
+        // share a sort_order, and a swap between equals moves nothing.
+        $reordered = $ordered->all();
+        [$reordered[$index], $reordered[$index + $direction]] = [$reordered[$index + $direction], $reordered[$index]];
+
+        $position = 1;
+
+        foreach ($reordered as $row) {
+            $row->forceFill(['sort_order' => $position++])->save();
+        }
+
+        Cache::tags('homepage')->flush();
+    }
+
     public function toggleSection(int $sectionId): void
     {
         $section = $this->ownedSection($sectionId);

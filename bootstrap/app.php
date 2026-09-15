@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\HandleMissingPages;
+use App\Http\Middleware\IssueVisitorId;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -19,6 +20,14 @@ return Application::configure(basePath: dirname(__DIR__))
          * it 404s before any route middleware runs.
          */
         $middleware->append(HandleMissingPages::class);
+
+        /*
+         * Returning audience is the primary KPI and there are no reader
+         * accounts, so a first-party anonymous cookie is the only handle we
+         * have. In the `web` group because it needs the cookie stack, and
+         * prepended so a POST that subscribes can read the id it just issued.
+         */
+        $middleware->web(prepend: [IssueVisitorId::class]);
 
         // The locale segment is user input; SetLocale is what validates it.
         $middleware->alias([

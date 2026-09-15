@@ -2,11 +2,11 @@
 {{-- Cream, one hairline, one 42px row. --}}
 <div class="border-b border-line bg-cream">
     <x-ui.container>
-        <div class="flex h-[2.625rem] items-center justify-between gap-4 text-xs">
+        <div class="flex h-[3rem] items-center justify-between gap-4 text-xs">
             {{-- aria-hidden: the masthead carries the same line as real content,
                  and a second copy outside every landmark is furniture a screen
                  reader has to step over. --}}
-            <p class="hidden text-ink-3 sm:block" aria-hidden="true">{{ setting('identity.tagline') }}</p>
+            <p class="hidden text-ink-3 sm:block" aria-hidden="true">{{ setting('identity.descriptor') }}</p>
 
             <nav class="flex items-center gap-4" aria-label="روابط سريعة">
                 @foreach (collect($links)->take(4) as $link)

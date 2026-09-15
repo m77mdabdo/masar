@@ -34,10 +34,45 @@ Route::middleware('locale')
         // would be read as a category named "rss.xml".
         Route::get('/rss.xml', [Web\FeedController::class, 'locale'])->name('rss.locale');
 
-        Route::get('/search', Web\SearchController::class)->name('search');
+        Route::get('/search', Web\SearchController::class)->middleware('throttle:search')->name('search');
         Route::get('/markets', Web\MarketsController::class)->name('markets');
         Route::get('/video', [Web\VideoController::class, 'index'])->name('video.index');
         Route::get('/newsletter', Web\NewsletterController::class)->name('newsletter');
+
+        /*
+         * Declared here, above the {category} catch-all: `/ar/newsletter/subscribe`
+         * is two segments and would otherwise be read as an article called
+         * "subscribe" inside a category called "newsletter".
+         *
+         * Throttled by the `newsletter` limiter. Double opt-in means a stranger
+         * can cause mail to be sent to an address they do not own, so the rate
+         * limit is a safety control here, not a capacity one — the per-address
+         * cooling-off window in SubscribeToNewsletter is the other half.
+         */
+        Route::post('/newsletter/subscribe', [Web\NewsletterSubscriptionController::class, 'store'])
+            ->middleware('throttle:newsletter')
+            ->name('newsletter.subscribe');
+
+        Route::get('/newsletter/confirm/{subscriber}', [Web\NewsletterSubscriptionController::class, 'confirm'])
+            ->middleware('signed')
+            ->name('newsletter.confirm');
+
+        /*
+         * Unsubscribe is two steps, and the GET does nothing.
+         *
+         * Mail clients and security scanners fetch every link in a message
+         * before a human sees it. A GET that unsubscribed on request would drop
+         * real readers off the list without anyone clicking. So the GET renders
+         * a button and the POST is the act — which is also the shape RFC 8058
+         * one-click unsubscribe expects.
+         */
+        Route::get('/newsletter/unsubscribe/{subscriber}', [Web\NewsletterSubscriptionController::class, 'unsubscribe'])
+            ->middleware('signed')
+            ->name('newsletter.unsubscribe');
+
+        Route::post('/newsletter/unsubscribe/{subscriber}', [Web\NewsletterSubscriptionController::class, 'destroy'])
+            ->middleware('signed')
+            ->name('newsletter.unsubscribe.confirm');
         Route::get('/about', [Web\PageController::class, 'about'])->name('about');
         Route::get('/contact', [Web\PageController::class, 'contact'])->name('contact');
         Route::get('/editorial-standards', [Web\PageController::class, 'editorialStandards'])->name('editorial-standards');

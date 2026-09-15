@@ -71,9 +71,9 @@ it('writes an audit entry when a setting changes', function (): void {
 });
 
 it('groups a setting by its namespace', function (): void {
-    settings()->set('integrations.analytics_id', 'G-XXXX');
+    settings()->set('integrations.newsletter_key', 'nk-XXXX');
 
-    expect(Setting::where('key', 'integrations.analytics_id')->value('group'))->toBe('integrations');
+    expect(Setting::where('key', 'integrations.newsletter_key')->value('group'))->toBe('integrations');
 });
 
 it('updates rather than duplicating an existing key', function (): void {

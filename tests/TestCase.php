@@ -32,6 +32,39 @@ abstract class TestCase extends BaseTestCase
         self::acquireSuiteLock();
     }
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        self::refuseToRunOutsideTheTestDatabase();
+    }
+
+    /**
+     * Refuses to touch anything that is not a test database.
+     *
+     * RefreshDatabase runs `migrate:fresh`, so pointing the suite at the wrong
+     * schema does not fail — it silently destroys it. That happened once, for
+     * real: `php artisan test` launched as a subprocess inherited
+     * DB_DATABASE=masar from the parent's environment, PHPUnit declined to
+     * override an already-set variable, and the suite wiped the development
+     * database. `force="true"` in phpunit.xml closes that specific hole; this
+     * closes the class of it, because the next way in will not look the same.
+     */
+    private static function refuseToRunOutsideTheTestDatabase(): void
+    {
+        $database = (string) config('database.connections.'.config('database.default').'.database');
+
+        if ($database === '' || str_contains($database, 'test')) {
+            return;
+        }
+
+        throw new RuntimeException(
+            "The test suite is pointed at the database [{$database}], which is not a test database. "
+            .'Refusing to run: RefreshDatabase would destroy it. '
+            .'Check that DB_DATABASE is not set in the environment that launched this run.',
+        );
+    }
+
     private static function acquireSuiteLock(): void
     {
         if (self::$lock !== null) {

@@ -6,6 +6,9 @@
     'fill' => false,
     'scale' => 'full',
     'eager' => false,
+    // Where the crop keeps its subject. `cover` throws away whichever axis is
+    // too long; without this it always throws it away from the middle.
+    'focal' => null,
     'sizes' => '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
 ])
 @php
@@ -47,6 +50,7 @@
             width="{{ $box->width }}"
             height="{{ $box->height }}"
             @class(['h-full w-full object-cover', 'absolute inset-0' => $fill])
+            @if ($focal) style="object-position: {{ $focal }}" @endif
             @if ($eager) fetchpriority="high" decoding="async"
             @else loading="lazy" decoding="async" @endif
         />
