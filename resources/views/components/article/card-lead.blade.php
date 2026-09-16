@@ -6,6 +6,7 @@
 <article class="group grid grid-cols-[1fr_5.75rem] items-start gap-4 bg-cream p-5">
     <div class="min-w-0">
         @if ($article->category)
+            <x-article.sponsored-flag :article="$article" />
             <span class="font-display text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-g-600">{{ $article->category->name }}</span>
         @endif
         <h3 class="mt-1.5 font-display text-base font-semibold text-g-950">

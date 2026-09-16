@@ -7,6 +7,17 @@ use App\Models\Article;
 use App\Models\Category;
 use App\Support\EntityUrl;
 
+/*
+ * Demo mode defaults ON, and it suppresses indexing across every surface — the
+ * robots meta tag, robots.txt and both sitemaps. These tests are about the site
+ * as it behaves once real content exists, so they say so explicitly rather than
+ * relying on a default that is deliberately the other way.
+ */
+beforeEach(function (): void {
+    app(App\Support\Settings::class)->set(App\Support\DemoMode::SETTING, false);
+});
+
+
 function publishedArticle(array $attributes = []): Article
 {
     $category = Category::factory()->create(['slug' => 'saudi', 'is_active' => true]);

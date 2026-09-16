@@ -94,7 +94,12 @@ it('takes a title from a news sitemap and falls back to the slug', function (): 
 });
 
 it('treats 304 as a success and not as a missing feed', function (): void {
-    Http::fake(['*' => Http::response('', 304)]);
+    // robots.txt is answered separately: a wildcard fake would serve it the 304
+    // under test, and an unreadable robots.txt correctly refuses the fetch.
+    Http::fake([
+        '*/robots.txt' => Http::response("User-agent: *\nDisallow:\n", 200),
+        '*' => Http::response('', 304),
+    ]);
 
     $result = app(RssFetcher::class)->fetch(Source::factory()->create(['etag' => 'W/"abc"']));
 
@@ -120,7 +125,10 @@ it('sends the conditional headers it was given', function (): void {
 });
 
 it('honours Retry-After rather than treating a rate limit as our error', function (): void {
-    Http::fake(['*' => Http::response('', 429, ['Retry-After' => '120'])]);
+    Http::fake([
+        '*/robots.txt' => Http::response("User-agent: *\nDisallow:\n", 200),
+        '*' => Http::response('', 429, ['Retry-After' => '120']),
+    ]);
 
     $result = app(RssFetcher::class)->fetch(Source::factory()->create());
 

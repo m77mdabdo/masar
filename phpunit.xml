@@ -47,6 +47,15 @@
         <env name="DB_USERNAME" value="root" force="true"/>
         <env name="DB_PASSWORD" value="" force="true"/>
         <env name="DB_URL" value="" force="true"/>
+        <!-- Redis databases of their own. The suite uses the real Redis
+             connection — CACHE_STORE=array does not touch the Redis facade — so
+             without this the tests write into the development buffers and back:
+             test article ids appeared in the dev view buffer, and dedupe keys
+             with a 24-hour TTL survived RefreshDatabase, so a run could pass or
+             fail on what ran yesterday. Tests\TestCase refuses to run if these
+             did not take effect. -->
+        <env name="REDIS_DB" value="14" force="true"/>
+        <env name="REDIS_CACHE_DB" value="15" force="true"/>
         <env name="MAIL_MAILER" value="array" force="true"/>
         <env name="QUEUE_CONNECTION" value="sync" force="true"/>
         <env name="SESSION_DRIVER" value="array" force="true"/>

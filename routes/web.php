@@ -77,6 +77,20 @@ Route::middleware('locale')
         Route::get('/contact', [Web\PageController::class, 'contact'])->name('contact');
         Route::get('/editorial-standards', [Web\PageController::class, 'editorialStandards'])->name('editorial-standards');
 
+        // Seeded footer links pointed at these three for the life of the
+        // project and every one of them 404'd.
+        Route::get('/corrections', [Web\PageController::class, 'corrections'])->name('corrections');
+        Route::get('/advertise', [Web\PageController::class, 'advertise'])->name('advertise');
+        Route::get('/team', [Web\PageController::class, 'team'])->name('team');
+
+        // Click-through for an advertisement. A redirect rather than a direct
+        // link, so a click is counted once, server-side, without any script on
+        // the page and without the advertiser learning anything we did not
+        // choose to send.
+        Route::get('/ads/{creative}/click', Web\AdClickController::class)
+            ->whereNumber('creative')
+            ->name('ads.click');
+
         Route::get('/opportunities', [Web\OpportunityController::class, 'index'])->name('opportunities.index');
         Route::get('/opportunities/{slug}', [Web\OpportunityController::class, 'show'])->name('opportunity.show');
 

@@ -62,8 +62,16 @@ return [
             'report' => false,
         ],
 
-        // Cloudflare R2 speaks S3. Credentials come from the environment only —
-        // CLAUDE.md §5: no keys in code.
+        /*
+         * Cloudflare R2 speaks S3. Credentials come from the environment only —
+         * CLAUDE.md §5: no keys in code.
+         *
+         * `throw` is TRUE here, unlike every other disk. A misconfigured object
+         * store does not fail at boot; it fails on the first write, and with
+         * `throw => false` that write returns `false` and is discarded. An
+         * editor uploads a photograph, sees no error, and the file is nowhere.
+         * Loud is the only safe setting for a remote disk.
+         */
         'r2' => [
             'driver' => 's3',
             'key' => env('R2_ACCESS_KEY_ID'),
@@ -74,8 +82,8 @@ return [
             'endpoint' => env('R2_ENDPOINT'),
             'use_path_style_endpoint' => env('R2_USE_PATH_STYLE_ENDPOINT', false),
             'visibility' => 'public',
-            'throw' => false,
-            'report' => false,
+            'throw' => true,
+            'report' => true,
         ],
 
         's3' => [

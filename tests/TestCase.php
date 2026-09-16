@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Support\Facades\Redis;
 use RuntimeException;
 
 abstract class TestCase extends BaseTestCase
@@ -25,6 +26,8 @@ abstract class TestCase extends BaseTestCase
      */
     private static mixed $lock = null;
 
+    private static bool $redisReady = false;
+
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
@@ -32,11 +35,50 @@ abstract class TestCase extends BaseTestCase
         self::acquireSuiteLock();
     }
 
+    /**
+     * Give the suite its own Redis databases, and start from empty.
+     *
+     * The suite uses the real Redis connection, so without this it shares the
+     * development buffers: test article ids turned up in the development view
+     * buffer, and dedupe keys carrying a 24-hour TTL survived RefreshDatabase —
+     * which means a run could pass or fail on what ran yesterday. Isolation
+     * that depends on nobody noticing is not isolation.
+     *
+     * Guarded rather than trusted, for the same reason the database is: a
+     * forced value in phpunit.xml does not always win over the environment.
+     */
+    private static function isolateRedis(): void
+    {
+        if (self::$redisReady) {
+            return;
+        }
+
+        self::$redisReady = true;
+
+        $default = (int) config('database.redis.default.database');
+        $cache = (int) config('database.redis.cache.database');
+
+        if ($default < 10 || $cache < 10) {
+            throw new RuntimeException(
+                "The test suite is pointed at Redis databases {$default}/{$cache}, which development uses. "
+                .'Refusing to run: it would read and write the development buffers. '
+                .'Check REDIS_DB and REDIS_CACHE_DB are not set in the environment that launched this run.',
+            );
+        }
+
+        // Start from empty so yesterday's keys cannot decide today's result.
+        Redis::connection()->flushdb();
+        Redis::connection('cache')->flushdb();
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
 
         self::refuseToRunOutsideTheTestDatabase();
+        // After the app boots: setUpBeforeClass has no container, so neither
+        // config() nor the Redis facade exists there.
+        self::isolateRedis();
     }
 
     /**

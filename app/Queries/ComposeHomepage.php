@@ -12,6 +12,7 @@ use App\Models\HomepageSection;
 use App\Models\Opportunity;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Resolves a homepage layout into the content it actually renders.
@@ -304,10 +305,49 @@ class ComposeHomepage
         }
 
         return match ($type) {
-            HomepageSectionType::MostRead => $filtered->sortByDesc('views_count')->values(),
+            HomepageSectionType::MostRead => $this->mostRead($filtered),
             HomepageSectionType::EditorsPicks => $filtered->filter(fn (Article $a): bool => (bool) $a->is_featured)->values(),
             default => $filtered->values(),
         };
+    }
+
+    /**
+     * Ranked on real reads in a rolling window — or not shown at all.
+     *
+     * `views_count` was written by nothing, so this section ranked on seeded
+     * numbers and «الأكثر قراءة» meant "whatever the seeder wrote". It now ranks
+     * on `article_views`, which only real readership fills.
+     *
+     * **Until there is real data the section returns nothing and disappears.**
+     * An empty most-read block for a few days is honest; a fabricated one is
+     * not — and falling back to the lifetime column would quietly restore
+     * exactly the fabrication this replaced.
+     *
+     * The window is days, not all time, because most-read on a news site means
+     * this week. A lifetime ranking ossifies and the section stops changing.
+     *
+     * @param  Collection<int, Article>  $articles
+     * @return Collection<int, Article>
+     */
+    private function mostRead(Collection $articles): Collection
+    {
+        $days = (int) config('masar.views.window_days', 7);
+
+        $reads = DB::table('article_views')
+            ->where('viewed_on', '>=', now()->subDays($days)->toDateString())
+            ->whereIn('article_id', $articles->pluck('id'))
+            ->selectRaw('article_id, SUM(views) as total')
+            ->groupBy('article_id')
+            ->pluck('total', 'article_id');
+
+        if ($reads->isEmpty()) {
+            return collect();
+        }
+
+        return $articles
+            ->filter(fn (Article $a): bool => $reads->has($a->getKey()))
+            ->sortByDesc(fn (Article $a): int => (int) $reads[$a->getKey()])
+            ->values();
     }
 
     /**

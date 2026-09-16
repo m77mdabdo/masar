@@ -29,7 +29,14 @@
 
     <title>{{ $pageTitle }}</title>
     @if ($description)<meta name="description" content="{{ $description }}">@endif
-    @if ($noindex)<meta name="robots" content="noindex, follow">@endif
+    {{-- Demo mode wins over the per-page flag and is stricter: nofollow as well,
+         because we do not want a crawler walking from here into generated copy.
+         The switch defaults closed, so a fresh deploy emits this. --}}
+    @if (app(App\Support\DemoMode::class)->isOn())
+        <meta name="robots" content="noindex, nofollow">
+    @elseif ($noindex)
+        <meta name="robots" content="noindex, follow">
+    @endif
 
     <link rel="canonical" href="{{ $canonical ?? url()->current() }}">
 
@@ -91,6 +98,13 @@
     @stack('schema')
 </head>
 <body class="min-h-screen bg-cream text-ink antialiased">
+@if (app(App\Support\DemoMode::class)->isOn())
+    {{-- Visible to a reader, not only to a crawler. Someone who lands on this
+         site should know what they are reading before they quote it. --}}
+    <div role="status" class="bg-gold-ink px-4 py-2 text-center text-[0.8125rem] font-medium text-cream">
+        نسخة تجريبية — المحتوى المعروض لأغراض العرض فقط وليس تغطية صحفية منشورة.
+    </div>
+@endif
     <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-3 focus:rounded-lg focus:bg-g-900 focus:px-4 focus:py-2 focus:text-cream">
         تخطَّ إلى المحتوى
     </a>

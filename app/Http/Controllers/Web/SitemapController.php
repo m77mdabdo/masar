@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Web;
 use App\Models\Article;
 use App\Models\Category;
 use App\Models\Topic;
+use App\Support\DemoMode;
 use App\Support\EntityUrl;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
@@ -15,10 +16,24 @@ class SitemapController
 {
     public function __construct(
         private readonly EntityUrl $urls,
+        private readonly DemoMode $demo,
     ) {}
+
+    /*
+     * A sitemap in demo mode would hand a crawler the full list of generated
+     * articles while robots.txt tells it to stay out — a contradiction that
+     * resolves in the crawler's favour often enough to matter. 404 is the
+     * honest answer: there is no sitemap for a site that is not to be indexed.
+     */
+    private function hiddenInDemoMode(): void
+    {
+        abort_if($this->demo->isOn(), 404);
+    }
 
     public function index(): Response
     {
+        $this->hiddenInDemoMode();
+
         $entries = Cache::tags(['articles', 'navigation'])->remember(
             'sitemap',
             (int) config('masar.cache.lists'),
@@ -34,6 +49,8 @@ class SitemapController
      */
     public function news(): Response
     {
+        $this->hiddenInDemoMode();
+
         $articles = Article::query()
             ->published()
             ->where('published_at', '>=', now()->subHours(48))

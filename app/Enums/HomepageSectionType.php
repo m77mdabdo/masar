@@ -25,7 +25,6 @@ enum HomepageSectionType: string
     case MostRead = 'most_read';
     case EditorsPicks = 'editors_picks';
     case Video = 'video';
-    case Podcast = 'podcast';
     case Reports = 'reports';
     case Data = 'data';
     case Issue = 'issue';
@@ -48,7 +47,6 @@ enum HomepageSectionType: string
             self::MostRead => 'الأكثر قراءة',
             self::EditorsPicks => 'اختيارات المحرر',
             self::Video => 'مرئيات',
-            self::Podcast => 'بودكاست',
             self::Reports => 'تقارير',
             self::Data => 'بيانات',
             self::Issue => 'ملف العدد',
@@ -100,7 +98,7 @@ enum HomepageSectionType: string
             self::Leads, self::Business => 3,
             self::Insights, self::Intelligence => 4,
             self::Markets, self::Stories, self::EditorsPicks,
-            self::Podcast, self::Reports, self::Data => 5,
+            self::Reports, self::Data => 5,
             self::Saudi, self::Opportunities, self::Video, self::Issue => 6,
             self::Tiles => 6,
             self::Companies => 8,

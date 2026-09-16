@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Intelligence;
 
+use App\Actions\Intelligence\ClearDuplicateFlag;
+use App\Actions\Intelligence\CreateDraftFromIntelligenceItem;
 use App\Actions\Intelligence\TriageIntelligenceItem;
 use App\Enums\ClassificationPath;
 use App\Enums\DocumentType;
 use App\Enums\ReviewState;
+use App\Filament\Resources\Articles\ArticleResource;
 use App\Filament\Resources\Intelligence\Pages\ListIntelligenceItems;
 use App\Models\IntelligenceItem;
 use App\Models\Source;
@@ -15,6 +18,7 @@ use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
@@ -89,9 +93,11 @@ class IntelligenceItemResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            // The queue order: most important first, then most recent. Matches
-            // IntelligenceItem::scopeQueued so the surface and the model agree.
-            ->defaultSort('importance', 'desc')
+            // The queue order: most important first, then most recent. Sorted by
+            // the *live* score — base plus recency against NOW() — because a
+            // stored score freezes an item's age at ingest and the ranking
+            // stops meaning anything within a day.
+            ->defaultSort(fn (Builder $query): Builder => $query->orderByLiveImportance())
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['source', 'duplicateOf', 'reviewer']))
             ->columns([
                 TextColumn::make('title')
@@ -111,8 +117,12 @@ class IntelligenceItemResource extends Resource
                     ->label('الأهمية')
                     ->badge()
                     ->sortable()
-                    ->color(fn (?int $state): string => match (true) {
-                        $state === null => 'gray',
+                    // The live score, not the stored one. The stored value is
+                    // kept for audit — it is what we thought at ingest — but it
+                    // is not what should rank the queue today.
+                    ->state(fn (IntelligenceItem $record): int => $record->liveImportance())
+                    ->tooltip(fn (IntelligenceItem $record): string => 'عند الرصد: '.$record->importance)
+                    ->color(fn (int $state): string => match (true) {
                         $state >= 70 => 'danger',
                         $state >= 40 => 'warning',
                         default => 'gray',
@@ -135,11 +145,18 @@ class IntelligenceItemResource extends Resource
                     ->formatStateUsing(fn (ReviewState $state): string => $state->label())
                     ->color(fn (ReviewState $state): string => $state->colour()),
 
+                // Visible by default, not behind a toggle. The title stage is
+                // known-weak, so an editor needs to see what an item was
+                // flagged against in order to judge the flag at all.
                 TextColumn::make('duplicateOf.title')
                     ->label('مكرر عن')
                     ->placeholder('—')
                     ->wrap()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->color('warning')
+                    ->description(fn (IntelligenceItem $record): ?string => $record->duplicate_stage === null
+                        ? null
+                        : 'مطابقة عبر: '.$record->duplicate_stage->label())
+                    ->url(fn (IntelligenceItem $record): ?string => $record->duplicateOf?->url, shouldOpenInNewTab: true),
 
                 TextColumn::make('published_at')
                     ->label('النشر')
@@ -190,6 +207,24 @@ class IntelligenceItemResource extends Resource
                     ),
             ])
             ->recordActions([
+                Action::make('createDraft')
+                    ->label('أنشئ مسودة')
+                    ->icon(Heroicon::OutlinedPencilSquare)
+                    ->color('primary')
+                    // Once an item has a draft it has one; the action is not a
+                    // way to create a second article for the same story.
+                    ->visible(fn (IntelligenceItem $record): bool => $record->article_id === null)
+                    ->action(function (IntelligenceItem $record) {
+                        $article = app(CreateDraftFromIntelligenceItem::class)($record, auth()->user());
+
+                        Notification::make()
+                            ->title('أُنشئت مسودة')
+                            ->body('المصدر مرفق كمرجع. العنوان والنص من كتابتك.')
+                            ->success()
+                            ->send();
+
+                        return redirect(ArticleResource::getUrl('edit', ['record' => $article]));
+                    }),
                 self::triageAction('approve', ReviewState::Approved, 'اعتماد', Heroicon::OutlinedCheckCircle, 'success'),
                 self::triageAction('save', ReviewState::Saved, 'حفظ لاحقًا', Heroicon::OutlinedBookmark, 'warning'),
                 ActionGroup::make([
@@ -199,6 +234,14 @@ class IntelligenceItemResource extends Resource
                     // by mistake at 9am is undoable for the rest of the month.
                     self::triageAction('restore', ReviewState::New, 'إعادة إلى الصندوق', Heroicon::OutlinedArrowUturnLeft, 'info')
                         ->visible(fn (IntelligenceItem $record): bool => $record->review_state->isResolved()),
+                    Action::make('notDuplicate')
+                        ->label('ليس مكررًا')
+                        ->icon(Heroicon::OutlinedScissors)
+                        ->color('warning')
+                        ->visible(fn (IntelligenceItem $record): bool => $record->duplicate_of_id !== null)
+                        ->action(function (IntelligenceItem $record): void {
+                            app(ClearDuplicateFlag::class)($record, auth()->user());
+                        }),
                     Action::make('open')
                         ->label('فتح المصدر')
                         ->icon(Heroicon::OutlinedArrowTopRightOnSquare)

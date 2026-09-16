@@ -23,6 +23,21 @@ enum DocumentType: string
     case Statistic = 'statistic';
     case Announcement = 'announcement';
     case Report = 'report';
+
+    /*
+     * The three non-institutional forms.
+     *
+     * The ten cases above are all things an institution publishes, which is
+     * what the classifier was built to read. Measured against a real business
+     * feed, half the misses were none of them: prices moving, someone
+     * forecasting, and an executive saying something. A reader's decision is
+     * moved by all three, so the inbox carries them — but they are not
+     * documents, and the weights below say so.
+     */
+    case MarketMove = 'market_move';
+    case Forecast = 'forecast';
+    case Statement = 'statement';
+
     case Other = 'other';
 
     public function label(): string
@@ -38,6 +53,9 @@ enum DocumentType: string
             self::Statistic => 'إحصاء',
             self::Announcement => 'إعلان',
             self::Report => 'تقرير',
+            self::MarketMove => 'حركة سوق',
+            self::Forecast => 'توقّع',
+            self::Statement => 'تصريح',
             self::Other => 'غير مصنّف',
         };
     }
@@ -47,6 +65,12 @@ enum DocumentType: string
      *
      * A decision or a regulation changes what a business may do. An
      * announcement usually does not.
+     *
+     * The three non-institutional forms sit deliberately low. A market move is
+     * a fact, but a transient one a market participant usually knows before we
+     * do. A forecast is an opinion about the future. A statement is often
+     * positioning. None of them binds anyone to anything, which is what
+     * separates them from a decision — so none of them scores like one.
      */
     public function weight(): float
     {
@@ -54,8 +78,9 @@ enum DocumentType: string
             self::Decision, self::Regulation => 1.0,
             self::Tender, self::Licence, self::Funding => 0.9,
             self::Earnings, self::Statistic => 0.7,
+            self::MarketMove => 0.6,
             self::Report, self::Appointment => 0.5,
-            self::Announcement => 0.4,
+            self::Announcement, self::Forecast, self::Statement => 0.4,
             self::Other => 0.3,
         };
     }

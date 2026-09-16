@@ -8,17 +8,21 @@ use App\Models\Article;
 use App\Models\Category;
 use App\Models\Topic;
 use App\Queries\RelatedArticlesQuery;
+use App\Support\ViewCounter;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ArticleController
 {
     public function __invoke(
+        Request $request,
         string $locale,
         string $category,
         string $slug,
         RelatedArticlesQuery $related,
+        ViewCounter $views,
     ): View {
         $article = Article::query()
             ->published()
@@ -35,6 +39,11 @@ class ArticleController
         if ($article === null || $article->category?->slug !== $category) {
             throw new NotFoundHttpException;
         }
+
+        // Counted after the article is known to exist and before the view is
+        // built. Buffered, deduplicated per visitor, and silent on failure —
+        // the page does not depend on it.
+        $views->record($article, $request);
 
         return view('pages.article', [
             'article' => $article,

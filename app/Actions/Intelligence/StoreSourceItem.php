@@ -31,6 +31,7 @@ class StoreSourceItem
         private readonly Deduper $deduper,
         private readonly Classifier $classifier,
         private readonly ImportanceScorer $scorer,
+        private readonly AlertOnHighImportance $alert,
     ) {}
 
     public function __invoke(Source $source, ParsedItem $parsed): ?IntelligenceItem
@@ -41,7 +42,7 @@ class StoreSourceItem
             return null;
         }
 
-        return DB::transaction(function () use ($source, $parsed, $urlHash): ?IntelligenceItem {
+        $stored = DB::transaction(function () use ($source, $parsed, $urlHash): ?IntelligenceItem {
             // Cheapest possible exit: we already hold this exact URL for this
             // source, so there is nothing to parse, score or compare.
             $existing = SourceItem::query()
@@ -98,6 +99,7 @@ class StoreSourceItem
                 'classification_path' => $classification['path'],
                 'classification_evidence' => $classification['evidence'],
                 'importance' => $importance['score'],
+                'importance_base' => $importance['base'],
                 'importance_inputs' => $importance['inputs'],
                 'review_state' => ReviewState::New,
                 // Flagged, never discarded: a second development on the same
@@ -108,5 +110,19 @@ class StoreSourceItem
                 'duplicate_stage' => $duplicate === null ? null : $duplicate['stage'],
             ]);
         });
+
+        /*
+         * Alerting happens after the transaction commits, never inside it.
+         *
+         * A notification raised inside a transaction that then rolls back tells
+         * an editor about an item that does not exist — and the queued mail has
+         * already gone. Outside, the worst case is an item stored with no alert,
+         * which the inbox still shows.
+         */
+        if ($stored !== null) {
+            ($this->alert)($stored);
+        }
+
+        return $stored;
     }
 }

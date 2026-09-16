@@ -65,6 +65,18 @@ return [
     |--------------------------------------------------------------------------
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Demo mode
+    |--------------------------------------------------------------------------
+    | Defaults to ON, and that default is the point: a fresh deploy is not
+    | indexed until somebody decides otherwise. The setting `site.demo_mode`
+    | overrides this once an owner has made that decision in the admin.
+    */
+    'demo' => [
+        'enabled' => env('MASAR_DEMO_MODE', true),
+    ],
+
     'cache' => [
         'homepage' => 900,
         'article' => 3600,
@@ -108,6 +120,8 @@ return [
         ],
 
         'defaults' => [
+            'site.demo_mode' => true,
+
             'identity.site_name' => 'مسار',
             'identity.tagline' => 'من المعلومة إلى الفرصة',
             // The strip above the masthead says what MASAR covers; the tagline
@@ -161,6 +175,39 @@ return [
     | actually cost us readers.
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Readership
+    |--------------------------------------------------------------------------
+    | Counted once per visitor per article, buffered in Redis, flushed on a
+    | schedule. Ranking runs on a rolling window because "most read" on a news
+    | site means this week — a lifetime counter ossifies and the section stops
+    | changing.
+    */
+    'views' => [
+        // How long a visitor's read of one article is remembered, so a refresh
+        // is not a second read. A day: the same person returning tomorrow is a
+        // genuine second read and worth counting.
+        'dedupe_hours' => 24,
+
+        // The ranking window.
+        'window_days' => 7,
+
+        /*
+         * User agents never counted.
+         *
+         * Note this is a *user-agent* list and is deliberately separate from
+         * `not_found.ignore_patterns`, which matches paths. A crawler fetching
+         * a real article is not a 404 and would otherwise rank it.
+         */
+        'ignore_agents' => [
+            '#bot#i', '#crawl#i', '#spider#i', '#slurp#i', '#fetch#i',
+            '#headless#i', '#phantom#i', '#curl#i', '#wget#i', '#python-requests#i',
+            '#lighthouse#i', '#pagespeed#i', '#gtmetrix#i', '#uptime#i', '#monitor#i',
+            '#preview#i', '#facebookexternalhit#i', '#embedly#i',
+        ],
+    ],
+
     'not_found' => [
         'ignore_patterns' => [
             '#^/wp-#i',
@@ -194,6 +241,22 @@ return [
         // nobody notices the story we never saw.
         'failure_threshold' => 5,
 
+        /*
+         * What is worth waking someone for.
+         *
+         * An inbox an editor checks is not an alert; an alert is for the things
+         * that do not wait. Two of them:
+         *
+         * - a source dying, because nothing arrives from it until someone acts
+         * - an item scoring above this, because a regulator decision at 70+ is
+         *   a story with a deadline
+         *
+         * Set `alert_importance` to null to stop the second entirely. A channel
+         * that fires constantly is one people mute, and a muted alert is worse
+         * than none because everyone believes it is working.
+         */
+        'alert_importance' => 75,
+
         // Default poll interval for a new source, in minutes.
         'default_poll_minutes' => 30,
 
@@ -203,6 +266,22 @@ return [
 
         // Identifies us honestly, and gives a publisher someone to contact
         // rather than a blocked IP range.
+        /*
+         * Scheduled polling is OFF until the crawler's identity resolves.
+         *
+         * The User-Agent below names a URL and a mailbox. Both were sent to two
+         * real publishers before either existed, which means a publisher who
+         * wanted to ask us to slow down or stop had nowhere to write — the exact
+         * situation the header exists to prevent. Politeness that cannot be
+         * answered is performative.
+         *
+         * Turn this on when https://masar.sa/bot serves a page explaining what
+         * the crawler is and how to block it, and contact@masar.sa reaches a
+         * human. Until then `masar:check-sources` still runs by hand for
+         * development; it just is not on a schedule.
+         */
+        'polling_enabled' => env('MASAR_POLLING_ENABLED', false),
+
         'user_agent' => env(
             'MASAR_USER_AGENT',
             'MasarBot/1.0 (+https://masar.sa/bot; editorial monitoring; contact@masar.sa)',
@@ -231,17 +310,72 @@ return [
             // Calibrated, not taken from the literature. The usual working
             // value of 3 assumes documents of hundreds of tokens; a headline is
             // seven or eight, so a single added word moves far more bits.
-            // Measured on realistic Arabic headline pairs:
             //
-            //   identical / diacritics / reordered .......  0
-            //   one word added, "عاجل:" prefix, rewrite .. 11-14
-            //   different story, same publisher .......... 25
-            //   unrelated stories ........................ 26-33
+            // The earlier calibration was not fabricated and is reproducible:
+            // on the constructed pairs it used, same-publisher-different-story
+            // still measures 25 and unrelated still measures 30, and 16 does
+            // sit between them. The flaw was the sample. Every one of those
+            // pairs shared the stem "هيئة السوق المالية", so the shared tokens
+            // held the distances high and the gap was an artefact of the
+            // corpus, not a property of the method.
             //
-            // 16 sits in the gap. IntelligenceDedupTest pins the distribution,
-            // so a change to the Arabic normaliser that shifts it fails loudly
-            // rather than quietly flagging unrelated stories as duplicates.
-            'simhash_max_distance' => 16,
+            // Measured again against 50 real Arabic headlines from a live feed
+            // and hand-labelled pairs that do not share a stem, **the gap
+            // disappears and the classes overlap**:
+            //
+            //   same story, reworded ..................... 5, 8, 9, 14, 14, 20
+            //   different stories ........................ 7, 14, 16, 23
+            //   unrelated real pairs (1,225 of them) ..... min 17, p05 24, median 31
+            //
+            // "أرامكو تعلن نتائج الربع الثالث" against the identical sentence
+            // with سابك in place of أرامكو — two companies, two stories —
+            // measures 7, closer than most genuine rewrites. The reverse also
+            // happens: البنك المركزي paraphrased as ساما is the same story at
+            // 20. SimHash weights tokens by frequency, and across six or seven
+            // tokens the shared domain words dominate while the one word that
+            // identifies the subject barely moves a bit.
+            //
+            // So no threshold separates them. 10 is the least bad: it catches
+            // 3 of 6 labelled duplicates and wrongly flags 1 of 4 different
+            // stories, where 16 caught 5 of 6 but wrongly flagged 3 of 4 —
+            // and across 70 real items 16 produced eight false positives and
+            // no true positives.
+            //
+            // This is survivable only because the behaviour is **flag, never
+            // discard**: a flagged item is still created and still in the
+            // inbox, annotated. A wrong flag costs an editor a keystroke.
+            //
+            // **THE TITLE STAGE IS KNOWN-WEAK. Do not tune this number
+            // expecting it to help.** Three labelled pairs are the evidence,
+            // and DedupTest pins all three:
+            //
+            //   "أرامكو تعلن نتائج الربع الثالث"
+            //   "سابك تعلن نتائج الربع الثالث" ................  7  DIFFERENT stories
+            //
+            //   "البنك المركزي يبقي على سعر الفائدة دون تغيير"
+            //   "ساما تبقي سعر الفائدة دون تغيير" ............. 20  SAME story
+            //
+            //   "النحاس يتعافى من أدنى مستوى في 3 أسابيع"
+            //   "حديث عن مرحلة جديدة في مسار القطاع" .......... 14  DIFFERENT stories
+            //
+            // A different story at 7 and a genuine rewrite at 20 is not a
+            // threshold problem. The signal does not carry over six or seven
+            // tokens: SimHash weights by frequency, shared domain words
+            // dominate, and the one word naming the subject barely moves a bit.
+            //
+            // The replacement is an **entity-aware comparison**: two headlines
+            // naming different companies cannot be duplicates however similar
+            // the sentence, which is exactly what أرامكو vs سابك needs and what
+            // no distance threshold can express. The entity extractor already
+            // exists. Until then the URL stage carries the load — it produced
+            // 18 true positives on the first feed that republished articles —
+            // and this stage flags, never discards.
+            //
+            // DedupTest pins the measured overlap, including the pairs that
+            // defeat it, so the next person does not re-derive a gap that is
+            // not there. The previous distribution was also pinned by a test,
+            // which is how a wrong number survived.
+            'simhash_max_distance' => 10,
 
             // How far back the title check looks. A story recurring months
             // later is a new story.
@@ -281,6 +415,28 @@ return [
             'statistic' => ['إحصاء', 'مؤشر', 'معدل', 'نسبة', 'بيانات', 'ارتفاع بنسبة', 'انخفاض بنسبة'],
             'report' => ['تقرير', 'دراسة', 'مسح', 'تحليل'],
             'announcement' => ['تعلن', 'أعلنت', 'إعلان', 'تدشين', 'إطلاق'],
+
+            // The three non-institutional forms. Keyed on movement verbs,
+            // hedging verbs and attribution respectively, because that is what
+            // actually distinguishes them in a headline — not the subject.
+            //
+            // `statistic` already owns "ارتفاع بنسبة" and "انخفاض بنسبة", which
+            // is the right split: a percentage change reported as a figure is a
+            // statistic, a price crossing a level is a market move.
+            'market_move' => [
+                'يتجاوز', 'تتجاوز', 'يتراجع', 'تتراجع', 'يرتفع', 'ترتفع',
+                'يهبط', 'تهبط', 'يقفز', 'تقفز', 'يتعافى', 'تتعافى',
+                'يستقر', 'تستقر', 'يفقد مكاسبه', 'إغلاق السوق',
+                'برنت', 'خام برنت', 'وول ستريت', 'عوائد السندات',
+            ],
+            'forecast' => [
+                'يتوقع', 'تتوقع', 'توقعات', 'المتوقع', 'يرجح', 'ترجح',
+                'تقديرات', 'يستبعد', 'توقّع',
+            ],
+            'statement' => [
+                'قال', 'قالت', 'صرح', 'صرحت', 'أكد', 'أكدت', 'يؤكد', 'تؤكد',
+                'يشير', 'تشير', 'بحسب', 'نبحث', 'يرى', 'ترى',
+            ],
         ],
 
         // Query params stripped during normalisation. Tracking parameters make

@@ -315,7 +315,7 @@ class DemoContentSeeder extends Seeder
         Article::query()->published()->inRandomOrder()->take(14)->update(['is_featured' => true]);
 
         // A mix of content types, so type-filtered sections have something to
-        // show. Four sections filter by type — intelligence, podcast, reports,
+        // show. Three sections filter by type — intelligence, reports,
         // data — and each needs its own pool after global dedup has taken its
         // cut, which is why these are sized well above each section's limit.
         $byType = [
@@ -661,7 +661,6 @@ class DemoContentSeeder extends Seeder
             ['type' => 'most_read', 'title' => 'الأكثر قراءة', 'source' => 'auto', 'config' => ['limit' => 10]],
             ['type' => 'editors_picks', 'title' => 'اختيارات المحرر', 'source' => 'auto', 'config' => ['limit' => 5]],
             ['type' => 'video', 'title' => 'مسار مرئي', 'source' => 'mixed', 'config' => ['limit' => 6, 'article_ids' => array_slice($picks, 5, 3)]],
-            ['type' => 'podcast', 'title' => 'بودكاست', 'source' => 'auto', 'config' => ['limit' => 5, 'content_type' => 'interview']],
             ['type' => 'reports', 'title' => 'تقارير', 'source' => 'auto', 'config' => ['limit' => 5, 'content_type' => 'report']],
             ['type' => 'data', 'title' => 'بيانات', 'source' => 'auto', 'config' => ['limit' => 5, 'content_type' => 'explainer']],
             ['type' => 'issue', 'title' => 'عدد مسار 001', 'source' => 'manual', 'config' => ['limit' => 6, 'article_ids' => array_slice($picks, 8, 6)]],

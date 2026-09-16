@@ -50,6 +50,20 @@ class DecayCheck extends Command
             $this->newLine();
             $this->error(count($failed).' check(s) failed. Say so in REPORT.md rather than moving on.');
 
+            // The most common cause of a rendered-output failure, and the one
+            // no application code can prevent: a raw SQL restore does not run
+            // the seeder, so nothing flushes the cache the way seeding does.
+            $rendering = array_filter(
+                $failed,
+                fn (array $row): bool => str_starts_with($row[0], 'flow: navigation') || str_starts_with($row[0], 'flow: market'),
+            );
+
+            if ($rendering !== []) {
+                $this->newLine();
+                $this->warn('If the database was just restored from a dump, try `php artisan cache:clear` first:');
+                $this->warn('an import does not run DatabaseSeeder, so nothing flushed the caches it left behind.');
+            }
+
             return self::FAILURE;
         }
 
@@ -192,10 +206,30 @@ class DecayCheck extends Command
             return [$ok, "{$sections} sections"];
         });
 
-        $this->flow('navigation renders', function () {
-            $items = DB::table('menu_items')->count();
+        /*
+         * Reads the rendered page, not the table.
+         *
+         * The previous version counted rows in `menu_items` and passed while
+         * the site served a masthead with no navigation at all — the items were
+         * in the database and an empty cached snapshot was in front of them.
+         * A check that asks the database whether the page is right is not a
+         * check on the page.
+         */
+        $this->flow('navigation renders in the masthead', function () use ($locale) {
+            $expected = DB::table('menu_items')->count();
+            $html = $this->render("/{$locale}");
 
-            return [$items > 0, "{$items} menu items"];
+            if ($html === null) {
+                return [false, 'homepage did not render'];
+            }
+
+            $header = preg_match('/<header\b.*?<\/header>/s', $html, $m) === 1 ? $m[0] : '';
+            $links = preg_match_all('/<a\b[^>]*>/i', $header);
+
+            // The masthead carries the wordmark and the newsletter link even
+            // with no menu, so "some links" is not the test — it needs enough
+            // to be a navigation.
+            return [$links >= 4, "{$links} links in <header>, {$expected} menu items in db"];
         });
 
         $this->flow('homepage order is editable', function () {
@@ -220,6 +254,21 @@ class DecayCheck extends Command
             return [$sources > 0, "{$sources} active sources · {$items} inbox items"];
         });
 
+        $this->flow('market ticker renders', function () use ($locale) {
+            // The as_of gate is meant to hide undated figures. It cannot tell
+            // the difference between "no figures" and "figures the cache is
+            // hiding", so the rendered page is the only honest check.
+            $dated = DB::table('settings')->where('key', 'market.as_of')->exists();
+            $html = $this->render("/{$locale}");
+            $rendered = $html !== null && str_contains($html, 'aria-label="مؤشرات السوق"');
+
+            if (! $dated) {
+                return [true, 'no market.as_of — ticker correctly withheld'];
+            }
+
+            return [$rendered, $rendered ? 'rendered' : 'market.as_of is set but no ticker on the page'];
+        });
+
         $this->flow('redirect becomes a 301', function () {
             $redirects = DB::table('redirects')->count();
 
@@ -242,12 +291,18 @@ class DecayCheck extends Command
 
     private function getsOk(string $path): bool
     {
+        return $this->render($path) !== null;
+    }
+
+    /** The rendered HTML of a public page, or null if it did not render. */
+    private function render(string $path): ?string
+    {
         try {
             $response = app('router')->dispatch(\Illuminate\Http\Request::create($path, 'GET'));
 
-            return $response->getStatusCode() === 200;
+            return $response->getStatusCode() === 200 ? (string) $response->getContent() : null;
         } catch (Throwable) {
-            return false;
+            return null;
         }
     }
 

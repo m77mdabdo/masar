@@ -16,6 +16,7 @@
 
     <div class="min-w-0">
         @if ($article->category)
+            <x-article.sponsored-flag :article="$article" />
             <span class="font-display text-[0.65rem] font-semibold uppercase tracking-[0.1em] text-g-600">{{ $article->category->name }}</span>
         @endif
         <h3 class="mt-0.5 font-display text-[0.85rem] font-medium text-g-950">

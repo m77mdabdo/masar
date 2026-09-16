@@ -41,6 +41,12 @@
         @endif
 
         <div class="{{ $minHeight }} flex flex-col justify-end gap-2 p-4 text-cream sm:p-5">
+            {{-- Outside every size condition. A disclosure that disappears on
+                 the small variant is not a disclosure — and the small variant
+                 is the one that appears in grids, which is where most readers
+                 meet a sponsored piece. --}}
+            <x-article.sponsored-flag :article="$article" tone="dark" class="w-fit" />
+
             @if ($article->category)
                 <span class="w-fit rounded-full border border-cream/35 px-2.5 py-0.5 text-[0.7rem] font-medium">
                     {{ $article->category->name }}

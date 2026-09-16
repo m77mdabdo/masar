@@ -5,7 +5,12 @@
     :description="'مواد ' . $author->name . ' في ' . setting('identity.site_name')"
 >
     @push('schema')
-        <x-schema.person :author="$author" :topics="$topics" />
+        <x-schema.person :author="$author" :topics="$topics" :profile-page="true" />
+        <x-schema.breadcrumbs :items="[
+            ['name' => setting('identity.site_name'), 'url' => route('web.home', app()->getLocale())],
+            ['name' => 'الكتّاب', 'url' => route('web.author.show', [app()->getLocale(), $author->id])],
+            ['name' => $author->name, 'url' => route('web.author.show', [app()->getLocale(), $author->id])],
+        ]" />
     @endpush
 
     <x-ui.container class="py-10">
@@ -60,6 +65,8 @@
             @endforelse
         </div>
 
-        <div class="mt-10">{{ $articles->links() }}</div>
+        @if ($articles->hasPages())
+            <div class="mt-10">{{ $articles->links() }}</div>
+        @endif
     </x-ui.container>
 </x-layout.public>

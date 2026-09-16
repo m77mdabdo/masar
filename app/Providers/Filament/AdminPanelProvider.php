@@ -66,6 +66,18 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogoHeight('2rem')
             ->favicon(asset('favicon.ico'))
 
+            /*
+             * The in-app notification centre. Database-backed, so a notice
+             * survives the editor not being logged in when it was raised —
+             * which is the case that matters: a source dies at 3am and the
+             * person who can fix it arrives at 9.
+             *
+             * Polled rather than broadcast: there is no websocket server and
+             * adding one to deliver a handful of notices a week would be
+             * infrastructure with nothing behind it.
+             */
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('60s')
             ->navigationGroups([
                 NavigationGroup::make('المحتوى'),
                 NavigationGroup::make('الكيانات'),

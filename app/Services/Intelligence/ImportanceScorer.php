@@ -7,6 +7,7 @@ namespace App\Services\Intelligence;
 use App\Enums\DocumentType;
 use App\Models\Company;
 use App\Models\Source;
+use Illuminate\Support\Facades\Cache;
 use App\Support\ArabicNormaliser;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -24,7 +25,7 @@ final class ImportanceScorer
     public function __construct(private readonly ArabicNormaliser $normaliser) {}
 
     /**
-     * @return array{score: int, inputs: array<string, mixed>}
+     * @return array{score: int, base: int, inputs: array<string, mixed>}
      */
     public function score(string $title, ?string $summary, Source $source, DocumentType $type, ?Carbon $publishedAt): array
     {
@@ -45,13 +46,29 @@ final class ImportanceScorer
             'recency' => $this->recency($publishedAt),
         ];
 
+        /*
+         * Two numbers, because one of the four inputs decays.
+         *
+         * `base` is the three durable inputs, already weighted. `score` is the
+         * whole thing including recency — what we thought at ingest, kept for
+         * audit. Only `base` is safe to rank on later; recency is added back at
+         * read time by IntelligenceItem, and in SQL when ordering.
+         */
+        $base = 0.0;
         $score = 0.0;
+
         foreach ($inputs as $key => $input) {
-            $score += ((float) $input['value']) * ((float) ($weights[$key] ?? 0));
+            $weighted = ((float) $input['value']) * ((float) ($weights[$key] ?? 0));
+            $score += $weighted;
+
+            if ($key !== 'recency') {
+                $base += $weighted;
+            }
         }
 
         return [
             'score' => (int) round($score * 100),
+            'base' => (int) round($base * 100),
             'inputs' => $inputs,
         ];
     }
@@ -96,7 +113,10 @@ final class ImportanceScorer
     /** @return Collection<int, string> */
     private function companyNames(): Collection
     {
-        return cache()->remember('intelligence:company-names', 3600, function (): Collection {
+        // Tagged, like every cache entry (§6). Untagged it was unreachable by
+        // any flush we have, which is exactly what makes a stale entry
+        // impossible to find later.
+        return Cache::tags(['entities'])->remember('intelligence:company-names', 3600, function (): Collection {
             return Company::query()
                 ->with('translations')
                 ->get()

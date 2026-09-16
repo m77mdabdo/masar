@@ -1,3 +1,4 @@
+@php $locale = app()->getLocale(); @endphp
 <x-layout.public :title="$topic->name" :description="$topic->translate('description')">
     <x-ui.container class="py-10">
         <header class="mb-10 border-b border-line pb-6">
@@ -9,6 +10,37 @@
             <p class="nums-tabular mt-2 text-sm text-ink-3">{{ $topic->articles_count }} مادة</p>
         </header>
 
+        {{-- Who appears in this topic's coverage. The graph answering a question
+             a tag cannot: not "what is tagged 2030" but "who is in those
+             stories". --}}
+        @if ($entities->isNotEmpty())
+            <section class="mb-10" aria-labelledby="topic-entities">
+                <x-ui.section-rule title="الأكثر ظهورًا في هذا الموضوع" id="topic-entities" />
+                <div class="grid gap-6 sm:grid-cols-2">
+                    @foreach ($entities as $type => $rows)
+                        <div>
+                            <h3 class="mb-2 text-[0.7rem] uppercase tracking-[0.08em] text-ink-3">
+                                {{ $type === 'person' ? 'أشخاص' : 'شركات' }}
+                            </h3>
+                            <ul class="space-y-1.5">
+                                @foreach ($rows as $row)
+                                    <li class="flex items-baseline justify-between gap-3">
+                                        <a class="truncate text-sm text-g-900 underline-offset-2 hover:underline"
+                                           href="{{ $type === 'person'
+                                               ? route('web.person.show', [$locale, $row['slug']])
+                                               : route('web.company.show', [$locale, $row['slug']]) }}">{{ $row['name'] }}</a>
+                                        <span class="nums-tabular shrink-0 text-xs text-ink-3">{{ $row['count'] }} مادة</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+        @endif
+
+        <x-ui.section-rule title="أحدث المواد" />
+
         <div class="space-y-6">
             @forelse ($articles as $article)
                 <x-article.card-row :article="$article" />
@@ -17,6 +49,8 @@
             @endforelse
         </div>
 
-        <div class="mt-10">{{ $articles->links() }}</div>
+        @if ($articles->hasPages())
+            <div class="mt-10">{{ $articles->links() }}</div>
+        @endif
     </x-ui.container>
 </x-layout.public>

@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Actions\Intelligence\ClearDuplicateFlag;
 use App\Actions\Intelligence\TriageIntelligenceItem;
+use App\Enums\DuplicateStage;
 use App\Enums\ReviewState;
 use App\Filament\Resources\Intelligence\IntelligenceItemResource;
 use App\Filament\Resources\Intelligence\Pages\ListIntelligenceItems;
@@ -122,4 +124,49 @@ it('counts only the untriaged in the navigation badge', function (): void {
     IntelligenceItem::factory()->count(2)->create(['review_state' => ReviewState::Approved]);
 
     expect(IntelligenceItemResource::getNavigationBadge())->toBe('3');
+});
+
+it('lets an editor clear a wrong duplicate flag', function (): void {
+    // The title stage is known-weak by measurement, not by suspicion: two
+    // companies' results scored 7 apart while a genuine rewrite scored 20. Wrong
+    // flags are expected, so clearing one has to be a single action.
+    $actor = staff('editor');
+    $original = IntelligenceItem::factory()->create(['review_state' => ReviewState::New]);
+    $flagged = IntelligenceItem::factory()->create([
+        'review_state' => ReviewState::New,
+        'duplicate_of_id' => $original->getKey(),
+        'duplicate_stage' => DuplicateStage::Title,
+    ]);
+
+    app(ClearDuplicateFlag::class)($flagged, $actor);
+
+    $flagged->refresh();
+    expect($flagged->duplicate_of_id)->toBeNull()
+        ->and($flagged->duplicate_stage)->toBeNull()
+        // The judgement is recorded, not discarded.
+        ->and($flagged->reviewed_by_id)->toBe($actor->getKey())
+        ->and($flagged->reviewed_at)->not->toBeNull()
+        // And it stays in the queue — clearing a flag is not triaging the item.
+        ->and($flagged->review_state)->toBe(ReviewState::New);
+});
+
+it('shows an editor what an item was flagged against', function (): void {
+    // A flag an editor cannot see the other half of is not reviewable.
+    $this->actingAs(staff('editor'));
+
+    $original = IntelligenceItem::factory()->create([
+        'title' => 'أرامكو تعلن نتائج الربع الثالث',
+        'review_state' => ReviewState::New,
+    ]);
+    IntelligenceItem::factory()->create([
+        'title' => 'سابك تعلن نتائج الربع الثالث',
+        'review_state' => ReviewState::New,
+        'duplicate_of_id' => $original->getKey(),
+        'duplicate_stage' => DuplicateStage::Title,
+    ]);
+
+    $html = livewire(ListIntelligenceItems::class)->assertOk()->html();
+
+    expect($html)->toContain(e('أرامكو تعلن نتائج الربع الثالث'))
+        ->and($html)->toContain(e(DuplicateStage::Title->label()));
 });

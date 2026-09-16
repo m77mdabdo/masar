@@ -153,6 +153,15 @@ class ManageSettings extends Page implements HasSchemas
     private function seoTab(): Tab
     {
         return Tab::make('SEO')->id('seo')->schema([
+            // The one switch. Placed first and above robots.txt on purpose:
+            // while it is on, the field below it does nothing.
+            Toggle::make('site__demo_mode')
+                ->label('وضع النسخة التجريبية')
+                ->helperText('عند تفعيله: لا يُفهرس الموقع إطلاقًا (noindex, nofollow)، '
+                    .'ويمنع robots.txt كل الزواحف، ولا تُنشر خرائط الموقع، ويظهر شريط «نسخة تجريبية» للقارئ. '
+                    .'أوقفه فقط بعد نشر محتوى تحريري حقيقي — فهرسة محتوى تجريبي تحت اسم مسار لا يمكن التراجع عنها.')
+                ->columnSpanFull(),
+
             TextInput::make('seo__title_template')->label('قالب العنوان')
                 ->helperText('استخدم :title موضعًا لعنوان الصفحة.')
                 ->columnSpanFull(),

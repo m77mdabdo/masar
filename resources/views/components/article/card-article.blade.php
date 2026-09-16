@@ -22,6 +22,7 @@
 
     <div class="flex flex-1 flex-col p-4">
         <div class="mb-2 flex flex-wrap items-center gap-2">
+            <x-article.sponsored-flag :article="$article" />
             @if ($article->category)
                 <span class="rounded bg-mint/25 px-2 py-0.5 text-[0.7rem] font-medium text-g-950">{{ $article->category->name }}</span>
             @endif

@@ -28,6 +28,15 @@ class CheckSources extends Command
 
     public function handle(): int
     {
+        if (! config('masar.intelligence.polling_enabled')) {
+            // Not a refusal — a manual run is exactly what is allowed while the
+            // gate is closed. But nobody should leave this command thinking the
+            // poller is running on its own when it is not.
+            $this->warn('Scheduled polling is OFF (masar.intelligence.polling_enabled).');
+            $this->warn('This is a manual run. Enable it once the User-Agent contact URL and mailbox resolve.');
+            $this->newLine();
+        }
+
         $sources = $this->option('source') !== null
             ? Source::query()->whereKey($this->option('source'))->get()
             : Source::query()->due()->get();

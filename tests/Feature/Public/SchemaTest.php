@@ -7,6 +7,17 @@ use App\Models\Article;
 use App\Models\Category;
 use App\Models\HomepageLayout;
 
+/*
+ * Demo mode defaults ON, and it suppresses indexing across every surface — the
+ * robots meta tag, robots.txt and both sitemaps. These tests are about the site
+ * as it behaves once real content exists, so they say so explicitly rather than
+ * relying on a default that is deliberately the other way.
+ */
+beforeEach(function (): void {
+    app(App\Support\Settings::class)->set(App\Support\DemoMode::SETTING, false);
+});
+
+
 /**
  * Structured data is how a news site appears in Top Stories at all, so a typo in
  * a JSON-LD block is expensive and invisible. These parse the emitted blocks

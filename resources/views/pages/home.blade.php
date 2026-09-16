@@ -3,12 +3,12 @@
 
     // Sections arrive from ComposeHomepage in the editor's order. Two runs are
     // laid out as one band rather than stacked — success stories beside most
-    // read and editor's picks, and podcast / reports / data — so they are pulled
+    // read and editor's picks, and reports / data — so they are pulled
     // out of the flow here by type, keeping the editor's order inside each row.
     $byType = $sections->keyBy('type');
     $railRows = [
         ['stories', 'most_read', 'editors_picks'],
-        ['podcast', 'reports', 'data'],
+        ['reports', 'data'],
     ];
     $grouped = collect($railRows)->flatten()->flip();
     $has = fn (string $type): bool => ($byType[$type]['items'] ?? collect())->isNotEmpty();
@@ -88,7 +88,6 @@
                         </x-home.rail-row>
                     @else
                         <x-home.rail-row :cols="3">
-                            @if ($has('podcast'))<x-home.podcast :section="$byType['podcast']" />@endif
                             @if ($has('reports'))<x-home.reports :section="$byType['reports']" />@endif
                             <x-home.data-grid
                                 :section="$byType['data'] ?? ['type' => 'data', 'title' => 'بيانات', 'items' => collect()]"

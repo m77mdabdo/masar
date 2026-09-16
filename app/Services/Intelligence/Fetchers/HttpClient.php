@@ -19,12 +19,27 @@ use Illuminate\Support\Facades\Http;
  */
 final class HttpClient
 {
+    public function __construct(private readonly RobotsPolicy $robots) {}
+
     /**
      * @return array{response: Response|null, error: string|null, retryAfter: int|null}
      */
     public function get(Source $source, string $url): array
     {
-        $headers = ['User-Agent' => (string) config('masar.intelligence.user_agent')];
+        $agent = (string) config('masar.intelligence.user_agent');
+
+        // Asked before the request, not after. A refusal here is not a failure
+        // of the source — it is the publisher's answer, and the only correct
+        // response is not to send the request at all.
+        if (! $this->robots->allows($url, $agent)) {
+            return [
+                'response' => null,
+                'error' => 'robots.txt disallows this URL (or robots.txt was unreachable)',
+                'retryAfter' => null,
+            ];
+        }
+
+        $headers = ['User-Agent' => $agent];
 
         // Conditional GET. Most polls should end here, with a 304.
         if (filled($source->etag)) {

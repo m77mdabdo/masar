@@ -15,7 +15,12 @@
         @endif
     </span>
 
-    <h3 class="min-w-0 font-display text-[0.85rem] font-medium text-g-950">
-        <a href="{{ $url }}" class="block leading-6 transition hover:text-g-700">{{ $article->title }}</a>
-    </h3>
+    <div class="min-w-0">
+        {{-- The rank card carries no metadata line, so the disclosure sits
+             above the headline. It still cannot be omitted. --}}
+        <x-article.sponsored-flag :article="$article" class="mb-1" />
+        <h3 class="font-display text-[0.85rem] font-medium text-g-950">
+            <a href="{{ $url }}" class="block leading-6 transition hover:text-g-700">{{ $article->title }}</a>
+        </h3>
+    </div>
 </article>
