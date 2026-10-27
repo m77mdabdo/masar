@@ -25,7 +25,10 @@
                     {{-- The 46px chart costs 14px the cell did not have; it comes out
                          of the padding and the gap rather than out of the figure,
                          which was clipping at the prototype's 24px/11px. --}}
-                    <div class="flex h-[3.375rem] items-center gap-2 border-s border-white/[0.07] px-4 sm:px-5">
+                    {{-- 16px between lg and 2xl: at 1280 the 20px padding left
+                         66px for a 69px print, and «11,234.56» lost its last
+                         digit. --}}
+                    <div class="flex h-[3.375rem] items-center gap-2 border-s border-white/[0.07] px-4 sm:px-5 lg:px-4 2xl:px-5">
                         @if ($cell['series'] !== [])
                             {{-- The line is the row's own points. A row saved
                                  without them gets no chart, rather than a curve
@@ -33,8 +36,12 @@
                             <span @class([
                                 // Two cells to a row on a phone leave no space
                                 // for a chart beside a six-figure print; the
-                                // figure is the part that has to survive.
-                                'hidden h-[1.375rem] w-[2.875rem] shrink-0 opacity-85 sm:block',
+                                // figure is the part that has to survive. The
+                                // same holds between lg and xl, where five
+                                // cells share 1024px: with the chart in, the
+                                // figure's box was 15px and every print ran
+                                // across its own line.
+                                'hidden h-[1.375rem] w-[2.875rem] shrink-0 opacity-85 sm:block lg:hidden xl:block',
                                 'text-mint' => $rising,
                                 'text-coral' => $falling,
                                 'text-cream/45' => ! $rising && ! $falling,
