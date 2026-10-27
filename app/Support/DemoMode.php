@@ -12,8 +12,10 @@ namespace App\Support;
  * this name it attaches to the brand before a single real word is published,
  * and no later correction unpicks that.
  *
- * So one switch drives four things — the site-wide robots meta tag, robots.txt,
- * the sitemap, and a banner the reader can see — and it **defaults to closed**.
+ * So one switch drives five things — the site-wide robots meta tag, an
+ * `X-Robots-Tag` header on every response (feeds and images included),
+ * robots.txt, the sitemap, and a banner the reader can see — and it
+ * **defaults to closed**.
  * A fresh deploy with no settings row is not indexed. Someone has to decide to
  * open it, which is the correct direction for a decision that cannot be undone.
  */

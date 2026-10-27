@@ -10,7 +10,7 @@ use App\Support\Settings;
  * brand. Indexing it is not a bug you fix later — it attaches to the masthead
  * before a real word is published.
  *
- * So the switch defaults closed and one setting drives four surfaces.
+ * So the switch defaults closed and one setting drives five surfaces.
  */
 beforeEach(function (): void {
     app(Settings::class)->flush();
@@ -56,7 +56,7 @@ it('shows the reader a banner while on', function (): void {
     expect($this->get('/ar')->assertOk()->getContent())->toContain('نسخة تجريبية');
 });
 
-it('opens all four surfaces when switched off', function (): void {
+it('opens all five surfaces when switched off', function (): void {
     app(Settings::class)->set(DemoMode::SETTING, false);
 
     $home = $this->get('/ar')->assertOk()->getContent();
@@ -68,7 +68,16 @@ it('opens all four surfaces when switched off', function (): void {
         ->and($robots)->toContain('Sitemap:');
 
     $this->get('/sitemap.xml')->assertOk();
+    $this->get('/ar')->assertHeaderMissing('X-Robots-Tag');
 });
+
+it('sends X-Robots-Tag on every response type while on, not only HTML', function (string $path): void {
+    // The meta tag reaches HTML only. The feeds carry every demo article's
+    // text, and a 404 is a response a crawler sees too.
+    app(Settings::class)->set(DemoMode::SETTING, true);
+
+    $this->get($path)->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+})->with(['/ar', '/ar/rss.xml', '/rss.xml', '/robots.txt', '/ar/no-such-page-anywhere']);
 
 it('has no static robots.txt shadowing the route', function (): void {
     // A static public/robots.txt silently wins over the route under any server

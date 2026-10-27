@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\HandleMissingPages;
 use App\Http\Middleware\IssueVisitorId;
+use App\Http\Middleware\SendDemoRobotsHeader;
 use App\Http\Middleware\ServeMaintenancePage;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
@@ -21,6 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
          * it 404s before any route middleware runs.
          */
         $middleware->append(HandleMissingPages::class);
+
+        // Demo content must not be indexed under the brand, in any format.
+        $middleware->append(SendDemoRobotsHeader::class);
 
         /*
          * Returning audience is the primary KPI and there are no reader
