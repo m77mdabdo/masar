@@ -15,8 +15,9 @@ use Throwable;
  *
  * **Impressions are buffered in Redis, never written per request.** CLAUDE.md §5
  * forbids `increment()` on every request for exactly this shape of counter, and
- * an ad slot is on more pages than an article is. `masar:flush-ad-impressions`
- * moves the buffer into the table.
+ * an ad slot is on more pages than an article is. `flush()` moves the buffer
+ * into the table; its scheduled command was removed with ads' launch scope
+ * (DEFERRED.md) and returns with them.
  *
  * **A failure to count is never a failure to render, and a failure to render is
  * never a failure of the page.** An advertisement is the least important thing

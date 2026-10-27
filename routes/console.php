@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Console\Commands\CheckSources;
-use App\Console\Commands\FlushAdImpressions;
 use App\Console\Commands\FlushArticleViews;
 use App\Console\Commands\PublishScheduledArticles;
 use App\Console\Commands\PurgeIntelligence;
@@ -41,16 +40,12 @@ if (config('masar.intelligence.polling_enabled')) {
 }
 
 /*
- * Readership and ad impressions both live in a Redis buffer between runs, so
- * nothing increments a row on every request (§5). Five minutes keeps each
- * column close enough to the truth for a count nobody is billing on, and bounds
- * what a Redis loss costs.
+ * Readership lives in a Redis buffer between runs, so nothing increments a row
+ * on every request (§5). Five minutes keeps the column close enough to the
+ * truth and bounds what a Redis loss costs. (Ad impressions had a twin of this
+ * entry; ads are out of launch scope — see DEFERRED.md.)
  */
 Schedule::command(FlushArticleViews::class)
-    ->everyFiveMinutes()
-    ->withoutOverlapping();
-
-Schedule::command(FlushAdImpressions::class)
     ->everyFiveMinutes()
     ->withoutOverlapping();
 

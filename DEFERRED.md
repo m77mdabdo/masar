@@ -112,27 +112,41 @@ sorts on it in SQL, and the stored components stay for auditability. Left here
 because the stored column is still what `masar:reclassify` writes and a reader of
 that column alone would still be reading a frozen number.
 
-## Ads — mechanism built, not reachable
+## Ads — out of launch scope (owner's ruling, 2026-10-27)
 
-**Needs a creative editor and at least one placement before it does anything.**
+**Not part of the launch. The parts that claimed to work were removed; the
+expensive-to-rederive parts were kept.**
 
-Corrected 2026-09-16; this entry said "the mechanism shipped" the day before and
-that was wrong. The orphan sweep found `x-ads.slot` referenced by no template at
-all, and underneath it: **zero placement rows**, with no seeder and no surface
-that creates one, and **no way to create a creative** — no relation manager on
-the campaign, no placement select, no image upload. The chain breaks in three
-places at once, so nothing reaches `AdServer` from a browser.
+Why: on 2026-10-27 the system had three pieces claiming ads worked and none of
+them did anything — `ad_placements`, `ad_campaigns` and `ad_creatives` all held
+zero rows, the admin had a campaign list screen with no create or edit, and
+`masar:flush-ad-impressions` ran every five minutes flushing a buffer no page
+could write to, because `x-ads.slot` was referenced by no template. Each is the
+"looks alive and is not" pattern this project keeps paying for.
 
-What exists and is correct: the three models, `AdServer` (placement lookup,
-Redis-buffered impressions, and a failure path that never reaches the reader),
-the click controller, `masar:flush-ad-impressions` and its schedule entry, the
-campaign CRUD, and the slot component itself — which renders nothing at all when
-nothing is running, as it should.
+**Removed:** the `Ads` Filament resource (`AdCampaignResource` and its list
+page), the `masar:flush-ad-impressions` command and its schedule entry.
 
-What it needs: a creative editor under the campaign (placement, image, alt,
-destination), at least one placement, and slot calls on the templates meant to
-carry one. The scope ruling still holds — no targeting, no bidding, no reporting
-beyond impressions and clicks.
+**Kept, deliberately:** the three migrations and models, their factories,
+`AdServer` (placement lookup, Redis-buffered impressions, a failure path that
+never reaches the reader, and `flush()`), `AdClickController` and its route —
+which 404s while no creative exists — the `x-ads.slot` component, and
+`tests/Feature/SiteControl/AdsTest.php`. The schema and the serving rules are
+the expensive part to re-derive and cost nothing at rest.
+
+**To turn it back on**, in this order, and not before all four exist:
+
+1. A campaign resource with create and edit, and a creative editor under the
+   campaign: placement, image through the media library, Arabic alt text,
+   destination URL, start and end.
+2. At least one placement, seeded or editable.
+3. `x-ads.slot` called from the templates meant to carry one, each covered by a
+   test that renders the page with a running campaign and finds the ad.
+4. The flush command and its schedule entry restored — `AdServer::flush()` still
+   does the work — with a test that buffers impressions and watches them land.
+
+The scope ruling from before still holds when it returns: no targeting, no
+bidding, no reporting beyond impressions and clicks.
 
 **The split worth naming.** The revenue feature is not built. The *editorial
 commitment* around it is, and is tested: a sponsored article cannot publish
