@@ -1,0 +1,218 @@
+{
+ "375|1": {
+  "contrast": {
+   "kicker": 12.71,
+   "headline": 10.77,
+   "mint": 5.78,
+   "standfirst": 6.72,
+   "byline": 5.43,
+   "button": 11.44,
+   "label": 14.24,
+   "body": 11.9,
+   "numeral": 4.89
+  },
+  "scrim": {
+   "maxSlope": 0.29,
+   "maxKink": 0.28,
+   "middleKeepsPct": 29
+  }
+ },
+ "375|2": {
+  "contrast": {
+   "kicker": 16.02,
+   "headline": 10.76,
+   "mint": 5.5,
+   "standfirst": 7.05,
+   "byline": 5.89,
+   "button": 14.71,
+   "label": 15.25,
+   "body": 13.27,
+   "numeral": 4.7
+  },
+  "scrim": {
+   "maxSlope": 0.42,
+   "maxKink": 0.18,
+   "middleKeepsPct": 24
+  }
+ },
+ "375|3": {
+  "contrast": {
+   "kicker": 15.26,
+   "headline": 10.45,
+   "mint": 5.04,
+   "standfirst": 8.16,
+   "byline": 5.72,
+   "button": 16.2,
+   "label": 15.46,
+   "body": 13.82,
+   "numeral": 4.92
+  },
+  "scrim": {
+   "maxSlope": 0.42,
+   "maxKink": 0.18,
+   "middleKeepsPct": 24
+  }
+ },
+ "768|1": {
+  "contrast": {
+   "kicker": 13.03,
+   "headline": 10.31,
+   "mint": 4.98,
+   "standfirst": 7.16,
+   "byline": 5.26,
+   "button": 11.08,
+   "label": 13.23,
+   "body": 11.45,
+   "numeral": 5.07
+  },
+  "scrim": {
+   "maxSlope": 0.28,
+   "maxKink": 0.28,
+   "middleKeepsPct": 29
+  }
+ },
+ "768|2": {
+  "contrast": {
+   "kicker": 15.24,
+   "headline": 10.13,
+   "mint": 5.26,
+   "standfirst": 7.05,
+   "byline": 5.79,
+   "button": 13.69,
+   "label": 14.72,
+   "body": 12.94,
+   "numeral": 4.74
+  },
+  "scrim": {
+   "maxSlope": 0.44,
+   "maxKink": 0.16,
+   "middleKeepsPct": 25
+  }
+ },
+ "768|3": {
+  "contrast": {
+   "kicker": 15.05,
+   "headline": 10.14,
+   "mint": 5.04,
+   "standfirst": 7.35,
+   "byline": 5.96,
+   "button": 13.94,
+   "label": 15.3,
+   "body": 13.82,
+   "numeral": 4.94
+  },
+  "scrim": {
+   "maxSlope": 0.44,
+   "maxKink": 0.16,
+   "middleKeepsPct": 25
+  }
+ },
+ "1440|1": {
+  "contrast": {
+   "kicker": 14.77,
+   "headline": 10.65,
+   "mint": 5.58,
+   "standfirst": 7.09,
+   "byline": 6.02,
+   "button": 13.15,
+   "label": 15.65,
+   "body": 13.32,
+   "numeral": 4.88
+  },
+  "scrim": {
+   "maxSlope": 0.86,
+   "maxKink": 0.77,
+   "middleKeepsPct": 75
+  }
+ },
+ "1440|2": {
+  "contrast": {
+   "kicker": 9.1,
+   "headline": 10.29,
+   "mint": 5.07,
+   "standfirst": 6.68,
+   "byline": 5.45,
+   "button": 11.88,
+   "label": 14.69,
+   "body": 12.97,
+   "numeral": 4.69
+  },
+  "scrim": {
+   "maxSlope": 0.45,
+   "maxKink": 0.27,
+   "middleKeepsPct": 76
+  }
+ },
+ "1440|3": {
+  "contrast": {
+   "kicker": 8.13,
+   "headline": 11.43,
+   "mint": 6.81,
+   "standfirst": 7.68,
+   "byline": 6.17,
+   "button": 14.25,
+   "label": 15.85,
+   "body": 13.82,
+   "numeral": 4.69
+  },
+  "scrim": {
+   "maxSlope": 0.45,
+   "maxKink": 0.27,
+   "middleKeepsPct": 76
+  }
+ },
+ "1920|1": {
+  "contrast": {
+   "kicker": 14.74,
+   "headline": 10.79,
+   "mint": 5.21,
+   "standfirst": 6.85,
+   "byline": 5.85,
+   "button": 13.02,
+   "label": 15.84,
+   "body": 13.31,
+   "numeral": 4.87
+  },
+  "scrim": {
+   "maxSlope": 0.85,
+   "maxKink": 0.8,
+   "middleKeepsPct": 63
+  }
+ },
+ "1920|2": {
+  "contrast": {
+   "kicker": 7.84,
+   "headline": 10.03,
+   "mint": 5.07,
+   "standfirst": 6.69,
+   "byline": 5.45,
+   "button": 11.71,
+   "label": 15.06,
+   "body": 12.79,
+   "numeral": 4.55
+  },
+  "scrim": {
+   "maxSlope": 0.45,
+   "maxKink": 0.15,
+   "middleKeepsPct": 75
+  }
+ },
+ "1920|3": {
+  "contrast": {
+   "kicker": 7.9,
+   "headline": 11.29,
+   "mint": 5.45,
+   "standfirst": 7.08,
+   "byline": 5.9,
+   "button": 13.73,
+   "label": 15.65,
+   "body": 13.13,
+   "numeral": 4.68
+  },
+  "scrim": {
+   "maxSlope": 0.45,
+   "maxKink": 0.15,
+   "middleKeepsPct": 75
+  }
+ }
+}

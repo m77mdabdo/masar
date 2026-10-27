@@ -254,3 +254,58 @@ holding**; the carousel **stays manual** (it never had autoplay).
   backdrops, one served per load; slides stacked, never `display:none`).
   Suite 961 passed; `masar:decay` green. Backup of the pre-change files:
   scratchpad `backup-hero-2227` (and git, `d5fbcdf`).
+
+## Hero slider — local scrims on the article-photo slides (2026-10-27)
+
+Brief: on slides two and three, remove the lines where the green gradients end,
+keep the middle of the photograph clear, darken only behind the text, hold 4.5:1,
+change no size, position, content, image or autoplay behaviour. Slide one is out of
+scope and untouched.
+
+- **Mechanism.** The section carries `data-ground` (`backdrop` | `photo`), bound by
+  Alpine to the visible slide. On `photo` the wide `.hero-scrim` / `.steps-scrim`
+  bands switch off. Three local scrims take over: `.text-scrim` behind the headline
+  stack, `.questions-scrim` behind the three steps, and `.kicker-scrim::before`.
+  Each one is a box in `--color-g-950` with `filter: blur()`, so its edge falls off
+  as a Gaussian with no stop at which the slope breaks. Text sits at least 2σ inside
+  each box. The scrims are at `z-0` and the text at `z-[1]`: they extend 5rem past
+  their block, and in DOM order they had painted over the kicker and the button.
+- **How it was measured.** The scrims were rendered over flat grey with the photo
+  and text hidden, then CIE L* was read along five rows and five columns. *Slope* is
+  the steepest L* change per pixel. *Kink* is the largest change of slope between
+  12px windows, which is what the eye sees as a line. *Middle* is the share of the
+  grey that survives in the central third.
+
+  | width | kink before → after | slope before → after | middle before → after |
+  |---|---|---|---|
+  | 375 | 0.28 → 0.22 | 0.28 → 0.45 | 29% → 24% |
+  | 768 | 0.28 → 0.19 | 0.28 → 0.45 | 29% → 25% |
+  | 1440 | 0.77 → 0.29 | 0.86 → 0.45 | 75% → 76% |
+  | 1920 | 0.80 → 0.15 | 0.85 → 0.45 | 63% → 75% |
+
+  The 375 "before" figures in `before/scrim.json` read slope 6.95 / kink 13.91.
+  That is an instrument artefact: the last rows of the capture were the page below
+  the hero. Columns now stop 16px short, and the corrected before figures are the
+  ones shown above.
+- **Contrast** (photo slides, worst line box, seven widths): mint word ≥ 5.03,
+  numerals ≥ 4.64 (1024, slide three), every other element ≥ 5.43. The full table
+  is in CLAUDE.md §2. At 0.93, `.questions-scrim` measured a numeral at 4.49, so it
+  went to 0.95.
+- **What did not change.** Slide one: 0 pixels differ at 375 / 768 / 1440 / 1920.
+  Hero height is one value per width across all slides and both backdrops
+  (796 / 770 / 738 / 527 / 560 / 630 / 840). No control overlaps a step, and there
+  is no horizontal overflow.
+- **Honest limit.** On a phone the text covers nearly the whole stage, so the middle
+  cannot stay clear. The scrim there is smoother, not lighter (middle 29% → 24%).
+  Two alternatives were tried and both were worse: a tighter mobile blur (slope
+  0.83, numerals 4.25) and a lighter 0.80 text scrim (mint 4.13).
+- **Noted, not touched.** `.hero-seam` is rendered and has no CSS. It is a dead
+  element.
+- **A build failure I caused.** The Vite build failed silently because a CSS
+  comment contained `L*/px`, and `*/` closed the comment. I caught it only because
+  the metrics came back identical to the previous run.
+- Screenshots: `tasks/screenshots/hero-photo-scrim/{before,after}/` (after: three
+  slides × seven widths) with `scrim.json`. `after-v1/` is the first pass, before
+  the 1024 numeral fix.
+- Suite 962 passed. `masar:decay`: queue ok, all seven flows ok or SKIP as before,
+  6 public forms addressed — no decay found.
