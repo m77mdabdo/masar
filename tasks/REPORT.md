@@ -157,3 +157,62 @@ No new component, no `!important`, no colour or token change, no font change.
 same local disk as the dev database under colliding ids, and would overwrite dev's
 photographs. That hazard is worth a fix of its own (a scratch `MEDIA_DISK`) before
 anyone runs that check again.
+
+---
+
+# Task 2.9 — the hero at mobile (2026-10-27)
+
+Base: HEAD (`99d7d16` + Task 2 commits), on the owner's ruling. The zip
+`MASAR-HERO-MOBILE-FIX.zip` differed from the pre-Task-2 file by one line and was
+discarded. **Lesson: an uncommitted working-tree edit is invisible to git history
+and to `masar:decay`, and the next write erases it without trace — commit it or
+revert it; do not leave work sitting in the tree.**
+
+Screenshots and data: `tasks/screenshots/task2-9/` — `before/` (HEAD), `after/`;
+`top-<w>x<h>.png` (viewport), `hero-<w>x<h>.png`, `mobile.json`. Widths: 375×667,
+375×812, 430×932, 768×1024, 1024×768, 1280×800, 1440×900, 1920×1080. **Desktop
+did not move:** the 1024, 1280, 1440 and 1920 viewport screenshots are
+pixel-identical before and after (0 pixels differ). Every change is scoped below
+`lg`, or is invisible (hit area, ARIA, comments).
+
+| # | verdict | measured |
+|---|---|---|
+| 1 | **CONFIRMED in part; cause refuted** | First question's label bottom vs fold: 375×667 820/667 (153 below), 375×812 820/812 (8 below), 430 and 768 visible. `min-h-[34rem]` is **not** the cause: below lg it sits on a grid holding both blocks (852px of content) and never binds. The hero starts at y=375 because above it are the demo banner (41), topbar (49), masthead (79) and a **180px ticker**. Fix: tighter gaps below lg (kicker gap 24→16 below sm, questions top padding 28→20 below sm, gaps between questions 60→40 below lg). After: 375×812 804/812 **visible**; 375×667 804/667, still 137 below. That cannot be closed inside the hero without removing content: the headline block's own content is ~355px and the hero starts 292px above the fold. The lever is the mobile ticker's height, which is out of scope (ticker redesign forbidden) — **decision for you**. |
+| 2 | **CONFIRMED, estimate refuted** | Hero is 852px at 375, not ~1,050. Gaps 60px. After: 796 (375), 770 (430), 738 (768); gaps 40 below lg, 60 at lg+. |
+| 3 | **REFUTED** | Below lg, `cover` crops horizontally only — visible source rows 0–100% at 375/430/768 — so the 40% vertical focal point has no effect on mobile. Visible source columns 37.6–62.4% (375), 35.4–64.6% (430); the tower sits at ~55–60% of the source width, so it is in frame. No change. |
+| 4 | **CONFIRMED, small** | 1 of 83 demo headlines clamped at 375 with `max-w-[14ch]` (needs five lines); 0 without it. Fix: `lg:max-w-[14ch]`. After: 0 of 83 clamped, max 4 lines. |
+| 5 | **REFUTED** | 0 of 83 headlines lose the mint word at 375, before and after. |
+| 6 | **REFUTED on HEAD** | Implementation: `<div @class(['relative flex flex-col justify-center p-7 pt-5 text-cream sm:p-9', 'pb-24 sm:pb-24 xl:pb-9' => $count > 1])>` — the explicit `sm:pb-24` restores the clearance `sm:p-9` would reset. Last answer → controls gap: 375 24px, 640 20, 768 20, 1023 20, 1024 21, 1279 70, **1280 40, 1440 60, 1920 60**; no overlap anywhere, including the top end where the padding drops to 36px. The lg/xl split is **deliberate**: at 1024 with 36px the controls covered the third answer (measured in Task 2); from 1280 answers are two lines. Both facts, and that the duplicate `sm:pb-24` is load-bearing, are now in a comment above the element. |
+| 7 | **CONFIRMED** | Buttons drawn 36×36. Fix: a 5px `::before` ring, same circle. After: real clicks 21px off centre on all four sides advance the carousel at 375, 768 and 1440 (8/8 each). |
+| 8 | **CONFIRMED** | Mean luminance of the photograph under the questions vs under the headline at 375: 0.0059 vs 0.0196 (3.3× darker), spread 0.0043 vs 0.0067. Fix: the lower layer is a 0.22 wash plus a 0.5 strip under the numerals' column only, masked in from the top. After: 0.0086–0.0154 (≈1.5× brighter), spread 0.0049–0.0105. |
+| 9 | **REFUTED on HEAD** (all ≥ 4.5) | See the table below. One trap: a byline is a flex paragraph, and measured as a box its full column width reached over unscrimmed photo — that produced a false 4.45 at 768 (and 1.03 at 1440) and briefly justified a tint change, which was reverted once the byline was measured by its own text items. The component's header comment now states the width and slide scope of every figure. |
+| 10 | **CONFIRMED, fixed now** | Not a vanishing name: `aria-labelledby` still resolves to slide one's hidden `h1`, so after advancing, the section was named after a headline no longer shown. No live region. Fix (two attributes, so not worth deferring): `aria-labelledby` only when there is one slide — with several, the group's own `aria-label` names it — and `aria-live="polite"` on the headline stack. |
+| 11 | **CONFIRMED (inert, not conflicting)** | With `:fill` the ratio class is replaced by `absolute inset-0`; `ratio="hero"` only sets the img's width/height attributes, which `h-full w-full object-cover` overrides. Kept, with a comment at the call site saying the crop is `focal`'s. |
+
+### Contrast at mobile — all three demo slides, worst line box, vs lightest pixel
+
+| width | | headline | standfirst | byline | step label | step body | numerals |
+|---|---|---|---|---|---|---|---|
+| 375 | HEAD | 7.89 | 5.76 | 4.81 | 14.67 | 14.30 | 4.84 |
+| 375 | after | 7.89 | 5.76 | 4.86 | 11.71 | 10.57 | 5.38 |
+| 768 | HEAD | 7.86 | 5.77 | 4.78 | 15.08 | 14.12 | 5.01 |
+| 768 | after | 7.86 | 5.74 | 4.83 | 11.36 | 10.15 | 5.47 |
+| 1440 | both (pixel-identical) | 14.58 | 8.80 | 6.99 | 16.10 | 14.55 | 5.10 |
+
+Step label and body fall (still > 10) because the questions block is lighter (item 8);
+numerals rise because the strip sits exactly under them. Recorded in CLAUDE.md §2,
+which also now says the earlier "headline ≥ 11.11" was slide one only.
+
+### Files
+
+`resources/views/components/home/big-story.blade.php` — items 1, 2, 4, 6 (comment), 7,
+10, 11, header comment (9). `resources/css/app.css` — item 8 (mobile questions layer
+only). `public/build/*` rebuilt; every new utility confirmed in the compiled CSS.
+`CLAUDE.md` — mobile ratios.
+
+## Where the queue stands
+
+- Task 1.5 items 1–7: **done** (`dd68f49`, `4eb7a38`, `73b6432`, `c647608` + `8d89785`, `02ac68e`, `89af72d`, `391f2bf`).
+- Day 7: **done** (`2671a60` … `99d7d16`).
+- Task 2: **done**, including 2.9 (`9267962`, `fb6ea10`, `30a216a`, `220381b`, and this commit).
+- Deployment: **not started** — blocked on domain, VPS and email provider.
