@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\SourceLegalMode;
 use App\Enums\SourceType;
+use App\Models\Concerns\IsDemoContent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,6 +25,7 @@ use Spatie\Activitylog\Support\LogOptions;
 class Source extends Model
 {
     use HasFactory;
+    use IsDemoContent;
     use LogsActivity;
 
     protected $fillable = [

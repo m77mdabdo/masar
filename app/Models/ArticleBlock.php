@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\ArticleSection;
+use App\Models\Concerns\IsDemoContent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ArticleBlock extends Model
 {
     use HasFactory;
+    use IsDemoContent;
 
     protected $fillable = [
         'article_id',

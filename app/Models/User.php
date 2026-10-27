@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\IsDemoContent;
 use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthentication;
 use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthenticationRecovery;
 use Filament\Models\Contracts\FilamentUser;
@@ -20,6 +21,7 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
 {
     use HasFactory;
     use HasRoles;
+    use IsDemoContent;
     use Notifiable;
 
     protected $fillable = [

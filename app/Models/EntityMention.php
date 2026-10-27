@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\EntityRole;
+use App\Models\Concerns\IsDemoContent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -16,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 class EntityMention extends Model
 {
     use HasFactory;
+    use IsDemoContent;
 
     // A mention is created or deleted, never edited.
     public const UPDATED_AT = null;

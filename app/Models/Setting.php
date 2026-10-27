@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\IsDemoContent;
 use App\Support\Settings;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,6 +14,7 @@ use Spatie\Activitylog\Support\LogOptions;
 class Setting extends Model
 {
     use HasFactory;
+    use IsDemoContent;
     use LogsActivity;
 
     protected $fillable = [

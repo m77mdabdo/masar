@@ -8,11 +8,12 @@ use App\Enums\ClassificationPath;
 use App\Enums\DocumentType;
 use App\Enums\DuplicateStage;
 use App\Enums\ReviewState;
+use App\Models\Concerns\IsDemoContent;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * One row in the editorial inbox.
@@ -24,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class IntelligenceItem extends Model
 {
     use HasFactory;
+    use IsDemoContent;
 
     protected $fillable = [
         'source_item_id',

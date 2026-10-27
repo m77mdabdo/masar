@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\CompanyType;
 use App\Models\Concerns\HasTranslations;
+use App\Models\Concerns\IsDemoContent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,6 +20,7 @@ class Company extends Model
 {
     use HasFactory;
     use HasTranslations;
+    use IsDemoContent;
     use LogsActivity;
     use SoftDeletes;
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Exceptions\IllustrativeMediaRejected;
+use App\Models\Concerns\IsDemoContent;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
@@ -18,6 +19,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
  */
 class Media extends BaseMedia
 {
+    use IsDemoContent;
+
     protected function casts(): array
     {
         return array_merge(parent::casts(), [

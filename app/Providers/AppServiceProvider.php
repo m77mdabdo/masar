@@ -26,6 +26,7 @@ use App\Policies\SubscriberPolicy;
 use App\Policies\TaxonomyPolicy;
 use App\Services\Ai\AiProvider;
 use App\Services\Ai\NullAiProvider;
+use App\Support\DemoContent;
 use App\Support\Settings;
 use App\View\Composers\NavigationComposer;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -36,6 +37,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Spatie\Activitylog\Models\Activity;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -91,6 +93,14 @@ class AppServiceProvider extends ServiceProvider
 
         $this->registerPolicies();
         $this->registerRateLimiters();
+
+        // Audit entries written while demo content is seeded are demo too, so
+        // masar:purge-demo can return the log to what it was before the seed.
+        Activity::creating(function (Activity $activity): void {
+            if (DemoContent::isRecording()) {
+                $activity->setAttribute('is_demo', true);
+            }
+        });
 
         // Navigation is needed by the public layout and nothing else, so it is
         // composed onto those views rather than shared globally.

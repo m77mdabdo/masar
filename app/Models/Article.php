@@ -9,6 +9,7 @@ use App\Enums\ArticleStatus;
 use App\Enums\ContentType;
 use App\Exceptions\DisclosureCannotBeWithdrawn;
 use App\Exceptions\IllustrativeMediaRejected;
+use App\Models\Concerns\IsDemoContent;
 use App\Support\MediaConversions;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -29,6 +30,7 @@ class Article extends Model implements HasMedia
 {
     use HasFactory;
     use InteractsWithMedia;
+    use IsDemoContent;
     use LogsActivity;
     use SoftDeletes;
 

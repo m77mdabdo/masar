@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\OpportunityPotential;
+use App\Models\Concerns\IsDemoContent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,6 +17,7 @@ use Illuminate\Support\Str;
 class Opportunity extends Model
 {
     use HasFactory;
+    use IsDemoContent;
     use SoftDeletes;
 
     protected $table = 'opportunities';
