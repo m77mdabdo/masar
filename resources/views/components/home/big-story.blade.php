@@ -7,7 +7,10 @@
      1280 / 1440 / 1920: headline ≥ 9.79, mint word ≥ 4.73, standfirst ≥ 6.60,
      byline ≥ 5.26, step label ≥ 12.26, step body ≥ 10.95, numerals ≥ 4.81.
      The per-width table is in CLAUDE.md §2. The scrim stops in app.css are
-     what hold these; re-measure if they move or a backdrop is added. --}}
+     what hold these; re-measure if they move or a backdrop is added.
+     Slides two and three (data-ground="photo") drop the bands for blurred
+     local scrims behind each text block; their own table is beside the
+     first: mint word ≥ 5.03, numerals ≥ 4.64. --}}
 @php
     use App\Enums\ArticleSection;
 
@@ -75,9 +78,15 @@
     {{-- One slide: the headline names the section. Several: the group's own
          label does, because aria-labelledby keeps resolving to slide one's
          headline after the reader has moved to slide three. --}}
-    <section class="full-bleed relative isolate" @if ($count === 1) aria-labelledby="big-story-heading" @endif
+    {{-- data-ground says what is behind the text: the illustrative backdrop
+         (slide one, dark and composed for it — wide scrim bands) or an
+         article's own photograph (bright daylight — local scrims behind each
+         text block only, so the photograph stays visible around them). --}}
+    <section class="full-bleed relative isolate overflow-hidden" @if ($count === 1) aria-labelledby="big-story-heading" @endif
+             data-ground="{{ $backdrop ? 'backdrop' : 'photo' }}"
              @if ($count > 1)
                  x-data="{ i: 0, n: {{ $count }}, go(d) { this.i = (this.i + d + this.n) % this.n } }"
+                 :data-ground="i === 0 && {{ $backdrop ? 'true' : 'false' }} ? 'backdrop' : 'photo'"
                  role="group" aria-roledescription="عرض متتابع" aria-label="{{ $section['title'] }}"
              @endif>
         @foreach ($slides as $k => $slide)
@@ -128,7 +137,7 @@
                  lg) justify-between distributes nothing, and the label sat on
                  the headline with no space at all. --}}
             <div class="flex flex-col justify-between gap-4 p-7 sm:gap-6 sm:p-11">
-                <p class="font-display text-[0.75rem] font-semibold uppercase tracking-[0.2em] text-white">
+                <p class="kicker-scrim relative isolate z-[1] w-fit font-display text-[0.75rem] font-semibold uppercase tracking-[0.2em] text-white">
                     {{ $section['title'] }}
                 </p>
 
@@ -137,9 +146,13 @@
                      tallest slide, so turning the carousel never changes the
                      hero's height (it did below lg, 796 → 770px at 375), and
                      each slide is bottom-aligned so the button stays put. --}}
-                <div class="grid" @if ($count > 1) aria-live="polite" @endif>
+                <div class="relative grid" @if ($count > 1) aria-live="polite" @endif>
+                    {{-- The scrims sit at z-0 and every text block at z-[1]: they reach 5rem
+                         past their own block, and painting in DOM order put
+                         them over the kicker and the button. --}}
+                    <span class="text-scrim pointer-events-none absolute z-0" aria-hidden="true"></span>
                 @foreach ($slides as $k => $slide)
-                    <div class="self-end text-cream [grid-area:1/1]"
+                    <div class="relative z-[1] self-end text-cream [grid-area:1/1]"
                          @if ($count > 1) :style="{ visibility: i === {{ $k }} ? 'visible' : 'hidden' }" @if ($k > 0) style="visibility:hidden" @endif @endif>
                         {{-- 68px over 14ch, swept against all 72 demo
                              headlines at the 620px stage. The narrower measure
@@ -215,10 +228,11 @@
                      tinted to rescue three lines of text. --}}
                 <span class="steps-scrim pointer-events-none absolute" aria-hidden="true"></span>
                 <div class="relative grid">
+                    <span class="questions-scrim pointer-events-none absolute z-0" aria-hidden="true"></span>
                 @foreach ($slides as $k => $slide)
                     {{-- 60px fills the side column's height at lg+; stacked
                          under the headline there is no slack to fill. --}}
-                    <ol class="relative space-y-10 self-center [grid-area:1/1] lg:space-y-[3.75rem]"
+                    <ol class="relative z-[1] space-y-10 self-center [grid-area:1/1] lg:space-y-[3.75rem]"
                         @if ($count > 1) :style="{ visibility: i === {{ $k }} ? 'visible' : 'hidden' }" @if ($k > 0) style="visibility:hidden" @endif @endif>
                         @foreach ($slide['steps'] as $step)
                             <li class="grid grid-cols-[auto_1fr] gap-4">

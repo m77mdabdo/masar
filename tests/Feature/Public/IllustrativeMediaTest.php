@@ -279,11 +279,39 @@ it('keeps every slide in the layout so turning the carousel cannot change the he
 
     // Hidden with visibility, never display: a display:none slide takes no
     // space, so the hero took the height of whichever slide was showing.
-    preg_match_all('/<div class="self-end text-cream \[grid-area:1\/1\]"[^>]*>/', $html, $text);
+    preg_match_all('/<div class="relative z-\[1\] self-end text-cream \[grid-area:1\/1\]"[^>]*>/', $html, $text);
     preg_match_all('/<ol class="[^"]*\[grid-area:1\/1\][^"]*"[^>]*>/', $html, $steps);
 
     expect($text[0])->toHaveCount(3)->and($steps[0])->toHaveCount(3)
         ->and(implode('', [...$text[0], ...$steps[0]]))->not->toContain('display:none')
         ->and($text[0][1])->toContain('visibility:hidden')
         ->and($text[0][0])->not->toContain('style="visibility:hidden"');
+});
+
+it('tells the stylesheet which ground is behind the text, slide by slide', function (): void {
+    // The backdrop slide keeps the wide scrim bands; article photographs get
+    // local scrims behind each text block. `data-ground` is the switch, and
+    // Alpine moves it with the carousel.
+    $slides = collect(range(1, 3))->map(fn (): Article => Article::factory()->withHeroImage()->create());
+    $render = fn ($backdrop): string => view('components.home.big-story', [
+        'section' => ['title' => 'القصة الكبرى', 'items' => $slides],
+        'backdrop' => $backdrop,
+        'attributes' => new ComponentAttributeBag,
+    ])->render();
+
+    $withBackdrop = $render(illustrativeMedia());
+    $without = $render(null);
+
+    expect($withBackdrop)->toContain('data-ground="backdrop"')
+        ->toContain(":data-ground=\"i === 0 && true ? 'backdrop' : 'photo'\"")
+        ->toContain('class="text-scrim')
+        ->toContain('class="questions-scrim')
+        ->toContain('kicker-scrim')
+        // The scrims reach 5rem past their block; under the text, never over it.
+        ->toContain('class="text-scrim pointer-events-none absolute z-0"')
+        ->toContain('class="questions-scrim pointer-events-none absolute z-0"')
+        ->toContain('class="kicker-scrim relative isolate z-[1]')
+        ->toMatch('/<ol class="relative z-\[1\] [^"]*\[grid-area:1\/1\]/')
+        ->and($without)->toContain('data-ground="photo"')
+        ->toContain(":data-ground=\"i === 0 && false ? 'backdrop' : 'photo'\"");
 });

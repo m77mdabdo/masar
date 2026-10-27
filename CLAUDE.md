@@ -103,6 +103,27 @@ then a black-scrim table) are superseded. These are not in the suite — the gro
 a photograph — so re-measure if `.hero-scrim` or `.steps-scrim` move, or a backdrop
 is added.
 
+**Slides two and three carry an article photograph, not a backdrop, and drop the
+bands.** The section's `data-ground="photo"` swaps them for blurred local scrims
+(`.text-scrim`, `.questions-scrim`, `.kicker-scrim`) behind each text block, so the
+middle of the picture stays clear and no gradient ends in a line. The table above
+still holds for slide one, which is pixel-identical. Photo slides, same method,
+2026-10-27:
+
+| width | kicker | headline | mint word | standfirst | byline | button | step label | step body | numerals |
+|---|---|---|---|---|---|---|---|---|---|
+| 375 | 15.27 | 10.45 | 5.04 | 7.05 | 5.72 | 14.69 | 15.85 | 13.82 | 4.93 |
+| 430 | 15.22 | 10.16 | 5.05 | 7.02 | 5.89 | 14.88 | 15.65 | 13.64 | 4.87 |
+| 768 | 15.05 | 10.13 | 5.04 | 7.05 | 5.79 | 13.70 | 15.48 | 13.63 | 4.93 |
+| 1024 | 8.18 | 10.42 | 5.03 | 6.68 | 5.43 | 11.90 | 15.27 | 13.65 | 4.64 |
+| 1280 | 7.98 | 10.30 | 5.03 | 6.68 | 5.45 | 11.54 | 15.46 | 13.65 | 4.93 |
+| 1440 | 8.13 | 10.29 | 5.07 | 6.68 | 5.45 | 11.88 | 15.30 | 13.64 | 4.92 |
+| 1920 | 7.84 | 10.03 | 5.07 | 6.69 | 5.45 | 11.71 | 15.67 | 13.48 | 4.75 |
+
+The tightest figure is a numeral at 1024 on slide three; `.questions-scrim` went from
+0.93 to 0.95 for it (4.49 → 4.64). Re-measure if any local scrim's inset, blur or
+opacity moves.
+
 ---
 
 ## 3. Architecture
