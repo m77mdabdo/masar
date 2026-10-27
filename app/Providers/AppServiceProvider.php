@@ -28,8 +28,8 @@ use App\Services\Ai\AiProvider;
 use App\Services\Ai\NullAiProvider;
 use App\Support\Settings;
 use App\View\Composers\NavigationComposer;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
@@ -98,6 +98,16 @@ class AppServiceProvider extends ServiceProvider
             ['components.layout.public'],
             NavigationComposer::class,
         );
+
+        // The 404 offers the main sections as a way back. Rescued, because an
+        // error page that throws while listing sections turns a 404 into a 500.
+        View::composer('errors.page', function ($view): void {
+            $view->with('sections', rescue(
+                fn () => Category::query()->active()->ordered()->whereNull('parent_id')->with('translations')->get(),
+                collect(),
+                report: false,
+            ));
+        });
     }
 
     /**
