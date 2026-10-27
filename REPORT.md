@@ -1923,3 +1923,513 @@ source-list numbering, and the footer year. None claims anything.
 
 Still on Day 6: the public-commitments sweep, then the security and
 accessibility passes.
+
+---
+
+# Day 6 — both fixes
+
+Date: 2026-09-16.
+
+## `mentions_count` — four copies, not two
+
+I estimated four lines. It was four *implementations*.
+
+The rule lived in `SyncArticleTopics` (correct), `SyncArticleEntities` (no
+filter at all), `RecountCommand::driftFor()` (no filter) and
+`RecountCommand::topicDrift()` (its own copy of the correct one).
+
+The consequence was worse than the original bug: **the drift query agreed with
+the bug**, so `masar:recount` reported *zero rows out of date on data where
+every row was wrong* — and running it silently rebuilt the inflated values over
+the corrected ones. I watched it undo my own fix before I understood why.
+
+All four now share `App\Support\PublishedContent`, which holds one definition
+of a live article and one of a live opportunity. `RecountCommand` calls the
+actions rather than keeping its own SQL, the way it already did for topics.
+
+Mentions on published **opportunities** now count too — a mention on a published
+opportunity is coverage as much as one on an article, and the old query counted
+both without checking either.
+
+Verified end to end: 12 companies and 7 people reported out of date, rebuilt,
+then zero. Values checked row by row against a published-only count.
+
+## `reading_time` — column dropped
+
+Always computed. Your reasoning was the deciding one and it is now in the
+migration: recomputing on save works until the next code path that writes an
+article without passing through it, which is exactly how the bug existed — the
+accessor was always right and the column overrode it.
+
+`PublishArticle` no longer freezes an estimate. The factory no longer seeds one.
+Ten surfaces read an accessor that cannot be stale.
+
+## Eight tests broke, and one of them was right
+
+Six were fixtures assuming drafts count as coverage — corrected to published,
+with a note saying why, since `publishableArticle()` means "could be published"
+rather than "is".
+
+One asserted `getRawOriginal('reading_time') > 0` on a column that no longer
+exists. Its intent — a live article never shows a blank reading time — is now
+structural rather than enforced at publish, and the test says so.
+
+**And one was already correct and I broke it.** `it('syncs topics and keeps the
+published-only counter correct')` deliberately used a draft to assert the
+counter stays at zero — my blanket replacement made its article published and
+destroyed its premise. Reverted, with a comment so the next blanket edit leaves
+it alone.
+
+## Decay check
+
+`php artisan test` — **796 passed, 2,475 assertions, 52.93s**. Smoke green,
+decay green.
+
+Both fixes done; the other 23 numbers untouched. Next on Day 6: the
+public-commitments sweep, then security and accessibility.
+
+---
+
+# Day 6 — the public-commitments sweep
+
+Date: 2026-09-16. `tasks/COMMITMENTS-SWEEP.md`. Nothing fixed, as with the
+numbers sweep.
+
+**19 claims. 14 kept. 3 intended. 2 broken.**
+
+## Broken 1 — and it is the worst thing I have found here
+
+The editorial standards page tells readers:
+
+> «لا يستطيع الكاتب تدقيق مادته بنفسه — هذا قيد مفروض في النظام، لا عرف
+> يُتبع أحيانًا.»
+
+*A writer cannot fact-check their own article — a constraint imposed in the
+system, not a convention sometimes followed.*
+
+`ArticlePolicy::factCheck()` implements that rule correctly **and nothing in the
+application calls it.** Its only references are its own tests. The transition
+that stamps the fact-check authorises `transition`, and `transition` returns
+**true** when the user owns the article.
+
+Proven against the real path rather than read off the source:
+
+    policy says factCheck allowed? NO
+    transition succeeded: editor_review
+    fact_checker_id recorded: 3  (author_id 3)
+    SELF-CHECKED: YES — the writer checked their own work
+
+A writer moves their own article through fact-check and the system records them
+as its fact-checker, while the page tells readers that is impossible.
+
+It is the same shape as everything else caught here — policy exists, tests
+pass, nothing calls it — but this one is a claim about **editorial integrity**,
+stated as a system guarantee, on the page a sceptical reader would check first.
+
+**It wants code, not rewording.** The intent is unambiguous.
+
+## Broken 2 — mine, from two days ago
+
+The corrections page describes a correction line appended to the article, and a
+material correction shown at the top. **There is no correction anywhere in the
+system** — no column, no model, no component. `updated_content_at` exists and
+feeds only `dateModified` and the sitemap; no reader ever sees it.
+
+I wrote that page and described a feature that does not exist. Build it or
+reword it; the current state is neither.
+
+## Intended, not enforced
+
+Three, all fine as editorial promises and none enforceable: quotes attributed to
+consenting people, paid content not passing the same editorial path, and
+independence from advertisers. They read as system guarantees in places, and
+claim 1 shows what that costs when the guarantee is absent.
+
+## One chain, not a false claim
+
+**Every contact email is empty.** The contact page degrades honestly — «لم يُضف
+بريد لهذا الفريق بعد» — but corrections, advertise and about all route readers
+there as the way to reach us. So the corrections policy tells a reader how to
+report an error and the route ends in an empty page.
+
+Same shape as the crawler's `contact@masar.sa`: an accountability route that
+does not resolve. Settings, not code.
+
+## Decay check
+
+`php artisan test` — **796 passed**. Smoke green.
+
+Still on Day 6: security and accessibility.
+
+---
+
+# Day 6 · claims closed out
+
+## Claim 1 — fixed, and it was not alone
+
+`TransitionArticleStatus` now authorises `factCheck` when an article leaves the
+fact-check stage, and enforces the invariant itself rather than trusting the
+policy to be asked. Six tests drive the real transition path; none is a policy
+unit test, because a passing policy unit test is what concealed this for the
+life of the project.
+
+**The general guard found two more.** Sweeping `authorize('x'|can('x'|cannot('x'`
+across `app/ resources/ routes/`, excluding `app/Policies/` and excluding
+Filament's standard CRUD verbs (which the panel calls implicitly), leaves
+exactly three custom methods on `ArticlePolicy` — and before today all three had
+zero callers. Neither of the other two was harmless:
+
+| method | what was actually exposed |
+|---|---|
+| `publish` | The panel disabled the publish button on **gate failures only**, never on the permission. The `seo` role carries `article.update.any` and no `article.publish`, so an SEO specialist could open any article sitting at `ready` with a clean gate and was shown a live green publish button whose only possible answer was an exception. |
+| `seo` | The SEO tab was **ungated entirely**. It carries the `noindex` toggle, so any writer who could edit an article could remove it from search — and that change leaves no visible trace on the page. |
+
+Both are wired now. `publish` drives the button's disabled state, with the
+tooltip separating "you may not publish" from "the gate has four things to say".
+The SEO tab is hidden rather than disabled: Filament does not dehydrate a hidden
+field, so a writer's save cannot blank meta values it never showed them.
+
+`tests/Feature/Filament/PolicyReachabilityTest.php` — 7 tests against the panel.
+**Four of the seven fail against the previous code**, including the one that
+writes `noindex` as a writer, which is the check that says the fix does
+something rather than describing something.
+
+The other four policy classes have only standard CRUD verbs. No further orphans.
+
+## Claim 2 — the page rewritten, the gap recorded
+
+Rewritten as an editorial commitment. Every sentence is first person and the
+page says in as many words that the corrections log is being built and is not
+there yet.
+
+One thing was made true rather than reworded. `updated_content_at` was written
+on every edit and surfaced only in the sitemap's `lastmod` and the JSON-LD's
+`dateModified` — a promise kept to crawlers and not to readers. The byline now
+shows «آخر تحديث» when an article was edited more than five minutes after
+publication. Verified on the rendered page, not the diff.
+
+Corrections as a mechanism is in `DEFERRED.md` with what it needs. The part that
+matters there is the index page: a list of every correction the publication has
+made is what makes the rest of the policy credible, and it is the part a
+body-text correction can never provide.
+
+## The three intended claims — reworded
+
+Each page now separates the sentence the system enforces from the sentence we
+are trusted on, rather than letting the enforced one lend its authority to the
+other.
+
+- **Sources** — «لا تُنشر مادة دون مصدر» stays, because it is a gate rule.
+  Attribution and consent moved to their own paragraph opening «التزام تحريري
+  نلتزم به نحن ولا يفرضه النظام، لأنه ليس مما يمكن للنظام أن يفرضه».
+- **Paid content** — «لا يمر على مسار التحرير نفسه» is gone. There is no separate
+  workflow; sponsored articles move through the same statuses. What replaced it
+  says which half is the system's: «ما يفرضه النظام هو الوسم».
+- **Advertising** — «هذا ليس وعدًا عامًا» is gone, replaced by «هذا قرارنا في
+  كيفية العمل، وهو ما تُحاسبوننا عليه», then the one part that is enforced:
+  publish rights are tied to an editorial role.
+
+## A fourth claim, found while rewording — enforced instead
+
+The advertise page also said the sponsored label cannot be removed after
+publication. Nothing stopped it: `is_sponsored` was a plain toggle on a
+published article, and clearing it would have taken the label off every card and
+off the schema.org block for a story readers had already seen disclosed.
+
+Cheap enough to make true rather than weaken, so: an `Article::saving` guard
+throwing `DisclosureCannotBeWithdrawn`, on the model rather than the form
+because the column is writable from several paths; the toggle disabled in the
+panel with the reason in its helper text, so an editor reads a sentence instead
+of an exception; five tests. The way back is deliberate and visible — unpublish,
+then unmark.
+
+That moves the sweep to **17 kept, 3 reworded, 0 broken.**
+
+## Written down
+
+- CLAUDE.md §5, new subsection **"What the site claims about itself"** — the page
+  rule the owner dictated, plus its corollary: a policy method with no caller
+  outside its own tests is dead code that reads as protection.
+- `tasks/HANDOVER.md` started. First entry is the contact-address chain:
+  corrections, advertise and about all dead-end until the four
+  `contact.*_email` settings are filled in Day 8-9, and the corrections case is
+  the one that matters — the page tells a reader how to report an error we
+  published and the route ends in an empty page.
+- `DEFERRED.md` — corrections as a mechanism; orphaned policy methods (there is
+  still no automated guard against the *next* orphan, only a grep run by hand);
+  the stale Ads entry corrected, since the mechanism shipped; the read-time
+  importance entry marked done.
+
+## Decay check
+
+    suite ........................................ 814 passed (2517 assertions)
+    queue ......................... ok — depth 0 · failed 0 · worker running
+    flow: publish an article ............................. ok — 72 published
+    flow: article on the homepage ......................... ok — 18 sections
+    flow: navigation renders in the masthead ..... ok — 14 links in <header>
+    flow: homepage order is editable ............ ok — 18 distinct positions
+    flow: newsletter stores a subscriber ........... ok — POST route present
+    flow: source poll reaches the inbox  ok — 10 active sources · 114 inbox items
+    flow: market ticker renders .............................. ok — rendered
+    flow: redirect becomes a 301 ............... ok — 0 redirects configured
+    public forms ............................... ok — 5 forms, all addressed
+
+No decay. `migrate:fresh --seed` skipped as usual (~15 min, opt-in).
+
+Still on Day 6: security and accessibility.
+
+---
+
+# Day 6 · the orphan sweep
+
+CLAUDE.md §7 now carries the rule. Eleven categories swept; the full record is
+`tasks/ORPHAN-SWEEP.md`. Four held real orphans, three of them doing harm rather
+than sitting there.
+
+## The pattern held, twice, in ways that were live bugs
+
+**`UnpublishArticle` — an action nothing called, holding an event.**
+`ArticleUnpublished` had a listener and a dispatcher, so both halves looked
+wired. Nothing called the dispatcher. The panel's «أرشفة» button goes straight
+through `TransitionArticleStatus`, which fired nothing — so archiving a live
+story flushed no cache and left it on the homepage until the TTL expired.
+
+Proven on the running site before the fix:
+
+    article:      #8 — شركات التقنية المالية يتجاوز مرحلة المشاريع التجريبية
+    on homepage:  yes
+    archived:     status is now archived
+    still on the homepage: YES  <-- the cache was never flushed
+
+The dispatch moved into `TransitionArticleStatus`, beside the `ArticlePublished`
+dispatch it mirrors. The action is deleted — its only other contribution was
+rejecting a target the transition map already rejects. Same probe after:
+`still on the homepage: no`. Five tests drive the transition; deleting the action
+broke nothing in 837.
+
+**Seven Filament resources with no gate — including the subscriber list.**
+This is the serious one. Filament allows anything it cannot resolve a policy
+for, so a resource with no policy and no access check is not locked by default;
+it is open. Category, Country, Industry, Market, Person, Topic and Subscriber
+were all in that state.
+
+A **fact-checker** — permissions: view, transition, factcheck — could open the
+newsletter subscriber list, read every reader's email address, and use the bulk
+action that downloads the whole list as CSV. Measured per role, not inferred.
+
+The docblock over `registerPolicies()` said the explicit registration existed so
+a missing policy would fail loudly "instead of silently falling back to *no
+policy, permission denied*". That sentence is backwards, and the seven open
+resources are what the backwards reading cost. Corrected in place.
+
+Fixed with `TaxonomyPolicy` (one class for the structured half of the graph —
+`CompanyPolicy` and `OpportunityPolicy` were two verbatim copies of it and are
+deleted) and `SubscriberPolicy` (read at `settings.manage`; create, update and
+delete false for everyone). `PanelAccessTest` holds the invariant: every
+resource has a resolvable policy or its own check. It names the offender when it
+fails, and it does fail when a policy is removed.
+
+After: writer and fact-checker see Articles, the Dashboard and the pipeline, and
+nothing else. Editor-in-chief keeps everything.
+
+## Two smaller ones
+
+**`media.manage` gated nothing.** Four roles held it; no code checked it; there
+is no media library for it to gate. The role editor offered a checkbox that
+granted no capability. Removed from the permission list, the four roles and the
+editor's area list — nothing changes for anyone, which is the point.
+
+**Every publish gate rule was proven to fire**, one broken field at a time,
+rather than assumed from the config being read. All nine fire. That category was
+clean and is now guarded.
+
+## What I got wrong, and am not fixing today
+
+**The ads mechanism renders nowhere.** `x-ads.slot` is referenced by no
+template. Under it: zero placement rows with nothing that creates one, and no
+way to create a creative at all — no relation manager, no placement select, no
+image upload. The serving half is real and correct; it has nothing to serve and
+nowhere to draw.
+
+I wrote "the mechanism shipped" in `DEFERRED.md` yesterday. That was wrong, and
+the entry now says what actually exists. Left unfixed on purpose: placing slots
+and seeding placements without a creative editor would add more inert surface,
+and the creative editor is real work that would displace security and
+accessibility. It needs a decision about when, not a patch today.
+
+## One gap found on the way
+
+`Subscriber::unsubscribeUrl()` has no caller — correct today, because the only
+mail we send is the double opt-in confirmation and an unconfirmed address is not
+on a list to leave. But **a confirmed subscriber has no way out**, and no
+message carries `List-Unsubscribe` or `List-Unsubscribe-Post`. Nobody is
+affected because nothing sends a newsletter. In `HANDOVER.md` as a condition on
+the first send rather than in anyone's memory.
+
+## Two false positives, recorded so nobody re-finds them
+
+`web.advertise` and `web.team` look orphaned to a `route()` grep and are not —
+they are reached through the footer menu, whose rows store literal URLs. Nothing
+is broken, but a literal URL in a menu row is checked by nothing at build, test
+or request time. In `DEFERRED.md`.
+
+`masar:flush-views` and `masar:flush-ad-impressions` look unscheduled to a grep
+for their signatures; both are scheduled by class name and `schedule:list` shows
+them every five minutes.
+
+## Decay check
+
+    suite ........................................ 837 passed (2556 assertions)
+    queue ......................... ok — depth 0 · failed 0 · worker running
+    flow: publish an article ............................. ok — 72 published
+    flow: article on the homepage ......................... ok — 18 sections
+    flow: navigation renders in the masthead ..... ok — 14 links in <header>
+    flow: homepage order is editable ............ ok — 18 distinct positions
+    flow: newsletter stores a subscriber ........... ok — POST route present
+    flow: source poll reaches the inbox  ok — 10 active sources · 114 inbox items
+    flow: market ticker renders .............................. ok — rendered
+    flow: redirect becomes a 301 ............... ok — 0 redirects configured
+    public forms ............................... ok — 5 forms, all addressed
+
+No decay.
+
+Remaining on Day 6: security and accessibility.
+
+---
+
+# Day 6 · security and accessibility
+
+## Security — the headline
+
+**Stored XSS on every article page.** All five JSON-LD components encoded with
+`JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES`, which leaves `<` and `>`
+literal, so a headline containing `</script>` ends the script element and
+everything after it parses as HTML. Reachable by anyone who can type a headline,
+executing for every reader.
+
+Proven on the running site before touching the code — title set to
+`</script><img src=x onerror=alert(1)>`, two working breakouts on the rendered
+page, one in the NewsArticle block and one in the breadcrumbs. Closed with a
+single `App\Support\JsonLd::encode()` carrying `JSON_HEX_TAG | JSON_HEX_AMP`,
+called by all five. Re-rendered: zero breakouts, payload hex-escaped, Arabic
+still readable. Both tests fail against the old flags.
+
+## nginx `add_header` silently discards inherited headers
+
+A `location` block that sets any `add_header` drops **every** `add_header` from
+the server block. Three location blocks set `Cache-Control` — build assets,
+fonts, and all images and video — so those paths were served with none of the
+four security headers, and `nosniff` matters most exactly on uploaded-media
+paths. Extracted to `deploy/nginx/security-headers.conf`, included at the server
+level and inside each of those three, installed by `provision.sh` before the
+site config that includes it. Added `Permissions-Policy`; HSTS is written and
+commented, for the TLS cutover.
+
+## Absence-is-permission, everywhere it could apply
+
+| surface | result |
+|---|---|
+| `PUT /storage/{path}` | 403 unsigned — Laravel requires a signed URL |
+| Horizon | 403 unauthenticated; the `viewHorizon` override holds |
+| `/admin` | 302 to login |
+| Filament export download | aborts 401 before anything else |
+| API endpoints | none exist |
+| Queued jobs | none carries a user or acts on anyone's behalf |
+| Dev tooling in production | no Telescope, no Debugbar; `deploy.sh` installs `--no-dev` |
+| Login rate limit | real, five attempts — **measured, not read** |
+
+`SafeUrl::external()` checks the scheme where a URL is *drawn*, not only where
+it was typed: article sources, company websites, footer social links and the ad
+click redirect. Filament's `->url()` does reject `javascript:` and `data:`
+(measured), but that is the one entry point that exists today, not the only way
+a row arrives.
+
+Four standing invariants: no model open to mass assignment (`Media` documented
+as the one deliberate exception, since it extends Spatie's `$guarded = []`), no
+JSON-LD encoded outside the helper, the locale parameter constrained at the
+router, no secrets tracked.
+
+## Accessibility
+
+**axe: zero violations, 19 pages × 2 viewports** — 26 to 33 passing checks per
+page, so the checker ran rather than silently skipped. It also found none of
+what the pass actually fixed, which is the finding worth keeping.
+
+**Focus.** Three text inputs carried `focus:outline-none` behind a 1px border
+colour change: the newsletter band, the newsletter page, and the site search
+box. Every text input a reader ever touches, with no keyboard indication of
+where they were. Real rings now — mint on the dark band, g-600 on the light
+ones, measured off the rendered page. A test forbids `focus:outline-none` in any
+template, because the site-wide `:focus-visible` floor in `app.css` is only a
+floor if nothing opts out.
+
+**Target size (WCAG 2.2, 2.5.8).** Measured every tab stop rather than trusting
+the note in `DEFERRED.md`, which said this had been accepted. Thirteen targets
+under 24×24 on the desktop homepage, eleven on mobile, twenty-eight on the
+article page — including the search icon at exactly 16×16 and the hamburger,
+**the only route to the rest of the navigation**, two pixels short at 22px wide.
+
+Now **zero on all three pages at both viewports**. The pattern was
+`inline-flex min-h-6 items-center` rather than extra padding: the box reaches
+24px while the text stays on its existing centre line, so nothing moved. The
+rows were already 48px tall, which is why it cost nothing.
+
+**Keyboard, drawer, motion — measured, all pass.**
+
+    burger reachable by keyboard : true
+    burger target                : 30x39  (was 22x39)
+    drawer opens                 : true   (aria-expanded flips)
+    focus moved into the drawer  : true   (onto the close button)
+    focus trapped in the drawer  : true
+    escape closes it             : true
+    focus returns to             : فتح القائمة
+    reduced-motion transition    : 1e-05s
+
+**Video.** axe flagged `video-caption` as needing review. Measured with ffprobe:
+**every clip on the site is silent** — no audio stream at all. So WCAG 1.2.2
+(captions) does not apply and 1.2.1 (text alternative for video-only
+prerecorded media) does, and there was none: the video media carried a filename
+where a description belongs, which is the rule CLAUDE.md §5 already states for
+images.
+
+The player now renders a `<figcaption>` wired with `aria-describedby`, carrying
+the footage description — from the caller, the clip's own alt, or the poster's,
+since the poster shows the same footage — and «مقطع بلا صوت» when the clip is
+known silent, because a reader who cannot hear needs to know the silence is the
+clip and not a fault at their end. `has_audio` is measured once at seed time and
+stored; **NULL says nothing either way**, since a page may not describe what
+nobody established.
+
+One bug caught inside that fix: the first ffprobe helper read `shell_exec`'s
+output, which returns NULL when a command prints nothing — precisely the
+no-audio case — so it reported every silent clip as unmeasured. Caught because
+the backfill came back all-null on files ffprobe had just answered at the shell.
+It reads the exit status now.
+
+## Written down
+
+- CLAUDE.md §5 — Filament authorisation defaults open; §5 accessibility — an
+  automated checker is a floor, how a target grows without the design moving,
+  and the silent-video rule; §7 — a package's protection is unverified until you
+  have watched it refuse.
+- `tasks/HANDOVER.md` — JSON-LD escaping is a security control with a test
+  behind it, the nginx `add_header` trap, and the two package defaults we were
+  wrong about.
+- `DEFERRED.md` — the WCAG 2.2 target-size entry replaced: it said this was
+  accepted, and it is now resolved to zero.
+
+## Decay check
+
+    suite ........................................ 858 passed (2594 assertions)
+    queue ......................... ok — depth 0 · failed 0 · worker running
+    flow: publish an article ............................. ok — 72 published
+    flow: article on the homepage ......................... ok — 18 sections
+    flow: navigation renders in the masthead ..... ok — 14 links in <header>
+    flow: homepage order is editable ............ ok — 18 distinct positions
+    flow: newsletter stores a subscriber ........... ok — POST route present
+    flow: source poll reaches the inbox  ok — 10 active sources · 114 inbox items
+    flow: market ticker renders .............................. ok — rendered
+    flow: redirect becomes a 301 ............... ok — 0 redirects configured
+    public forms ............................... ok — 5 forms, all addressed
+
+No decay. **Day 6 closed.**

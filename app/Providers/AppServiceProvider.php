@@ -16,13 +16,14 @@ use App\Models\Opportunity;
 use App\Models\Person;
 use App\Models\Setting;
 use App\Models\Source;
+use App\Models\Subscriber;
 use App\Models\Topic;
 use App\Models\User;
 use App\Policies\ArticlePolicy;
-use App\Policies\CompanyPolicy;
 use App\Policies\MenuItemPolicy;
-use App\Policies\OpportunityPolicy;
 use App\Policies\SettingPolicy;
+use App\Policies\SubscriberPolicy;
+use App\Policies\TaxonomyPolicy;
 use App\Services\Ai\AiProvider;
 use App\Services\Ai\NullAiProvider;
 use App\Support\Settings;
@@ -121,16 +122,35 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Registered explicitly rather than relying on convention discovery, so
-     * that moving or renaming a policy fails loudly instead of silently
-     * falling back to "no policy, permission denied".
+     * Registered explicitly rather than by convention discovery, so that moving
+     * or renaming a policy fails loudly.
+     *
+     * The line this docblock used to carry — that the fallback is "no policy,
+     * permission denied" — was **wrong, and expensively so**. A model with no
+     * policy is not denied; it is *allowed*, because Filament skips
+     * authorisation it cannot resolve. Seven resources sat open on exactly that
+     * misreading, the subscriber list among them. Any model reachable from the
+     * panel is listed here.
      */
     private function registerPolicies(): void
     {
         Gate::policy(Article::class, ArticlePolicy::class);
-        Gate::policy(Company::class, CompanyPolicy::class);
-        Gate::policy(Opportunity::class, OpportunityPolicy::class);
         Gate::policy(MenuItem::class, MenuItemPolicy::class);
         Gate::policy(Setting::class, SettingPolicy::class);
+        Gate::policy(Subscriber::class, SubscriberPolicy::class);
+
+        // The structured half of the content graph. One rule, one class.
+        foreach ([
+            Category::class,
+            Company::class,
+            Country::class,
+            Industry::class,
+            Market::class,
+            Opportunity::class,
+            Person::class,
+            Topic::class,
+        ] as $model) {
+            Gate::policy($model, TaxonomyPolicy::class);
+        }
     }
 }

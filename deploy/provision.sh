@@ -76,6 +76,10 @@ fi
 log "service configs"
 install -m 644 "$APP_DIR/deploy/php-fpm/masar.conf"        /etc/php/8.4/fpm/pool.d/masar.conf
 rm -f /etc/php/8.4/fpm/pool.d/www.conf
+# The snippet must land before the site config that includes it, or `nginx -t`
+# fails on a missing include rather than on anything real.
+install -d -m 755 /etc/nginx/snippets
+install -m 644 "$APP_DIR/deploy/nginx/security-headers.conf" /etc/nginx/snippets/masar-security-headers.conf
 install -m 644 "$APP_DIR/deploy/nginx/masar.conf"          /etc/nginx/sites-available/masar
 ln -sf /etc/nginx/sites-available/masar /etc/nginx/sites-enabled/masar
 rm -f /etc/nginx/sites-enabled/default

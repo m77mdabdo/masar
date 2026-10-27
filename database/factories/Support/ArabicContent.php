@@ -296,8 +296,30 @@ final class ArabicContent
     ];
 
     /** @var array<int, string> */
-    public const NUMBER_LABELS = [
-        'حجم التداول', 'نمو سنوي', 'عدد الشركات المرخصة',
-        'قيمة الاستثمارات', 'الحصة السوقية', 'معدل التشغيل',
+    /**
+     * Key numbers, as label/unit pairs rather than two independent pools.
+     *
+     * They were two pools, drawn separately, which produced «عدد الشركات
+     * المرخصة = 36 مليار ريال» — the number of licensed companies expressed in
+     * billions of riyals — on the darkest band of the article page, the one
+     * whose whole design says "these are the figures the story turns on". A
+     * label and a value that do not belong together is a fabricated statistic
+     * however plausible each half looks alone.
+     *
+     * `unit` says what shape the value takes. `source` is the attribution the
+     * figure carries to the reader; every figure here names a body that
+     * publishes the kind of number it is.
+     *
+     * @var array<int, array{label: string, unit: string, source: string}>
+     */
+    public const KEY_NUMBERS = [
+        ['label' => 'حجم التداول اليومي', 'unit' => 'sar_billions', 'source' => 'تداول السعودية'],
+        ['label' => 'النمو السنوي', 'unit' => 'percent', 'source' => 'الهيئة العامة للإحصاء'],
+        ['label' => 'عدد الشركات المرخصة', 'unit' => 'count', 'source' => 'وزارة الاستثمار'],
+        ['label' => 'قيمة الاستثمارات', 'unit' => 'sar_billions', 'source' => 'وزارة الاستثمار'],
+        ['label' => 'الحصة السوقية', 'unit' => 'percent', 'source' => 'الهيئة العامة للإحصاء'],
+        ['label' => 'معدل التشغيل', 'unit' => 'percent', 'source' => 'الهيئة العامة للإحصاء'],
+        ['label' => 'عدد الوظائف المستحدثة', 'unit' => 'count', 'source' => 'صندوق تنمية الموارد البشرية'],
+        ['label' => 'حجم الإنفاق الرأسمالي', 'unit' => 'sar_billions', 'source' => 'وزارة المالية'],
     ];
 }

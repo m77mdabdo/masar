@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Actions\Articles\PublishArticle;
+use Carbon\CarbonImmutable;
 use App\Actions\Articles\SchedulePublication;
 use App\Actions\Articles\SyncArticleEntities;
 use App\Actions\Articles\SyncArticleTopics;
@@ -266,6 +267,8 @@ class DemoContentSeeder extends Seeder
             ArticleStatus::NeedsRevision, ArticleStatus::OnHold,
         ];
 
+        $published = 0;
+
         foreach ($plan as $group) {
             for ($i = 0; $i < $group['count']; $i++) {
                 $article = Article::factory()
@@ -288,9 +291,11 @@ class DemoContentSeeder extends Seeder
                     $workflow->walkTo($article, ArticleStatus::Ready, $chief);
                     $article = $publish($article->refresh(), $chief);
 
-                    // Backdate so the demo has a spread of publication dates.
+                    // Backdate across years, not across months. See
+                    // publicationDate(): a one-year archive draws a one-bar
+                    // timeline, and a one-bar chart states nothing.
                     $article->forceFill([
-                        'published_at' => now()->subDays(random_int(1, 180))->subHours(random_int(0, 23)),
+                        'published_at' => $this->publicationDate($published++),
                         'views_count' => random_int(50, 25_000),
                     ])->save();
                 } elseif ($target === 'scheduled') {
@@ -387,6 +392,63 @@ class DemoContentSeeder extends Seeder
 
             $this->attachGraph($article, $companies, $people, $topics);
         }
+    }
+
+    /**
+     * Where the nth published article lands in time.
+     *
+     * **The archive is the reason this exists.** Every seeded article used to
+     * fall inside one year, so the company profile's coverage timeline had a
+     * single bar and correctly hid itself — a one-bar chart states nothing. The
+     * component was built and tested and had never drawn anything, and the page
+     * looked finished, which is how it went unnoticed.
+     *
+     * The shape is a real publication's: most of the archive is recent, and it
+     * tapers backwards rather than spreading evenly. An even spread would draw
+     * a flat chart, which is its own kind of lie about a publication that has
+     * been growing.
+     *
+     * Deterministic in shape, random within a year: the distribution across
+     * years is fixed so the timeline always has something to draw, while the
+     * day and hour vary so the front page does not look generated.
+     *
+     * @var array<int, int>  year => how many of the archive sits in it
+     */
+    private const ARCHIVE_SHAPE = [
+        2026 => 30,
+        2025 => 16,
+        2024 => 10,
+        2023 => 7,
+        2022 => 5,
+        2021 => 2,
+    ];
+
+    private function publicationDate(int $index): CarbonImmutable
+    {
+        $cursor = 0;
+
+        foreach (self::ARCHIVE_SHAPE as $year => $count) {
+            if ($index < $cursor + $count) {
+                $start = CarbonImmutable::create($year, 1, 1, 0, 0, 0, config('app.timezone'));
+
+                // The current year has not finished, so its articles must not
+                // land in the future: a scheduled-looking published article is
+                // invisible to every published() scope and would quietly
+                // shrink the front page.
+                $end = min(
+                    $start->endOfYear(),
+                    CarbonImmutable::now()->subHours(6),
+                );
+
+                return $start->addSeconds(random_int(0, max(1, $end->diffInSeconds($start))));
+            }
+
+            $cursor += $count;
+        }
+
+        // More published articles than the shape accounts for: put the overflow
+        // in the current year rather than dropping it somewhere arbitrary.
+        return CarbonImmutable::now()->subDays(random_int(1, 120))->subHours(random_int(0, 23));
     }
 
     /**

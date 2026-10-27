@@ -20,6 +20,17 @@ class Dashboard extends BaseDashboard
 {
     protected static ?int $navigationSort = -2;
 
+    /**
+     * Declared even though every widget on it carries its own gate, because a
+     * page with no access check is open to every authenticated user and the
+     * next widget added here would inherit that rather than the gate
+     * (CLAUDE.md §5). `PanelAccessTest` requires this method on every page.
+     */
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->can('article.view') ?? false;
+    }
+
     public function getTitle(): string
     {
         return 'لوحة التحرير';

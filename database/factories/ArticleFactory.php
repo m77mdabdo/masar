@@ -52,16 +52,12 @@ class ArticleFactory extends Factory
             'what_happened' => $this->faker->randomElement(ArabicContent::WHAT_HAPPENED),
             'business_impact' => $this->faker->randomElement(ArabicContent::BUSINESS_IMPACT),
             'opportunity' => $this->faker->randomElement(ArabicContent::OPPORTUNITY),
-            'key_numbers' => [
-                ['value' => $this->faker->numberBetween(2, 90).'%', 'label' => $this->faker->randomElement(ArabicContent::NUMBER_LABELS)],
-                ['value' => $this->faker->numberBetween(1, 40).' مليار ريال', 'label' => $this->faker->randomElement(ArabicContent::NUMBER_LABELS)],
-            ],
+            'key_numbers' => $this->keyNumbers(),
 
             'hero_media_id' => null,
             'hero_alt' => 'صورة تعبيرية توضح نشاطًا اقتصاديًا مرتبطًا بموضوع المادة.',
             'hero_credit' => null,
 
-            'reading_time' => null,
             'is_featured' => false,
             'is_sponsored' => false,
             'sponsor_name' => null,
@@ -86,6 +82,42 @@ class ArticleFactory extends Factory
     /**
      * A fully gate-passing, live article: fact-checked, sourced, summarised.
      */
+    /**
+     * Two key numbers whose value matches its label, each carrying a source and
+     * an "as of" date.
+     *
+     * All four parts are required by CLAUDE.md §5 — labelled, dated,
+     * attributed, and gone rather than degraded when the basis is missing — and
+     * the renderer drops any entry short of them.
+     *
+     * The label and the value used to come from two independent pools, which
+     * produced «عدد الشركات المرخصة = 36 مليار ريال»: the count of licensed
+     * companies expressed in billions of riyals, on the darkest band of the
+     * article page. A label and a value that do not belong together is a
+     * fabricated statistic however plausible each half reads alone.
+     *
+     * @return array<int, array{value: string, label: string, source: string, as_of: string}>
+     */
+    private function keyNumbers(): array
+    {
+        $chosen = $this->faker->randomElements(ArabicContent::KEY_NUMBERS, 2);
+
+        return array_map(function (array $number): array {
+            $value = match ($number['unit']) {
+                'percent' => $this->faker->numberBetween(2, 90).'%',
+                'sar_billions' => $this->faker->numberBetween(1, 40).' مليار ريال',
+                default => number_format($this->faker->numberBetween(120, 9_800)),
+            };
+
+            return [
+                'value' => $value,
+                'label' => $number['label'],
+                'source' => $number['source'],
+                'as_of' => $this->faker->dateTimeBetween('-14 months', '-1 month')->format('Y-m'),
+            ];
+        }, $chosen);
+    }
+
     public function published(): static
     {
         return $this->state(fn (): array => [

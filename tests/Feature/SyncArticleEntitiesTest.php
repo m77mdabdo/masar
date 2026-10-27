@@ -13,13 +13,21 @@ use App\Models\Person;
 use App\Models\Topic;
 use App\Queries\EntityContentQuery;
 
+/*
+ * Every fixture here is published on purpose. `mentions_count` counts published
+ * content only (§5): it used to count drafts as coverage, so an entity named
+ * only in an unpublished article presented as one we cover — and the homepage
+ * filters its entities section on that column. A draft fixture would now count
+ * nothing, and the test would be asserting the wrong rule.
+ */
+
 function syncEntities(): SyncArticleEntities
 {
     return app(SyncArticleEntities::class);
 }
 
 it('attaches mentions and sets the counters', function (): void {
-    $article = Article::factory()->create();
+    $article = Article::factory()->published()->create();
     $company = Company::factory()->create();
     $person = Person::factory()->create();
 
@@ -34,7 +42,7 @@ it('attaches mentions and sets the counters', function (): void {
 });
 
 it('decrements the counter of an entity that is removed', function (): void {
-    $article = Article::factory()->create();
+    $article = Article::factory()->published()->create();
     $kept = Company::factory()->create();
     $dropped = Company::factory()->create();
 
@@ -53,7 +61,7 @@ it('decrements the counter of an entity that is removed', function (): void {
 });
 
 it('keeps counters correct when the role changes but the entity does not', function (): void {
-    $article = Article::factory()->create();
+    $article = Article::factory()->published()->create();
     $company = Company::factory()->create();
 
     syncEntities()($article, [['type' => 'company', 'id' => $company->id, 'role' => EntityRole::Mentioned]]);
@@ -70,14 +78,14 @@ it('counts mentions of the same company across several articles', function (): v
     $company = Company::factory()->create();
 
     foreach (range(1, 3) as $ignored) {
-        syncEntities()(Article::factory()->create(), [['type' => 'company', 'id' => $company->id]]);
+        syncEntities()(Article::factory()->published()->create(), [['type' => 'company', 'id' => $company->id]]);
     }
 
     expect($company->fresh()->mentions_count)->toBe(3);
 });
 
 it('clears every mention when given an empty list', function (): void {
-    $article = Article::factory()->create();
+    $article = Article::factory()->published()->create();
     $company = Company::factory()->create();
 
     syncEntities()($article, [['type' => 'company', 'id' => $company->id]]);
@@ -88,7 +96,7 @@ it('clears every mention when given an empty list', function (): void {
 });
 
 it('collapses a duplicate entity instead of failing on the unique index', function (): void {
-    $article = Article::factory()->create();
+    $article = Article::factory()->published()->create();
     $company = Company::factory()->create();
 
     syncEntities()($article, [
@@ -101,7 +109,7 @@ it('collapses a duplicate entity instead of failing on the unique index', functi
 });
 
 it('clamps prominence into the 0-100 range', function (): void {
-    $article = Article::factory()->create();
+    $article = Article::factory()->published()->create();
     $company = Company::factory()->create();
     $person = Person::factory()->create();
 
@@ -115,14 +123,14 @@ it('clamps prominence into the 0-100 range', function (): void {
 });
 
 it('rejects an entity type that is not in the morph map', function (): void {
-    $article = Article::factory()->create();
+    $article = Article::factory()->published()->create();
 
     expect(fn () => syncEntities()($article, [['type' => 'unicorn', 'id' => 1]]))
         ->toThrow(InvalidArgumentException::class);
 });
 
 it('rejects a mention with no id', function (): void {
-    $article = Article::factory()->create();
+    $article = Article::factory()->published()->create();
 
     expect(fn () => syncEntities()($article, [['type' => 'company']]))
         ->toThrow(InvalidArgumentException::class);
@@ -146,7 +154,7 @@ it('counts only published articles towards a topic counter', function (): void {
 it('excludes a future-dated article from the topic counter', function (): void {
     $topic = Topic::factory()->create();
 
-    $future = Article::factory()->create([
+    $future = Article::factory()->published()->create([
         'status' => ArticleStatus::Published,
         'published_at' => now()->addWeek(),
     ]);

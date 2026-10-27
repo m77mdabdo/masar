@@ -106,21 +106,60 @@ published articles. There are 72.
 `intelligence_items.importance` stores a value whose recency component decays
 against `now()`, so every score freezes an item's age at ingest and the recency
 weight effectively does nothing — a third of the corpus drifted in a day.
-`masar:reclassify` re-derives it. **Scheduled for the Day 5 slot:** compute
-recency at read time, keep the stored components for auditability.
+`masar:reclassify` re-derives it. **Done 2026-09-15** in the Day 5 slot:
+`liveImportanceScore()` computes recency at read time, `scopeOrderByLiveImportance()`
+sorts on it in SQL, and the stored components stay for auditability. Left here
+because the stored column is still what `masar:reclassify` writes and a reader of
+that column alone would still be reading a frozen number.
 
-## Ads
+## Ads — mechanism built, not reachable
 
-No ad slots, no campaigns, no scheduling. Sponsored content is partly there and
-the part that matters works: `is_sponsored` is enforced by the publish gate,
-which refuses to publish without a sponsor name, and the label cannot be removed
-after publication.
+**Needs a creative editor and at least one placement before it does anything.**
 
-## WCAG 2.2 target size
+Corrected 2026-09-16; this entry said "the mechanism shipped" the day before and
+that was wrong. The orphan sweep found `x-ads.slot` referenced by no template at
+all, and underneath it: **zero placement rows**, with no seeder and no surface
+that creates one, and **no way to create a creative** — no relation manager on
+the campaign, no placement select, no image upload. The chain breaks in three
+places at once, so nothing reaches `AdServer` from a browser.
 
-Metadata links were given a 24px minimum height with vertical padding only, so
-the line does not visibly change. Accepted rather than fixed, recorded here so
-the next accessibility pass knows it was a decision.
+What exists and is correct: the three models, `AdServer` (placement lookup,
+Redis-buffered impressions, and a failure path that never reaches the reader),
+the click controller, `masar:flush-ad-impressions` and its schedule entry, the
+campaign CRUD, and the slot component itself — which renders nothing at all when
+nothing is running, as it should.
+
+What it needs: a creative editor under the campaign (placement, image, alt,
+destination), at least one placement, and slot calls on the templates meant to
+carry one. The scope ruling still holds — no targeting, no bidding, no reporting
+beyond impressions and clicks.
+
+**The split worth naming.** The revenue feature is not built. The *editorial
+commitment* around it is, and is tested: a sponsored article cannot publish
+without a named sponsor; the «محتوى مدعوم» label is a component that takes no
+flag from its caller and appears on every one of the six card weights, enforced
+by a file-level test; the label cannot be removed after publication
+(`DisclosureCannotBeWithdrawn`, five tests); and every ad link carries
+`rel="nofollow sponsored noopener"`. Everything we promised a reader about paid
+placement is real. What is missing is the part that would make us money.
+
+## WCAG 2.2 target size — resolved 2026-09-16
+
+**Was:** metadata links were given a 24px minimum height with vertical padding
+only, so the line did not visibly change, and it was accepted rather than fixed.
+That note understated it: the Day 6 pass measured every tab stop on three pages
+and found **thirteen** targets under 24×24 on the desktop homepage alone,
+including the site search icon at exactly 16×16 and the hamburger — the only
+route to the rest of the navigation — at 22px wide, two pixels short.
+
+**Now zero**, on the homepage at both viewports and on the article page. The
+pattern throughout was `inline-flex min-h-6 items-center` rather than more
+padding: the target grows to 24px while the text stays on its existing centre
+line, so nothing in the design moves. The rows these links sit in were already
+48px tall, which is why it cost nothing.
+
+One target is unchanged by decision, not oversight: nothing. Every link measured
+now clears it.
 
 ## Homepage LCP
 
@@ -135,3 +174,76 @@ stands: render delay dominates and the remaining levers cost design.
 A full homepage needs 72 published articles; the layout's appetite is 70. Below
 that, sections under-fill. Recorded because it is a constraint on demo content,
 not a bug.
+
+## Corrections as a mechanism
+
+**Written as a promise, never built.** The corrections page described appending a
+correction line to the article carrying the old wording, the new wording and the
+date, and lifting a material correction to the top of the piece. None of it
+exists: no `corrections` table, no column on `articles`, no component, nothing
+rendered. The page was rewritten on 2026-09-16 to describe what we do rather
+than what the system does.
+
+This is a real gap in the trust model, not a cosmetic one. A correction that
+lives inside the body text is invisible to a reader who read the article before
+it was made, invisible to a reader comparing versions, and invisible to anything
+that could list what we got wrong. The partial substitute now in place is the
+last-updated date in the byline, which was already stored in
+`articles.updated_content_at` and surfaced only to crawlers.
+
+**What it needs:** a `corrections` table (article, what it said, what it says
+now, why, who, when, and whether it is material), a component at the top of the
+article for material corrections and the foot for the rest, a Filament action on
+the article that writes one instead of an editor retyping the body, and an index
+page listing every correction the publication has made. The index is the part
+that makes the rest credible.
+
+## Orphaned policy methods
+
+`ArticlePolicy::factCheck()`, `::publish()` and `::seo()` all had zero callers
+outside their own tests. All three now have real ones — the fact-check
+transition, the publish button's disabled state, the SEO tab's visibility — and
+`tests/Feature/Filament/PolicyReachabilityTest.php` drives the panel rather than
+the policy, because a policy unit test passes whether or not anything invokes
+the policy.
+
+**Deferred:** there is no automated guard against the *next* orphan. The sweep
+that found these was a grep, run by hand. A test that walks every policy class,
+skips Filament's standard CRUD verbs, and fails on a custom method with no call
+site in `app/`, `resources/` or `routes/` would make it permanent. Worth doing;
+not worth the Day 6 slot.
+
+## A test that keeps the orphan sweep honest
+
+`tasks/ORPHAN-SWEEP.md` found four real orphans across eleven categories, by
+greps run by hand. Exactly one of those categories now has a test behind it:
+`PanelAccessTest` fails on a Filament resource with no gate.
+
+The rest — a policy method with no caller, an action with no caller, a Blade
+component nothing renders, a permission nothing checks — were found once and are
+guarded by nothing. A single `tests/Feature/OrphanSweepTest.php` holding those
+four greps as invariants, each with an explicit allow-list for what we have
+decided to keep, would make the sweep permanent instead of remembered.
+
+Worth a slot. Not worth Day 6.
+
+## A media library surface
+
+`media.manage` was a permission held by four roles and checked nowhere, because
+there is no media library resource — uploads happen inside the article form and
+are gated on editing the article. The permission is removed rather than left as
+a promise.
+
+When a media library does exist (browse, replace, re-credit, retire an image
+without opening every article that uses it), it brings `media.manage` back with
+something behind it, and social, video and designer stop being read-only panel
+users.
+
+## Footer links stored as literal URLs
+
+The footer's «المنصة» column is a database menu whose items store `/ar/about`,
+`/ar/team`, `/ar/advertise` as literal strings rather than route names. Nothing
+checks them: change a route and the footer points at a 404 with no failure at
+build, test or request time — and no `route()` grep will ever show those pages
+as linked. Not broken today. Wants either a link checker in the decay check or a
+route-name column on the menu item.

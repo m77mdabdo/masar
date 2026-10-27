@@ -32,9 +32,9 @@
         <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_13rem]">
             <div class="max-w-[46rem]">
                 <nav aria-label="مسار التنقل" class="mb-4 flex flex-wrap items-center gap-2 text-xs text-cream/70">
-                    <a href="{{ route('web.home', $locale) }}" class="transition hover:text-mint">الرئيسية</a>
+                    <a href="{{ route('web.home', $locale) }}" class="inline-flex min-h-6 items-center transition hover:text-mint">الرئيسية</a>
                     <span aria-hidden="true">›</span>
-                    <a href="{{ $urls->for($article->category) }}" class="transition hover:text-mint">{{ $article->category?->name }}</a>
+                    <a href="{{ $urls->for($article->category) }}" class="inline-flex min-h-6 items-center transition hover:text-mint">{{ $article->category?->name }}</a>
                     <span aria-hidden="true">›</span>
                     <span class="truncate text-cream/50">{{ Str::limit($article->title, 40) }}</span>
                 </nav>

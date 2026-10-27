@@ -46,8 +46,9 @@
                     @endforeach
                 </dl>
 
-                @if ($company->website)
-                    <a href="{{ $company->website }}" rel="nofollow noopener" target="_blank"
+                @php $companyUrl = \App\Support\SafeUrl::external($company->website); @endphp
+                @if ($companyUrl)
+                    <a href="{{ $companyUrl }}" rel="nofollow noopener" target="_blank"
                        class="mt-4 inline-block text-sm text-gold-ink underline">الموقع الرسمي</a>
                 @endif
             </section>

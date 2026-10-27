@@ -29,7 +29,6 @@ class RoleSeeder extends Seeder
         'article.publish',
         'article.factcheck',
         'article.seo',
-        'media.manage',
         'navigation.manage',
         'homepage.manage',
         'settings.manage',
@@ -50,21 +49,20 @@ class RoleSeeder extends Seeder
         'editor_in_chief' => [
             'article.view', 'article.create', 'article.update.own', 'article.update.any',
             'article.delete', 'article.transition', 'article.publish', 'article.factcheck',
-            'article.seo', 'media.manage', 'navigation.manage', 'homepage.manage',
+            'article.seo', 'navigation.manage', 'homepage.manage',
             'settings.manage', 'users.manage', 'intelligence.configure',
             'intelligence.triage', 'audit.view',
         ],
 
         'editor' => [
             'article.view', 'article.create', 'article.update.own', 'article.update.any',
-            'article.transition', 'article.publish', 'article.seo', 'media.manage',
+            'article.transition', 'article.publish', 'article.seo',
             'homepage.manage', 'intelligence.triage', 'audit.view',
         ],
 
         'writer' => [
             'article.view', 'article.create', 'article.update.own', 'article.transition',
-            'media.manage',
-        ],
+            ],
 
         'researcher' => [
             'article.view', 'article.create', 'article.update.own', 'article.transition',
@@ -79,16 +77,22 @@ class RoleSeeder extends Seeder
             'article.view', 'article.update.any', 'article.transition', 'article.seo',
         ],
 
+        // These three are read-only panel users today. They had `media.manage`,
+        // which gated nothing anywhere in the codebase — there is no media
+        // library surface for it to gate — so the role editor offered a
+        // checkbox that granted no capability. Removed rather than left as a
+        // promise; a media library resource is in DEFERRED.md and brings the
+        // permission back with something behind it.
         'social' => [
-            'article.view', 'media.manage',
+            'article.view',
         ],
 
         'video' => [
-            'article.view', 'media.manage',
+            'article.view',
         ],
 
         'designer' => [
-            'article.view', 'media.manage',
+            'article.view',
         ],
     ];
 

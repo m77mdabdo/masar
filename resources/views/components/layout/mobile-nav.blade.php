@@ -4,12 +4,19 @@
      as true at 1440px as at 390px, so the burger is not a small-screen
      affordance here — it is the way to the rest of the menu. --}}
 <div x-data="{ open: false }">
+    {{-- The glyph stays 22px wide because that is the drawn mark; the *target*
+         is padded out to clear the 24×24 minimum (WCAG 2.2, 2.5.8). It missed
+         by two pixels, on the one control that reaches the rest of the
+         navigation — and no exception applies: it is not inline text and there
+         is no other route to the menu. --}}
     <button type="button" @click="open = true"
-            class="grid w-[1.375rem] gap-[5px] py-3 text-ink transition hover:opacity-70"
+            class="flex items-center justify-center px-1 py-3 text-ink transition hover:opacity-70"
             aria-label="فتح القائمة" :aria-expanded="open.toString()">
-        <span class="block h-[1.5px] w-full bg-current" aria-hidden="true"></span>
-        <span class="block h-[1.5px] w-full bg-current" aria-hidden="true"></span>
-        <span class="block h-[1.5px] w-full bg-current" aria-hidden="true"></span>
+        <span class="grid w-[1.375rem] gap-[5px]" aria-hidden="true">
+            <span class="block h-[1.5px] w-full bg-current"></span>
+            <span class="block h-[1.5px] w-full bg-current"></span>
+            <span class="block h-[1.5px] w-full bg-current"></span>
+        </span>
     </button>
 
     <div x-show="open" x-cloak @keydown.escape.window="open = false" class="fixed inset-0 z-50">

@@ -14,7 +14,11 @@
     <span class="h-px flex-1 bg-line" aria-hidden="true"></span>
 
     @if ($href)
-        <a href="{{ $href }}" class="shrink-0 whitespace-nowrap text-xs text-ink-3 transition hover:text-g-700">
+        {{-- inline-flex + min-h-6 rather than extra padding: the target reaches
+             24px (WCAG 2.2, 2.5.8) while the text stays on the rule's centre
+             line, so nothing moves. This link is not inline in a sentence, so
+             the inline exception does not cover it. --}}
+        <a href="{{ $href }}" class="inline-flex min-h-6 shrink-0 items-center whitespace-nowrap text-xs text-ink-3 transition hover:text-g-700">
             {{ $more ?? 'الكل' }}
             <span aria-hidden="true" class="inline-block rtl:-scale-x-100">→</span>
         </a>

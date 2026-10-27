@@ -196,7 +196,13 @@ notifications, and the intelligence inbox.
 - Everything published is original MASAR writing with attribution and a link to the source.
 - Never fabricate a source, a quote, a statistic, or a person.
 
+### What the site claims about itself
+- **A page may not describe a system guarantee the code does not enforce. Either the code enforces it or the page says what we do, not what the system prevents.** A reader cannot inspect the newsroom; the editorial pages are the only account of it they get, so a sentence there is a claim in exactly the way a figure in the ticker is. Nineteen such claims were swept: fourteen were enforced, three were intent written in the grammar of a mechanism and got reworded, and two were false. The worst was «لا يمكن لكاتب أن يراجع مادته بنفسه» — the policy existed, was documented, and **had no caller**, so a writer could fact-check their own article and the page said they could not. The rule that follows from it: a claim of prevention is a test you now owe. If you are not writing that test in the same pass, write "we do not" instead.
+- **A policy method with no caller outside its own tests is dead code that reads as protection.** `ArticlePolicy::factCheck()`, `::publish()` and `::seo()` were all orphaned; a passing `ArticlePolicyTest` is what concealed it, because a unit test of a policy passes just as happily when nothing invokes the policy. Test the path a user takes, and sweep for `authorize('x'|can('x'|cannot('x'` before trusting any policy method that is not one of Filament's standard CRUD verbs.
+
 ### Security
+- **Authorisation defaults open in Filament. Every resource has a policy or it is public to every authenticated user. Absence is not denial.** Seven resources sat in that state, the newsletter subscriber list among them: a fact-checker — view, transition, factcheck, nothing else — could read every reader's email address and use the bulk action that downloads the whole list as CSV. The docblock over `registerPolicies()` asserted the opposite, that a missing policy fell back to *permission denied*; it is the second comment on this project to assert a guarantee that was inverted in reality, and both times the comment is what stopped anyone checking. `tests/Feature/Filament/PanelAccessTest.php` holds it as an invariant — it walks every resource on disk and fails on one with no resolvable policy and no access check of its own. It is not a list of the resources we happen to know about, and it must never become one.
+- **Ask the same question of anything mounted by a package or routed without middleware.** A default that opens is not visible at the call site: Horizon's packaged gate is `Gate::check(...) || app()->environment('local')`, which is open to anyone who can reach the port on a dev machine, and its job payloads carry subscriber email addresses.
 - Never commit secrets. No API keys, tokens or passwords in code, migrations, seeders or tests.
 - `$fillable` explicitly listed on every model. Never `$guarded = []`.
 - Validate every external input through a Form Request.
@@ -269,6 +275,31 @@ settings, and carries a date and a source.
 Semantic HTML, visible focus states, alt text required on every image,
 keyboard navigation, `prefers-reduced-motion` respected.
 
+- **An automated checker is a floor, not a pass.** axe reports zero violations
+  across nineteen pages at two viewports — and found none of what the Day 6 pass
+  actually fixed: three text inputs with `focus:outline-none` behind a 1px
+  border colour change (every input a reader ever touches, including site
+  search), and thirteen targets under 24×24 on the homepage alone, the search
+  icon at exactly 16×16 and the hamburger — the only route to the rest of the
+  navigation — two pixels short at 22px. Walk the tab order and measure the
+  boxes; the checker will not.
+- **A target grows without the design moving.** `inline-flex min-h-6
+  items-center`, not extra padding: the box reaches 24px (WCAG 2.2, 2.5.8) while
+  the text stays on its existing centre line. Almost every row on this site is
+  already taller than 24px, so this costs nothing. `focus:outline-none` is
+  forbidden outright and a test enforces it — the site-wide
+  `:focus-visible { outline: 2px }` floor in `app.css` is only a floor if no
+  template opts out.
+- **Silent video is not captioned video, and neither is assumed.** A clip with
+  an audio track is synchronised media and owes captions (1.2.2); a silent one is
+  video-only prerecorded media and owes a text alternative (1.2.1). The player
+  cannot tell which it holds, so `has_audio` is measured once with ffprobe at
+  seed time and stored beside `alt`. TRUE owes captions, FALSE renders «مقطع بلا
+  صوت» — a reader who cannot hear must know the silence is the clip and not a
+  fault at their end — and NULL says nothing either way, because a page may not
+  describe what nobody established. Video alt text follows the same rule as
+  images: never the filename.
+
 ---
 
 ## 6. Conventions
@@ -285,6 +316,7 @@ keyboard navigation, `prefers-reduced-motion` respected.
 - **An accent used as a foreground must state its ground.** `text-mint` and plain `text-gold` fail on cream (2.11 and 2.42) and pass on g-950 (7.78). A component using either carries a `{{-- contrast-safe: … --}}` line saying which ground it sits on; an unexplained use fails the suite. The check is not a ban and not a list of filenames.
 - **A CSS override must target a class the framework actually renders.** Dead CSS fails silently — no error, no warning, and a theme that looks finished. The admin's active sidebar item sat at 1.05:1 for the life of the project because the override named `.fi-sidebar-item-active .fi-sidebar-item-button` and Filament renders `.fi-active` and `.fi-sidebar-item-btn`. Read the computed style off the rendered page, not the stylesheet.
 - **An ARIA role replaces an element's implicit role; it does not add to it.** `role="tabpanel"` on a `<ul>` is no longer a list, and a screen reader stops announcing how many items it holds. Wrap the element, never override it — and the same goes for `role="button"` on an `<a>`, `role="list"` on a `<div>` that has `<li>` children, and every other "just add the role" fix.
+- **A rule with more than one implementation has no implementation. When two places must apply the same rule, they share the code — not the intent.** "Counters count published rows only" existed in four places: one action had it right, a sibling action had no filter, and `masar:recount` held two more copies — one of which was the drift detector, so the measuring instrument agreed with the bug. They now share `App\Support\PublishedContent`, and the command calls the actions instead of restating their SQL.
 - **Every cache entry carries a tag. An untagged entry cannot be flushed by any mechanism we have and will eventually hold something stale nobody can find.** `intelligence:company-names` sat untagged for months: no `Cache::tags(...)->flush()` reached it, so a renamed company would not have affected importance scoring for an hour and nothing could have hurried it. That invisibility is the property, not the hour. The full register of what can go stale is `tasks/STALE-SNAPSHOT-INVENTORY.md`.
 - **Media lives on the disk named by `MEDIA_DISK`.** Local dev resolves it to `media` under `storage/app/public`; production sets `r2`. No code anywhere names a disk.
 - **A section must not resolve more items than its template renders.** `HomepageSectionType::defaultLimit()` is the design's count, not a generous ceiling — anything past it is content an editor placed and no reader sees.
@@ -317,6 +349,15 @@ default, because the anchor had 24 spaces of indentation and the call site had
 20. Read the computed value back, not your own diff.
 
 
+**A verification tool must not reimplement the logic it verifies. If the
+checker holds its own copy of the rule, it will agree with the bug. Call the
+implementation.** `masar:recount` measured counter drift with its own SQL, and
+that SQL was missing the same published filter the counter was missing — so it
+reported **zero rows out of date on data where every row was wrong**, and
+rebuilding restored the inflated values over a correct fix. A drift detector
+that shares the defect it detects is worse than no detector, because it carries
+a green tick.
+
 **Assert the property, not a snapshot of it. A threshold gets raised until it
 means nothing; an invariant — same work over three times the data costs the same
 queries — cannot be quietly relaxed.** The first version of the co-mention guard
@@ -324,6 +365,50 @@ asserted "at most 3 queries" and failed at 4, which was the true figure and
 still bounded; raising it to 4 would have taught nothing and the next person
 would have raised it again. Several guards in this codebase are thresholds
 wearing an invariant's clothes — when you touch one, convert it.
+
+**An automated checker reports what it can reach. Zero violations means the tool
+found nothing, not that there is nothing. Walk the page yourself.** axe returned
+zero across nineteen pages at two viewports and found none of what the
+accessibility pass actually fixed: three text inputs whose focus ring had been
+replaced by a 1px border-colour change — which reads as *styled* rather than
+absent — and fifty-three targets under 24×24, the site search icon at exactly
+16×16 and the hamburger, the only route to the rest of the navigation, two
+pixels short. Walking the tab order and measuring every box found all of it in
+one run. The same applies to a defect already written down as accepted: the
+`DEFERRED.md` note on target size was an estimate, and the estimate understated
+it by an order of magnitude. **An accepted defect recorded from an estimate is
+an unmeasured defect with permission.**
+
+**A protection provided by a package is unverified until you have watched it
+refuse. Read the source to know what to test, not instead of testing.** We have
+now been wrong twice about what a package default does, in opposite directions.
+Filament's authorisation *fallback*: a resource with no policy reads as locked
+and is open, and a docblock in this repo asserted the opposite for months.
+Filament's *login rate limit*: real, five attempts, but discovered by reading
+`vendor/` — which is the same act of trust that produced the first error.
+`LoginThrottleTest` now watches a sixth attempt be refused, and watches correct
+credentials fail to get through the limiter, so an upgrade that drops it fails
+here rather than in production.
+
+**A policy method with no caller outside its own tests is not a rule, it is a
+comment that passes CI. Sweep for orphans when you add one.** Three for three on
+this project — `ArticlePolicy::factCheck()`, `::publish()` and `::seo()` — which
+is not a coincidence but a property of how policies get written: the method
+first, the wiring later, and nothing complains about the gap. `seo` was the
+worst, because the SEO tab carries `noindex`: any writer could remove an article
+from search and the change leaves no visible trace on the page, so it surfaces
+months later as "why does this story get no traffic" and is never traced back.
+The sweep is `authorize('x'|can('x'|cannot('x'` across `app/ resources/ routes/`
+excluding `app/Policies/`; Filament's standard CRUD verbs are called implicitly
+and are not orphans. Test the path a user takes — a policy unit test passes
+whether or not anything invokes the policy.
+
+**A blanket edit across test files will eventually change a test's premise
+rather than its fixture. After a broad replacement, read what changed, not just
+what passed.** Two instances in one day: a disclosure component dropped inside
+an `@if ($size !== 'sm')` so it vanished on the variant that appears in grids,
+and a sweeping fixture change that made an article published in the one test
+whose whole premise was that it was a draft. Both suites stayed green.
 
 **A health check must observe the artefact, not its inputs. Querying the
 database to assert the page is correct proves only that the data exists. Read
@@ -394,7 +479,7 @@ A task is not complete until all of these are true:
 | Search | LIKE-based over a normalised expression, not an index. Arabic folding happens in `ArabicNormaliser` on both the query and the stored text. **Swap to Scout/Meilisearch inside `SearchArticlesQuery` when published articles pass ~2,000** — the caller does not change. |
 | **Edge compression is required** | The Core Web Vitals targets are met *only* with gzip/brotli at the edge. Measured on a mobile 4G profile: with compression LCP 1.8–2.2s (passes); without it 2.7–4.1s (fails). Nginx must compress `text/*`, `application/javascript`, `application/json`, `image/svg+xml`. This is a deployment requirement, not an application concern — do not add compression middleware to Laravel to paper over a misconfigured edge. |
 | `APP_URL` | **`http://127.0.0.1:8000`**, matching `php artisan serve`. Media URLs are absolute and built from it, so leaving it at `http://localhost` points every image at XAMPP's Apache on port 80 and the whole site renders with alt text where the photographs should be. |
-| **Homepage LCP: 3685 ms — SUPERSEDED, pending a clean re-measure.** | Measured on Lighthouse's mobile slow-4G profile with compression at the edge. The LCP element is the big-story hero photograph — `div.grid > div.relative > picture.block > img.h-full` — and the phases are **TTFB 12% · Load Delay 29% · Load Time 2% · Render Delay 57%**. Load Time is 2%: the image is not the problem. FCP is 2270 ms and is LCP's floor, because 512 KB on that profile is ~2.6 s of transfer before anything paints. Every free lever has been pulled — narrowed srcset ladders, `font-display` per face, a metric-matched fallback, deferred off-screen paint. All eight font faces were checked and are genuinely used. **The remaining levers all cost design: fewer font weights, a smaller hero crop, or fewer sections. Nineteen sections with real photography is the product — do not cut sections to move this number.** Home CLS is 0.041, accepted as a trade for `font-display: optional` on the body face (no reflow mid-read) against a previous 0.013. **The 3685 ms figure is no longer trusted.** A re-measure on 2026-09-14, with the `uses-text-compression` audit checked on every run, read home 2053 ms / CLS 0.061, article 2238, markets 2832 and **category 3725** — the category page being both the slowest and the one nobody has examined. The likeliest explanation for the gap is that the original was taken on a harness where compression was not actually on, a mistake made and caught during that same audit. Do not quote either number as settled until one clean run replaces this row; the *reasoning* above (render delay dominates, remaining levers cost design, do not cut sections) still stands. |
+| **Homepage LCP: 3685 ms — SUPERSEDED, pending a clean re-measure.** | Measured on Lighthouse's mobile slow-4G profile with compression at the edge. The LCP element is the big-story hero photograph — `div.grid > div.relative > picture.block > img.h-full` — and the phases are **TTFB 12% · Load Delay 29% · Load Time 2% · Render Delay 57%**. Load Time is 2%: the image is not the problem. FCP is 2270 ms and is LCP's floor, because 512 KB on that profile is ~2.6 s of transfer before anything paints. Every free lever has been pulled — narrowed srcset ladders, `font-display` per face, a metric-matched fallback, deferred off-screen paint. All eight font faces were checked and are genuinely used. **The remaining levers all cost design: fewer font weights, a smaller hero crop, or fewer sections. Nineteen sections with real photography is the product — do not cut sections to move this number.** Home CLS is 0.041, accepted as a trade for `font-display: optional` on the body face (no reflow mid-read) against a previous 0.013. **The 3685 ms figure is no longer trusted.** A re-measure on 2026-09-14, with the `uses-text-compression` audit checked on every run, read home 2053 ms / CLS 0.061, article 2238, markets 2832 and category 3725. **The category figure predates its fix and is not the page's number any more.** On 2026-09-15 the category page was examined: its LCP image was lazy-loaded (2,521 ms load delay against 114 ms fetch — the §5 eager-image rule), the first featured card was made eager, and `lcp-lazy-loaded` went 0 → 1 on category and markets. Re-checked against the rendered pages on 2026-10-27: every category shape and markets carries exactly one non-lazy image with `fetchpriority="high"`, every other image lazy. No clean LCP has been taken since the fix, so the category page has no trusted number — not 3725, and nothing better yet. The likeliest explanation for the gap is that the original was taken on a harness where compression was not actually on, a mistake made and caught during that same audit. Do not quote either number as settled until one clean run replaces this row; the *reasoning* above (render delay dominates, remaining levers cost design, do not cut sections) still stands. |
 | Media storage | `MEDIA_DISK` selects it. Local is `media` (`storage/app/public/media`, served through `storage:link`); production is `r2` with the `R2_*` credentials from the environment. `config/media-library.php` reads that one key, so nothing else in the app names a disk. |
 | Demo imagery | `ImageLibrarySeeder` turns `public/images/` into real media records. It normalises each source to a 2400px master once and generates each conversion once per **image**, not once per article — the same 28 photographs behind 130 articles is 704 identical conversions otherwise, which measured at ten minutes of `migrate:fresh --seed` against 4 seconds now. `MediaConversions::withoutGenerating()` is what makes that safe; a caller that uses it and forgets to write the files leaves records whose conversions 404. |
 | **No media master in the repository** | GitHub rejects any file over 100 MB, and two 4K stock clips — 167 MB and 101 MB — did exactly that. Deleting them from the working tree does not fix it: the blob is already in the pack and the push fails on the same object. `public/images/` holds **web-delivery renditions only**, named `<id>-web-<width>x<height>.mp4` so the name states what the file is, 1080p on the long edge, H.264, and **under `masar.media.max_video_kb`** (10 MB). Masters live in `storage/app/video-masters/`, which is untracked. `.gitignore` cannot express a size rule, so the size rule is a test: `tests/Feature/RepositoryWeightTest.php` fails on any tracked file over the budget and on any tracked name with a master's shape. A clip that is still over budget after transcoding is not committed at all — it is re-sourced. |

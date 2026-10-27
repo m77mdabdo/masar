@@ -44,7 +44,7 @@
                             placeholder="name@example.com"
                             autocomplete="email"
                             @error('email') aria-invalid="true" aria-describedby="subscribe-email-error" @enderror
-                            class="ltr-isolate min-w-0 flex-1 rounded-lg border border-line px-4 py-3 focus:border-g-600 focus:outline-none"
+                            class="ltr-isolate min-w-0 flex-1 rounded-lg border border-line px-4 py-3 focus:border-g-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-g-600"
                         />
                         <x-ui.button type="submit" size="lg">اشترك</x-ui.button>
                     </div>

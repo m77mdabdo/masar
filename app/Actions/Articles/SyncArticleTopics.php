@@ -6,6 +6,7 @@ namespace App\Actions\Articles;
 
 use App\Models\Article;
 use App\Models\Topic;
+use App\Support\PublishedContent;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -46,19 +47,20 @@ class SyncArticleTopics
 
         $placeholders = implode(',', array_fill(0, count($topicIds), '?'));
 
+        // The definition of "published" is shared with the entity counter
+        // rather than written out twice — see App\Support\PublishedContent.
+        [$published, $bindings] = PublishedContent::articleCondition();
+
         DB::update(
             "update `topics`
              set `articles_count` = (
                  select count(*) from `article_topic`
                  inner join `articles` on `articles`.`id` = `article_topic`.`article_id`
                  where `article_topic`.`topic_id` = `topics`.`id`
-                   and `articles`.`status` = ?
-                   and `articles`.`deleted_at` is null
-                   and `articles`.`published_at` is not null
-                   and `articles`.`published_at` <= ?
+                   and {$published}
              )
              where `id` in ({$placeholders})",
-            ['published', now()->toDateTimeString(), ...$topicIds],
+            [...$bindings, ...$topicIds],
         );
     }
 

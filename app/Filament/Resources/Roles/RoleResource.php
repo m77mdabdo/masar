@@ -39,7 +39,6 @@ class RoleResource extends Resource
      */
     private const AREAS = [
         'article' => 'المواد',
-        'media' => 'الوسائط',
         'navigation' => 'التنقل',
         'homepage' => 'الصفحة الرئيسية',
         'settings' => 'الإعدادات',

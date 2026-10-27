@@ -31,4 +31,4 @@
             : null,
     ], fn ($value): bool => $value !== null && $value !== '');
 @endphp
-<script type="application/ld+json">{!! json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+<script type="application/ld+json">{!! \App\Support\JsonLd::encode($schema) !!}</script>

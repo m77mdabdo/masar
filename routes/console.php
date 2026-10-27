@@ -41,9 +41,10 @@ if (config('masar.intelligence.polling_enabled')) {
 }
 
 /*
- * Ad impressions live in a Redis buffer between runs so nothing increments a
- * row on every request (§5). Five minutes keeps the column close enough to the
- * truth for a count nobody is billing on, and bounds what a Redis loss costs.
+ * Readership and ad impressions both live in a Redis buffer between runs, so
+ * nothing increments a row on every request (§5). Five minutes keeps each
+ * column close enough to the truth for a count nobody is billing on, and bounds
+ * what a Redis loss costs.
  */
 Schedule::command(FlushArticleViews::class)
     ->everyFiveMinutes()

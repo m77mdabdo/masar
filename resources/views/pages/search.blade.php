@@ -9,7 +9,7 @@
             <input
                 id="q" name="q" type="search" value="{{ $term }}"
                 placeholder="ابحث في مسار…"
-                class="min-w-0 flex-1 rounded-lg border border-line bg-white px-4 py-3 focus:border-g-600 focus:outline-none"
+                class="min-w-0 flex-1 rounded-lg border border-line bg-white px-4 py-3 focus:border-g-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-g-600"
             />
             <x-ui.button type="submit" size="lg">بحث</x-ui.button>
         </form>

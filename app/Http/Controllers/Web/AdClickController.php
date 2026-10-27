@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Web;
 
 use App\Models\AdCreative;
+use App\Support\SafeUrl;
 use Illuminate\Http\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -26,8 +27,17 @@ class AdClickController
             throw new NotFoundHttpException;
         }
 
+        // Checked at the redirect, not only where the URL was entered: this
+        // controller sends the reader somewhere, and "somewhere" arrives from a
+        // column. Anything that is not http(s) is not a destination.
+        $destination = SafeUrl::external($creative->destination_url);
+
+        if ($destination === null) {
+            throw new NotFoundHttpException;
+        }
+
         $creative->incrementQuietly('clicks');
 
-        return redirect()->away($creative->destination_url, 302);
+        return redirect()->away($destination, 302);
     }
 }

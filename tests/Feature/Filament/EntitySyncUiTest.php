@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\ArticleStatus;
 use App\Enums\EntityRole;
 use App\Filament\Resources\Articles\Pages\EditArticle;
 use App\Models\Company;
@@ -14,8 +15,14 @@ beforeEach(function (): void {
     $this->actingAs(staff('editor_in_chief'));
 });
 
+/*
+ * Published, not merely publishable. `publishableArticle()` builds an article
+ * that *could* pass the gate; its status is still a draft. `mentions_count`
+ * counts published content only (§5), so a draft fixture counts nothing.
+ */
+
 it('writes entity selections through SyncArticleEntities', function (): void {
-    $article = publishableArticle();
+    $article = publishableArticle(['status' => ArticleStatus::Published, 'published_at' => now()->subHour()]);
     $company = Company::factory()->create();
     $person = Person::factory()->create();
 
@@ -42,7 +49,7 @@ it('writes entity selections through SyncArticleEntities', function (): void {
 });
 
 it('keeps counters correct when an entity is removed', function (): void {
-    $article = publishableArticle();
+    $article = publishableArticle(['status' => ArticleStatus::Published, 'published_at' => now()->subHour()]);
     $kept = Company::factory()->create();
     $dropped = Company::factory()->create();
 
@@ -65,7 +72,7 @@ it('keeps counters correct when an entity is removed', function (): void {
 });
 
 it('loads existing mentions back into the form', function (): void {
-    $article = publishableArticle();
+    $article = publishableArticle(['status' => ArticleStatus::Published, 'published_at' => now()->subHour()]);
     $company = Company::factory()->create();
 
     $article->mentions()->create([
@@ -88,6 +95,8 @@ it('loads existing mentions back into the form', function (): void {
 });
 
 it('syncs topics and keeps the published-only counter correct', function (): void {
+    // Draft on purpose — this test is the published-only rule itself: the topic
+    // is attached, and the counter stays at zero until the article is live.
     $topic = Topic::factory()->create();
     $article = publishableArticle();
 

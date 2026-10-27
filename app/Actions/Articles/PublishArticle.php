@@ -23,14 +23,13 @@ class PublishArticle
     {
         return DB::transaction(function () use ($article, $actor, $note): Article {
             // Written before the transition so the gate and the published row
-            // see the same values, and so reading_time is never null on a live
-            // article just because nobody opened the SEO tab.
+            // see the same values.
             $article->published_at ??= now();
             $article->scheduled_for = null;
 
-            // The accessor computes from the body when the column is empty;
-            // assigning it back freezes that estimate onto the live row.
-            $article->reading_time = $article->reading_time;
+            // Reading time is no longer written here. It was, and freezing the
+            // estimate at publish is what made it wrong for every article
+            // edited afterwards.
 
             $article->save();
 

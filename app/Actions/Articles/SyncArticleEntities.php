@@ -10,6 +10,7 @@ use App\Models\Company;
 use App\Models\Person;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use App\Support\PublishedContent;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -130,6 +131,30 @@ class SyncArticleEntities
      *
      * @param  array<string, array<int, int>>  $touched
      */
+    /**
+     * Rebuild every counted entity's total, using the one definition of
+     * published. `masar:recount` calls this rather than keeping its own copy of
+     * the SQL — it had one, it was missing the published filter, and running the
+     * command silently restored the inflated numbers this action had just
+     * corrected.
+     */
+    public function recountAll(): int
+    {
+        // recount() takes [type => [ids]], the shape currentlyMentioned() builds.
+        $touched = [];
+        $total = 0;
+
+        foreach (self::COUNTED as $type => $model) {
+            $ids = $model::query()->pluck('id')->map(fn ($id): int => (int) $id)->all();
+            $touched[$type] = $ids;
+            $total += count($ids);
+        }
+
+        $this->recount($touched);
+
+        return $total;
+    }
+
     private function recount(array $touched): void
     {
         foreach ($touched as $type => $ids) {
@@ -146,15 +171,46 @@ class SyncArticleEntities
             $table = (new $model)->getTable();
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
 
+            /*
+             * Published content only (§5), using the same definition the topic
+             * counter uses. This counted every mention including drafts, so an
+             * entity we had only ever named in an unpublished article presented
+             * as one we cover — and `ComposeHomepage` filters the entities
+             * section on this column, so it decided homepage content too.
+             *
+             * Both content types are counted, because a mention on a published
+             * opportunity is coverage as much as one on an article.
+             */
+            [$articlePublished, $articleBindings] = PublishedContent::articleCondition();
+            [$opportunityPublished, $opportunityBindings] = PublishedContent::opportunityCondition();
+
             DB::update(
                 "update `{$table}`
                  set `mentions_count` = (
                      select count(*) from `entity_mentions`
                      where `entity_mentions`.`entity_type` = ?
                        and `entity_mentions`.`entity_id` = `{$table}`.`id`
+                       and (
+                           (
+                               `entity_mentions`.`mentionable_type` = 'article'
+                               and exists (
+                                   select 1 from `articles`
+                                   where `articles`.`id` = `entity_mentions`.`mentionable_id`
+                                     and {$articlePublished}
+                               )
+                           )
+                           or (
+                               `entity_mentions`.`mentionable_type` = 'opportunity'
+                               and exists (
+                                   select 1 from `opportunities`
+                                   where `opportunities`.`id` = `entity_mentions`.`mentionable_id`
+                                     and {$opportunityPublished}
+                               )
+                           )
+                       )
                  )
                  where `id` in ({$placeholders})",
-                [$type, ...$ids],
+                [$type, ...$articleBindings, ...$opportunityBindings, ...$ids],
             );
         }
     }

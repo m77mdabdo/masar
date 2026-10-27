@@ -8,9 +8,15 @@
                 <li class="flex gap-3 text-sm">
                     <span class="nums-tabular mt-0.5 text-ink-3">{{ $loop->iteration }}.</span>
                     <div class="min-w-0">
-                        @if ($source->url)
-                            <a href="{{ $source->url }}" rel="nofollow noopener" target="_blank"
-                               class="font-medium text-g-700 underline underline-offset-4 transition hover:text-g-900">
+                        {{-- The scheme is checked here, not only where the URL was
+                             typed: a source row can arrive from an import or a
+                             fixture, and a `javascript:` href runs on click. An
+                             unlinkable URL renders as plain text, never silently
+                             as a live link. --}}
+                        @php $sourceUrl = \App\Support\SafeUrl::external($source->url); @endphp
+                        @if ($sourceUrl)
+                            <a href="{{ $sourceUrl }}" rel="nofollow noopener" target="_blank"
+                               class="inline-flex min-h-6 items-center font-medium text-g-700 underline underline-offset-4 transition hover:text-g-900">
                                 {{ $source->title }}
                             </a>
                         @else

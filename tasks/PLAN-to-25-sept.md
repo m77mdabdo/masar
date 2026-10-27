@@ -149,6 +149,19 @@ Everything that could not happen without the domain existing.
   it, send a real test to a real inbox, and confirm it arrives, renders Arabic
   RTL, and the unsubscribe link works. Note in the handover that IP warming takes
   2-4 weeks before any bulk send.
+- **Unsubscribe is a blocker on the first bulk send, not a handover note.**
+  `Subscriber::unsubscribeUrl()` exists, is signed and never expires — and today
+  has no caller, because the only message the system sends is the double opt-in
+  confirmation and an unconfirmed address is not on a list to leave. The moment
+  anything sends to a confirmed list, a reader with no way out is a legal
+  problem in most jurisdictions and a deliverability problem everywhere. No bulk
+  send goes out until every message carries:
+    - the `unsubscribeUrl()` link, visibly, in the body;
+    - a `List-Unsubscribe` header holding that URL;
+    - `List-Unsubscribe-Post: List-Unsubscribe=One-Click` (RFC 8058).
+
+  No message in the codebase carries either header today. Found by the orphan
+  sweep on 2026-09-16 — `tasks/ORPHAN-SWEEP.md`.
 - **Enable the crawler.** `masar.intelligence.polling_enabled` stays false until
   `https://masar.sa/bot` serves a page explaining what the bot is and how to
   block it, and `contact@masar.sa` reaches a human. Both are conditions, not

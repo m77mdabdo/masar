@@ -16,7 +16,7 @@
     <span class="h-px flex-1"></span>
 
     @if ($href)
-        <a href="{{ $href }}" class="shrink-0 text-xs text-ink-3 transition hover:text-g-700">
+        <a href="{{ $href }}" class="inline-flex min-h-6 shrink-0 items-center text-xs text-ink-3 transition hover:text-g-700">
             {{ $more ?? 'الكل' }} <span aria-hidden="true" class="rtl:inline-block rtl:-scale-x-100">→</span>
         </a>
     @elseif ($nav)

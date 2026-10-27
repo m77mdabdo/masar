@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Articles\Schemas;
 
 use App\Actions\Support\GenerateSlug;
+use App\Enums\ArticleStatus;
 use App\Enums\ContentType;
 use App\Filament\Resources\Articles\Pages\EditArticle;
 use App\Models\Article;
@@ -145,10 +146,21 @@ class ArticleForm
                     ->default(config('masar.default_locale'))
                     ->required(),
 
+                /*
+                 * Locked once the article is published carrying the label. The
+                 * model throws either way; disabling it here is so an editor
+                 * reads the reason instead of an exception. A disabled Filament
+                 * field is not dehydrated, so the stored value survives the save.
+                 */
                 Toggle::make('is_sponsored')
                     ->label('محتوى مدفوع')
                     ->live()
-                    ->helperText('يجب الإفصاح عنه للقارئ.'),
+                    ->disabled(fn (?Article $record): bool => (bool) $record?->is_sponsored
+                        && $record->status === ArticleStatus::Published)
+                    ->helperText(fn (?Article $record): string => ((bool) $record?->is_sponsored
+                        && $record->status === ArticleStatus::Published)
+                        ? 'لا يمكن إزالة الوسم عن مادة منشورة. أعِد المادة إلى المسودة أولًا.'
+                        : 'يجب الإفصاح عنه للقارئ.'),
 
                 TextInput::make('sponsor_name')
                     ->label('اسم الجهة الراعية')
@@ -256,6 +268,12 @@ class ArticleForm
                     ->helperText('خطوة قابلة للتنفيذ لقارئ في موقع القرار. لا نصيحة استثمارية.')
                     ->columnSpanFull(),
 
+                /*
+                 * All four fields are required because the renderer drops any
+                 * entry short of them (CLAUDE.md §5). Making them optional here
+                 * would let an editor fill a figure that silently never appears
+                 * — worse than refusing it, because the refusal is invisible.
+                 */
                 Repeater::make('key_numbers')
                     ->label('أرقام مفتاحية')
                     ->schema([
@@ -265,13 +283,26 @@ class ArticleForm
                             ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
                         TextInput::make('label')
                             ->label('الوصف')
-                            ->required(),
+                            ->required()
+                            ->helperText('يجب أن يطابق وحدة القيمة: نسبة مع نسبة، مبلغ مع مبلغ، عدد مع عدد.'),
+                        TextInput::make('source')
+                            ->label('المصدر')
+                            ->required()
+                            ->maxLength(120)
+                            ->helperText('الجهة التي نشرت الرقم. لا يُنشر رقم بلا جهة.'),
+                        TextInput::make('as_of')
+                            ->label('تاريخ الرقم')
+                            ->required()
+                            ->placeholder('2026-03')
+                            ->rule('regex:/^\d{4}-(0[1-9]|1[0-2])$/')
+                            ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr'])
+                            ->helperText('سنة وشهر. رقم بلا تاريخ يقرأه القارئ كأنه اليوم.'),
                     ])
                     ->columns(2)
                     ->maxItems(6)
                     ->defaultItems(0)
                     ->addActionLabel('أضف رقمًا')
-                    ->helperText('أرقام بصيغة غربية (0-9) دائمًا.')
+                    ->helperText('أرقام بصيغة غربية (0-9) دائمًا. كل رقم يحمل مصدرًا وتاريخًا، وإلا لا يظهر للقارئ.')
                     ->columnSpanFull(),
             ]);
     }
@@ -348,11 +379,23 @@ class ArticleForm
             ]);
     }
 
+    /**
+     * Gated on ArticlePolicy::seo(). This tab holds the noindex switch, so an
+     * ungated version lets anyone who can edit an article remove it from search
+     * silently — the change leaves no visible trace on the page. Hidden rather
+     * than disabled: Filament does not dehydrate a hidden field, so a writer's
+     * save cannot blank meta values it never showed them.
+     *
+     * On create there is no record to weigh, so the bare permission answers.
+     */
     private static function seoTab(): Tab
     {
         return Tab::make('SEO')
             ->id('seo')
             ->icon(Heroicon::OutlinedMagnifyingGlass)
+            ->visible(fn (?Article $record): bool => $record === null
+                ? auth()->user()?->can('article.seo') === true
+                : auth()->user()?->can('seo', $record) === true)
             ->schema([
                 TextInput::make('meta_title')
                     ->label('عنوان الميتا')

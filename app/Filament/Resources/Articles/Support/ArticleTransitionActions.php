@@ -82,22 +82,34 @@ class ArticleTransitionActions
     }
 
     /**
-     * Publishing is disabled while the gate has anything to say, and the reasons
-     * are in the tooltip — an editor must never click publish and be told no
-     * without being told why.
+     * Publishing is disabled while the gate has anything to say *or* the user
+     * lacks the permission, and the reason is in the tooltip — an editor must
+     * never click publish and be told no without being told why.
+     *
+     * The disabled state comes from ArticlePolicy::publish(), which fuses the
+     * permission and the gate into the single question this button asks. That
+     * is what a policy is for here; the Action re-checks the two separately and
+     * throws the specific failure. Until this call existed the policy had no
+     * caller at all, and a writer with no publish permission was shown a live
+     * green button whose only answer was an exception.
      */
     private static function publishAction(Article $article): Action
     {
+        $user = auth()->user();
         $failures = $article->isPublishable();
+        $allowed = $user?->can('publish', $article) === true;
+        $permitted = $user?->can('article.publish') === true;
 
         return Action::make('publish')
             ->label('نشر')
             ->color('success')
             ->icon('heroicon-o-rocket-launch')
-            ->disabled($failures !== [])
-            ->tooltip($failures === []
-                ? null
-                : 'لا يمكن النشر: '.implode(' · ', $failures))
+            ->disabled(! $allowed)
+            ->tooltip(match (true) {
+                $allowed => null,
+                ! $permitted => 'ليس لديك صلاحية النشر.',
+                default => 'لا يمكن النشر: '.implode(' · ', $failures),
+            })
             ->requiresConfirmation()
             ->modalHeading('نشر المادة')
             ->modalDescription('ستصبح المادة مرئية للقراء فورًا.')

@@ -28,7 +28,10 @@
             @if ($article->author)
                 <a href="{{ app(App\Support\EntityUrl::class)->for($article->author) }}"
                    @class([
-                       'block truncate font-medium transition',
+                       // py-0.5 rather than min-h-6: the link must stay `block
+                       // truncate` for the long-name case, and 20px + 4px of
+                       // padding clears 2.5.8 without changing the stack.
+                       'block truncate py-0.5 font-medium transition',
                        'text-cream hover:text-mint' => $dark,
                        'text-g-900 hover:text-g-700' => ! $dark,
                    ])>{{ $article->author->name }}</a>
@@ -43,6 +46,21 @@
                     <time datetime="{{ $article->published_at->toIso8601String() }}" class="ltr-isolate nums-tabular">
                         {{ $article->published_at->format('Y-m-d') }}
                     </time>
+                @endif
+                {{-- The corrections policy promises an update is dated where the
+                     reader can see it. updated_content_at was written on every
+                     edit and surfaced only in the sitemap and the schema.org
+                     block, which is a promise kept to crawlers and not to
+                     readers. Shown only when it is genuinely later than
+                     publication, so a save made minutes after going live does
+                     not present itself as a revision. --}}
+                @if ($article->published_at && $article->updated_content_at?->gt($article->published_at->copy()->addMinutes(5)))
+                    <span>·</span>
+                    <span>آخر تحديث
+                        <time datetime="{{ $article->updated_content_at->toIso8601String() }}" class="ltr-isolate nums-tabular">
+                            {{ $article->updated_content_at->format('Y-m-d') }}
+                        </time>
+                    </span>
                 @endif
                 <span class="nums-tabular">{{ $article->reading_time }} دقيقة قراءة</span>
             </div>

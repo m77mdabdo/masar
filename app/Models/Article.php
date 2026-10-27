@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Actions\Articles\EvaluatePublishGate;
 use App\Enums\ArticleStatus;
 use App\Enums\ContentType;
+use App\Exceptions\DisclosureCannotBeWithdrawn;
 use App\Exceptions\IllustrativeMediaRejected;
 use App\Support\MediaConversions;
 use Illuminate\Database\Eloquent\Builder;
@@ -54,7 +55,6 @@ class Article extends Model implements HasMedia
         'hero_media_id',
         'hero_alt',
         'hero_credit',
-        'reading_time',
         'is_featured',
         'is_sponsored',
         'sponsor_name',
@@ -83,7 +83,6 @@ class Article extends Model implements HasMedia
             'is_featured' => 'boolean',
             'is_sponsored' => 'boolean',
             'noindex' => 'boolean',
-            'reading_time' => 'integer',
             'views_count' => 'integer',
             'gate_failures_count' => 'integer',
             'published_at' => 'datetime',
@@ -117,6 +116,28 @@ class Article extends Model implements HasMedia
 
             if ((bool) $illustrative) {
                 throw IllustrativeMediaRejected::forArticle();
+            }
+        });
+
+        // Disclosure is one-way. A reader who saw «محتوى مدعوم» on this article
+        // cannot be shown a later version without it, and the advertise page
+        // says so in as many words — so the sentence is enforced here rather
+        // than left as an intention. Guarded on the model because is_sponsored
+        // is writable from the form, from a future import and from any action
+        // that touches the column.
+        //
+        // The way back is deliberate and visible: unpublish first, then unmark.
+        static::saving(function (self $article): void {
+            if (! $article->isDirty('is_sponsored') || $article->is_sponsored) {
+                return;
+            }
+
+            $wasSponsored = (bool) $article->getOriginal('is_sponsored');
+            $status = $article->getOriginal('status');
+            $status = $status instanceof ArticleStatus ? $status : ArticleStatus::tryFrom((string) $status);
+
+            if ($wasSponsored && $status === ArticleStatus::Published) {
+                throw DisclosureCannotBeWithdrawn::forArticle();
             }
         });
     }
@@ -262,15 +283,16 @@ class Article extends Model implements HasMedia
     // ------------------------------------------------------------------
 
     /**
-     * Stored `reading_time` wins when set; otherwise estimate from the body.
+     * Always computed from the body. There is no stored column any more.
+     *
+     * There was, and it won over this method, so an article edited after
+     * publication kept whatever estimate was frozen at publish — on every card
+     * and every listing. A computed value cannot drift.
+     *
      * Arabic reads slower than English — see config('masar.reading_speed_wpm').
      */
-    public function getReadingTimeAttribute($value): int
+    public function getReadingTimeAttribute(): int
     {
-        if ($value !== null && (int) $value > 0) {
-            return (int) $value;
-        }
-
         // Whitespace splitting, not str_word_count: the latter is Latin-centric
         // and returns 0 for Arabic text.
         $text = trim(strip_tags((string) $this->body));

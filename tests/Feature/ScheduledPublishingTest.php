@@ -82,14 +82,20 @@ it('sets reading time when publishing on schedule', function (): void {
     $article = publishableArticle([
         'status' => ArticleStatus::Ready,
         'editor_id' => $chief->id,
-        'reading_time' => null,
+        'body' => str_repeat('كلمة ', 400),
     ]);
 
     schedule()($article, now()->addMinutes(5), $chief);
     $this->travelTo(now()->addMinutes(10));
     $this->artisan('masar:publish-scheduled')->assertSuccessful();
 
-    expect($article->fresh()->getRawOriginal('reading_time'))->toBeGreaterThan(0);
+    /*
+     * There is no stored reading_time any more, so this no longer asks whether
+     * publishing wrote one. The intent it was protecting — a live article never
+     * shows a blank or zero reading time — is now structural: the value is
+     * computed from the body every time it is read and cannot be absent.
+     */
+    expect($article->fresh()->reading_time)->toBeGreaterThan(0);
 });
 
 it('reports nothing to do when there is nothing due', function (): void {

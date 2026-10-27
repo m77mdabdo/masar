@@ -223,9 +223,24 @@ class VideoLibrarySeeder extends Seeder
             $article->clearMediaCollection('video');
             $article->clearMediaCollection('video_poster');
 
+            /*
+             * `alt` and `has_audio` are both accessibility data, not bookkeeping.
+             *
+             * A silent clip is video-only prerecorded media (WCAG 1.2.1) and
+             * needs a text alternative; one with an audio track is synchronised
+             * media (1.2.2) and needs captions. The player cannot tell which it
+             * is holding, and it must not claim a clip is silent without
+             * knowing — so the answer is measured here, once, with ffprobe, and
+             * stored. Unknown stays unknown: the player then says nothing about
+             * sound rather than guessing.
+             */
             $article->addMedia($clip['video'])
                 ->preservingOriginal()
-                ->withCustomProperties(['source_file' => $clip['source']])
+                ->withCustomProperties([
+                    'source_file' => $clip['source'],
+                    'alt' => $article->hero_alt ?? '',
+                    'has_audio' => self::hasAudioTrack($clip['video']),
+                ])
                 ->toMediaCollection('video');
 
             if (File::isFile($clip['poster'])) {
@@ -253,6 +268,31 @@ class VideoLibrarySeeder extends Seeder
         }
 
         return $count;
+    }
+
+    /**
+     * Whether a file carries an audio stream. Null when ffprobe cannot say —
+     * which the player treats as "do not claim either way".
+     */
+    private static function hasAudioTrack(string $path): ?bool
+    {
+        // The exit status, not the output. `shell_exec` returns NULL when a
+        // command prints nothing — which is precisely the no-audio case — so
+        // reading the output alone reports every silent clip as unmeasured.
+        // Caught because the backfill came back all-null on files ffprobe had
+        // just answered correctly at the shell.
+        $cmd = 'ffprobe -v error -select_streams a -show_entries stream=index -of csv=p=0 '
+            .escapeshellarg($path).' 2>/dev/null';
+
+        $lines = [];
+        $status = 1;
+        @exec($cmd, $lines, $status);
+
+        if ($status !== 0) {
+            return null;
+        }
+
+        return trim(implode('', $lines)) !== '';
     }
 
     /**

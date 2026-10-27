@@ -9,13 +9,13 @@ Sorted by the decision rule:
 - **B. A reader sees it** — must be real or must stop claiming. These cost trust.
 - **C. Decorative** — probably should not exist.
 
-**26 numbers found. 3 are wrong. 1 is unverifiable. 22 are true.**
+**26 numbers found. 3 were wrong — all three now fixed (2026-09-16). 1 is unverifiable and correctly framed. 22 were already true.**
 
 ---
 
 ## Wrong
 
-### 1. `companies.mentions_count` / `people.mentions_count` — bucket A and B
+### 1. `companies.mentions_count` / `people.mentions_count` — bucket A and B — **FIXED**
 
 **What writes it:** `SyncArticleEntities`, on every article save that touches
 mentions, and `masar:recount`.
@@ -39,7 +39,7 @@ Measured on demo data, all eight companies checked are inflated:
 entity covered only in drafts can appear on the homepage as though we cover it.
 And the admin's company list sorts on it.
 
-### 2. `articles.reading_time` — bucket B
+### 2. `articles.reading_time` — bucket B — **FIXED: column dropped**
 
 **What writes it:** `PublishArticle` persists the estimate at publish; otherwise
 an accessor estimates from the body at render.
@@ -129,15 +129,23 @@ dated, attributed, and it disappears rather than degrading.
 
 ---
 
-## What I would do, if asked
+## What was done, 2026-09-16
 
-Not fixing any of these yet, as instructed. The ordering I would suggest:
+**`mentions_count`** — and the fix was four times larger than the four lines I
+predicted. The rule was implemented in **four** places, not two:
+`SyncArticleTopics` (correct), `SyncArticleEntities` (no filter),
+`RecountCommand::driftFor()` (no filter) and `RecountCommand::topicDrift()`
+(its own copy). The drift query agreed with the bug, so `masar:recount`
+reported **zero rows out of date on data where every row was wrong** — and
+running it silently rebuilt the inflated values over the corrected ones.
 
-1. **`mentions_count`** — it is a rule violation, it is measurably wrong on
-   every row checked, and it decides what appears on the homepage. The fix is
-   four lines: `SyncArticleTopics` already contains the published filter to copy.
-2. **`reading_time`** — either recompute on every save rather than only at
-   publish, or drop the stored column and always estimate. The second is
-   simpler and cannot drift.
-3. Nothing else. The remaining 22 are true, and the market figures are the
-   correct treatment of a number we cannot verify.
+All four now share `App\Support\PublishedContent`, and the command calls the
+actions rather than holding its own SQL. Verified: 12 companies and 7 people
+reported out of date, rebuilt, then zero.
+
+**`reading_time`** — column dropped. Always computed from the body. Recomputing
+on save would have worked until the next code path that writes an article
+without passing through it, which is exactly how the bug existed.
+
+The other 23 were left alone, including the three decorative ones. A number that
+claims nothing and misleads nobody is not worth a migration.

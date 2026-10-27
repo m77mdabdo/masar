@@ -46,7 +46,7 @@
                             placeholder="name@example.com" dir="ltr"
                             autocomplete="email"
                             @error('email') aria-invalid="true" aria-describedby="newsletter-email-error" @enderror
-                            class="ltr-isolate min-w-0 flex-1 rounded-full border border-cream/25 bg-cream/10 px-4 py-2.5 text-cream placeholder:text-cream/40 focus:border-mint focus:outline-none"
+                            class="ltr-isolate min-w-0 flex-1 rounded-full border border-cream/25 bg-cream/10 px-4 py-2.5 text-cream placeholder:text-cream/40 focus:border-mint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint"
                         />
                         <button type="submit" class="shrink-0 rounded-full bg-cream px-6 py-2.5 font-medium text-g-900 transition hover:bg-mint">
                             اشترك

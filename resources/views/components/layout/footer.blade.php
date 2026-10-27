@@ -14,7 +14,7 @@
                 <h2 id="footer-explore" class="mb-3 font-display text-sm font-semibold text-g-900">استكشف</h2>
                 <ul class="space-y-2 text-sm">
                     @foreach (($explore ?? collect()) as $item)
-                        <li><a href="{{ $item['url'] }}" class="text-ink-3 transition hover:text-g-700">{{ $item['label'] }}</a></li>
+                        <li><a href="{{ $item['url'] }}" class="inline-flex min-h-6 items-center text-ink-3 transition hover:text-g-700">{{ $item['label'] }}</a></li>
                     @endforeach
                 </ul>
             </nav>
@@ -23,7 +23,7 @@
                 <h2 id="footer-company" class="mb-3 font-display text-sm font-semibold text-g-900">المنصة</h2>
                 <ul class="space-y-2 text-sm">
                     @foreach (($company ?? collect()) as $item)
-                        <li><a href="{{ $item['url'] }}" class="text-ink-3 transition hover:text-g-700">{{ $item['label'] }}</a></li>
+                        <li><a href="{{ $item['url'] }}" class="inline-flex min-h-6 items-center text-ink-3 transition hover:text-g-700">{{ $item['label'] }}</a></li>
                     @endforeach
                 </ul>
             </nav>
@@ -31,10 +31,10 @@
             <nav aria-labelledby="footer-legal">
                 <h2 id="footer-legal" class="mb-3 font-display text-sm font-semibold text-g-900">قانوني</h2>
                 <ul class="space-y-2 text-sm">
-                    <li><a href="{{ route('web.editorial-standards', $locale) }}" class="text-ink-3 transition hover:text-g-700">معايير التحرير</a></li>
-                    <li><a href="{{ route('web.about', $locale) }}" class="text-ink-3 transition hover:text-g-700">سياسة الخصوصية</a></li>
-                    <li><a href="{{ route('web.about', $locale) }}" class="text-ink-3 transition hover:text-g-700">شروط الاستخدام</a></li>
-                    <li><a href="{{ route('web.about', $locale) }}" class="text-ink-3 transition hover:text-g-700">سياسة ملفات الارتباط</a></li>
+                    <li><a href="{{ route('web.editorial-standards', $locale) }}" class="inline-flex min-h-6 items-center text-ink-3 transition hover:text-g-700">معايير التحرير</a></li>
+                    <li><a href="{{ route('web.about', $locale) }}" class="inline-flex min-h-6 items-center text-ink-3 transition hover:text-g-700">سياسة الخصوصية</a></li>
+                    <li><a href="{{ route('web.about', $locale) }}" class="inline-flex min-h-6 items-center text-ink-3 transition hover:text-g-700">شروط الاستخدام</a></li>
+                    <li><a href="{{ route('web.about', $locale) }}" class="inline-flex min-h-6 items-center text-ink-3 transition hover:text-g-700">سياسة ملفات الارتباط</a></li>
                 </ul>
             </nav>
 
@@ -42,13 +42,14 @@
                 <h2 class="mb-3 font-display text-sm font-semibold text-g-900">تابعنا</h2>
                 <ul class="space-y-2 text-sm">
                     @foreach ((array) setting('contact.social', []) as $platform => $url)
+                        @continue (! ($social = \App\Support\SafeUrl::external($url)))
                         <li>
-                            <a href="{{ $url }}" rel="noopener" class="ltr-isolate text-ink-3 transition hover:text-g-700">{{ $platform }}</a>
+                            <a href="{{ $social }}" rel="noopener" class="ltr-isolate inline-flex min-h-6 items-center text-ink-3 transition hover:text-g-700">{{ $platform }}</a>
                         </li>
                     @endforeach
                     @if (setting('contact.editorial_email'))
                         <li>
-                            <a href="mailto:{{ setting('contact.editorial_email') }}" class="ltr-isolate text-ink-3 transition hover:text-g-700">
+                            <a href="mailto:{{ setting('contact.editorial_email') }}" class="ltr-isolate inline-flex min-h-6 items-center text-ink-3 transition hover:text-g-700">
                                 {{ setting('contact.editorial_email') }}
                             </a>
                         </li>
@@ -68,21 +69,21 @@
             <p>© <span class="nums-tabular">{{ now()->year }}</span> {{ setting('identity.site_name') }}. جميع الحقوق محفوظة.</p>
 
             <div class="flex flex-wrap items-center gap-4">
-                <a href="{{ route('web.editorial-standards', $locale) }}" class="transition hover:text-g-700">معايير التحرير</a>
-                <a href="{{ route('web.rss.locale', $locale) }}" class="transition hover:text-g-700">RSS</a>
+                <a href="{{ route('web.editorial-standards', $locale) }}" class="inline-flex min-h-6 items-center transition hover:text-g-700">معايير التحرير</a>
+                <a href="{{ route('web.rss.locale', $locale) }}" class="inline-flex min-h-6 items-center px-0.5 transition hover:text-g-700">RSS</a>
 
                 <span class="flex items-center gap-1">
                     @foreach (config('masar.locales') as $code => $config)
                         @continue (! ($config['enabled'] ?? false))
                         @if (! $loop->first)<span aria-hidden="true">/</span>@endif
                         <a href="{{ route('web.home', $code) }}"
-                           @class(['transition hover:text-g-700', 'font-bold text-ink' => $code === $locale])>{{ $config['name'] }}</a>
+                           @class(['inline-flex min-h-6 items-center px-0.5 transition hover:text-g-700', 'font-bold text-ink' => $code === $locale])>{{ $config['name'] }}</a>
                     @endforeach
                 </span>
 
                 {{-- A link, not a scripted button: it works with JavaScript off
                      and it is the same anchor a keyboard user already has. --}}
-                <a href="#main" class="transition hover:text-g-700">
+                <a href="#main" class="inline-flex min-h-6 items-center transition hover:text-g-700">
                     إلى الأعلى <span aria-hidden="true">↑</span>
                 </a>
             </div>
