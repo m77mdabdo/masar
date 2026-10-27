@@ -75,10 +75,27 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        self::refuseToRunOutsideTheTestDatabase();
         // After the app boots: setUpBeforeClass has no container, so neither
         // config() nor the Redis facade exists there.
         self::isolateRedis();
+    }
+
+    /**
+     * The database guard runs here, not in setUp().
+     *
+     * RefreshDatabase runs inside parent::setUp(), so a guard placed after it
+     * fires once the damage is done. Measured on 2026-10-27 against a probe
+     * database shaped like the dev one (it had a `migrations` table, which is
+     * what makes migrate:fresh wipe): the old guard printed "Refusing to run:
+     * RefreshDatabase would destroy it" over a database RefreshDatabase had
+     * already destroyed. setUpTraits() is the last moment before any trait
+     * touches a connection.
+     */
+    protected function setUpTraits()
+    {
+        self::refuseToRunOutsideTheTestDatabase();
+
+        return parent::setUpTraits();
     }
 
     /**
@@ -91,20 +108,32 @@ abstract class TestCase extends BaseTestCase
      * override an already-set variable, and the suite wiped the development
      * database. `force="true"` in phpunit.xml closes that specific hole; this
      * closes the class of it, because the next way in will not look the same.
+     *
+     * The name must END in `_test`. "Contains test" let `latest`, `contest` and
+     * `masar_test_backup` through.
      */
     private static function refuseToRunOutsideTheTestDatabase(): void
     {
         $database = (string) config('database.connections.'.config('database.default').'.database');
 
-        if ($database === '' || str_contains($database, 'test')) {
+        if (self::isTestDatabaseName($database)) {
             return;
         }
 
         throw new RuntimeException(
             "The test suite is pointed at the database [{$database}], which is not a test database. "
-            .'Refusing to run: RefreshDatabase would destroy it. '
+            .'Refusing to run: RefreshDatabase would destroy it. A test database name must end in `_test`. '
             .'Check that DB_DATABASE is not set in the environment that launched this run.',
         );
+    }
+
+    /**
+     * `masar_test`, or the per-process copy `--parallel` makes of it
+     * (`masar_test_test_3`). Nothing else.
+     */
+    public static function isTestDatabaseName(string $database): bool
+    {
+        return preg_match('/_test(_test_\d+)?$/', $database) === 1;
     }
 
     private static function acquireSuiteLock(): void

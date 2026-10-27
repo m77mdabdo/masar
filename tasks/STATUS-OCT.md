@@ -327,3 +327,47 @@ Disclosed so nobody chases it later:
 - `CLAUDE.md` (one row) and this file.
 - Scratch only: Vite output, Lighthouse JSON, the proxy script — all under the
   session scratchpad, none in the repo.
+
+## 11. The 16 September write — explained (Task 1.5, item 3)
+
+**What wrote it:** an `Article::factory()->make()` (or `->create()` that then
+failed) run against the dev connection at 19:28:15, outside the test suite,
+followed by an out-of-band re-dating of the archive. Evidence:
+
+- `ArticleFactory::definition()` declares `category_id => Category::factory()`
+  then `author_id => User::factory()`. Laravel creates `belongsTo` parents even on
+  `make()`. The rows match that order and nothing else: category #7 at
+  19:28:15, user #5 at 19:28:16 (`email_verified_at` 19:28:15, set while the
+  definition was evaluated), no article.
+- 28 s later every article was rewritten by status: the 72 published at
+  19:29:48, the 25 others at 19:28:44 (4 of those re-stamped today by R5). That
+  is the `ARCHIVE_SHAPE` re-dating applied to the dev database directly.
+- No audit entry exists because Category and User are not `LogsActivity` models,
+  and the article updates were bulk query updates.
+- **Not the suite.** The suite guard existed from 15 Sept (`ea92932`), `tests/Unit`
+  touches no database, and every Feature test uses `RefreshDatabase`, whose first
+  act on `masar` would have been `migrate:fresh` — yet every 14 Sept row survived.
+- The binlog that would name the session is gone: `binlog.000003` starts at the
+  21 Sept startup. It does show the instance ran 21 Sept – 12 Oct, writing only
+  to other projects' databases (`rehlet_sehha`, `rehlet_sehha_test`,
+  `photographer`); `masar` received no writes in that period. No Claude Code
+  transcript from 16 Sept exists on this machine.
+
+**What the investigation found that is worse:** the suite guard did not work.
+It ran in `setUp()` after `parent::setUp()`, and `RefreshDatabase` runs inside
+`parent::setUp()`. Measured with a disposable database shaped like the dev one
+(a `migrations` table plus a sentinel table — `migrate:fresh` only wipes when
+`migrations` exists): one Feature test **wiped the sentinel and created 55
+tables, then printed "Refusing to run: RefreshDatabase would destroy it".**
+After moving the guard to `setUpTraits()` the same probe ended with 2 tables and
+the sentinel intact. The name rule also changed from "contains `test`" to "ends
+in `_test`" (or the `--parallel` copy `_test_test_N`).
+
+**Not closed by this:** the vector that actually wrote on 16 Sept — factories
+run from tinker or a script on the dev connection — is not touched by a test
+bootstrap guard.
+
+**Removed (R6):** category #7 `aliquam-explicabo` and user #5
+`ohasan@example.org`, both unreferenced, both served 200 publicly
+(`/ar/aliquam-explicabo`, `/ar/authors/5`), now 404. Recorded as activity
+#1634 (`event = maintenance`).
