@@ -16,7 +16,7 @@ use App\Models\Subscriber;
 use App\Models\Topic;
 use App\Support\DemoContent;
 use App\Support\Settings;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -42,7 +42,7 @@ function tableCounts(): array
     return $counts;
 }
 
-function mention(Illuminate\Database\Eloquent\Model $content, Illuminate\Database\Eloquent\Model $entity): EntityMention
+function mention(Model $content, Model $entity): EntityMention
 {
     return EntityMention::query()->create([
         'mentionable_type' => $content->getMorphClass(),

@@ -10,6 +10,11 @@
             @endif
             <div class="min-w-0 flex-1">
                 <h1 class="font-display text-3xl font-semibold text-g-950">{{ $company->name }}</h1>
+                @if ($company->is_demo)
+                    {{-- Demo companies are invented. A reader who arrives from a
+                         shared link must not take one for a real business. --}}
+                    <p class="mt-2"><x-ui.badge tone="gold">شركة تخيّلية لأغراض العرض — لا تمثّل شركة قائمة</x-ui.badge></p>
+                @endif
                 <div class="mt-2 flex flex-wrap gap-2 text-sm text-ink-3">
                     <x-ui.tag>{{ $company->type?->label() }}</x-ui.tag>
                     @if ($company->industry?->name)<x-ui.tag>{{ $company->industry->name }}</x-ui.tag>@endif

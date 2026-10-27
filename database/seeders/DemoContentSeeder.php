@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Actions\Articles\PublishArticle;
-use Carbon\CarbonImmutable;
 use App\Actions\Articles\SchedulePublication;
 use App\Actions\Articles\SyncArticleEntities;
 use App\Actions\Articles\SyncArticleTopics;
+use App\Actions\Support\GenerateSlug;
 use App\Enums\ArticleStatus;
 use App\Enums\CompanyType;
 use App\Enums\ContentType;
@@ -20,15 +20,14 @@ use App\Models\Category;
 use App\Models\Company;
 use App\Models\Country;
 use App\Models\EntityMention;
-use App\Models\HomepageLayout;
+use App\Models\HomepageSection;
 use App\Models\Industry;
-use App\Models\Market;
-use App\Models\Menu;
 use App\Models\Opportunity;
 use App\Models\Person;
 use App\Models\Subscriber;
 use App\Models\Topic;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Database\Factories\Support\ArabicContent;
 use Database\Seeders\Support\ArticleWorkflow;
 use Illuminate\Database\Seeder;
@@ -51,28 +50,27 @@ class DemoContentSeeder extends Seeder
         }
 
         $categories = Category::query()->orderBy('sort_order')->get();
+        $topics = Topic::query()->orderBy('id')->get();
 
-        if ($categories->isEmpty()) {
-            $this->command?->warn('DemoContentSeeder skipped: run CategorySeeder first.');
+        if ($categories->isEmpty() || $topics->isEmpty()) {
+            $this->command?->warn('DemoContentSeeder skipped: run CategorySeeder and SiteStructureSeeder first.');
 
             return;
         }
 
+        $industries = Industry::query()->get()->keyBy('slug');
+        $countries = Country::query()->orderBy('id')->get();
+
         $staff = $this->seedStaff();
-        $countries = $this->seedCountries();
-        $industries = $this->seedIndustries();
-        $this->seedMarkets();
-        $topics = $this->seedTopics();
         $companies = $this->seedCompanies($industries, $countries);
         $people = $this->seedPeople($companies);
 
         $this->seedArticles($categories, $topics, $staff, $companies, $people);
         $this->seedUnpublishableArticles($categories, $staff);
 
-        $this->seedOpportunities($industries, $countries);
+        $this->seedOpportunities($industries->values(), $countries);
         $this->seedSubscribers();
-        $this->seedMenus($categories);
-        $this->seedHomepage();
+        $this->pinHomepage();
 
         $this->syncCounters();
 
@@ -112,110 +110,124 @@ class DemoContentSeeder extends Seeder
     }
 
     /**
-     * @return Collection<int, Country>
+     * The demo's companies. Every one is invented, and every name was searched
+     * against real companies before it was used (2026-10-27): a fictional
+     * company that shares a real one's name puts invented figures on a real
+     * business. One candidate, «مجداف» for the shipping line, turned out to be
+     * a real logistics group and was replaced.
+     *
+     * The previous twelve were generic names likely to collide, and the first
+     * four carried Tadawul codes 1010–1013 — real listing codes, 1010 among
+     * them a listed bank's. A fictional company has no ticker.
+     *
+     * @var array<int, array{slug: string, name: string, type: CompanyType, industry: string, founded: int, short: string, description: string}>
      */
-    private function seedCountries(): Collection
-    {
-        return collect(ArabicContent::COUNTRIES)->map(function (array $row): Country {
-            $country = Country::firstOrCreate(['slug' => $row['slug']], ['code' => $row['code']]);
-            $country->translations()->updateOrCreate(['locale' => 'ar'], ['name' => $row['name']]);
-
-            return $country;
-        });
-    }
+    public const COMPANIES = [
+        ['slug' => 'zayzafoon-sands', 'name' => 'زيزفون الرمال للطاقة المتجددة', 'type' => CompanyType::Company, 'industry' => 'energy', 'founded' => 2019,
+            'short' => 'مطوّر ومشغّل لمحطات طاقة شمسية ورياح تبيع إنتاجها لعملاء صناعيين.',
+            'description' => 'تطوّر الشركة محطات هجينة من الطاقة الشمسية والرياح وتبيع إنتاجها مباشرة لعملاء صناعيين بعقود طويلة الأجل، ثم أضافت تخزين الطاقة بالبطاريات إلى محطاتها.'],
+        ['slug' => 'durraq-payments', 'name' => 'دُرّاق للمدفوعات', 'type' => CompanyType::Startup, 'industry' => 'fintech', 'founded' => 2021,
+            'short' => 'منصة دفع وتحصيل للمتاجر الصغيرة والمتوسطة.',
+            'description' => 'تقدّم المنصة أجهزة نقاط بيع وروابط دفع وتسويات يومية للتجار، وأضافت لاحقًا تمويلًا قصير الأجل يُسدَّد من حركة المبيعات.'],
+        ['slug' => 'sadafat-al-qulzum', 'name' => 'صدفة القلزم للشحن البحري', 'type' => CompanyType::Company, 'industry' => 'logistics', 'founded' => 2008,
+            'short' => 'مشغّل خطوط شحن منتظمة بين موانئ البحر الأحمر.',
+            'description' => 'تشغّل الشركة خطوط شحن منتظمة للحاويات الصغيرة بين موانئ البحر الأحمر، وتقدّم التخزين والتخليص لعملائها التجاريين.'],
+        ['slug' => 'dar-al-qamariya', 'name' => 'دار القمرية للضيافة التراثية', 'type' => CompanyType::Company, 'industry' => 'tourism', 'founded' => 2016,
+            'short' => 'سلسلة نُزل صغيرة في مبانٍ تراثية مرمّمة.',
+            'description' => 'بدأت الشركة بنُزل عائلي واحد في مبنى تراثي مرمّم، وتدير اليوم سلسلة نُزل صغيرة تقوم على الترميم والتوظيف المحلي.'],
+        ['slug' => 'shuaa-al-nafud', 'name' => 'شعاع النفود للطاقة', 'type' => CompanyType::Company, 'industry' => 'energy', 'founded' => 2017,
+            'short' => 'مطوّر أنظمة طاقة شمسية على أسطح المصانع والمستودعات.',
+            'description' => 'تركّب الشركة أنظمة شمسية على أسطح المنشآت الصناعية وتشغّلها مقابل رسوم شهرية، دون أن يتحمّل العميل كلفة التركيب.'],
+        ['slug' => 'qitmira-foods', 'name' => 'قطميرة للأغذية', 'type' => CompanyType::Company, 'industry' => 'food-and-agriculture', 'founded' => 2012,
+            'short' => 'مصنّع منتجات تمور معالجة للتجزئة والتصدير.',
+            'description' => 'تصنّع الشركة معاجين التمور ومنتجاتها المعالجة للمخابز ومتاجر التجزئة، وتصدّر جزءًا من إنتاجها إلى أسواق الخليج.'],
+        ['slug' => 'arasat-development', 'name' => 'عرصات للتطوير العقاري', 'type' => CompanyType::Company, 'industry' => 'real-estate', 'founded' => 2010,
+            'short' => 'مطوّر مشاريع سكنية متوسطة الحجم.',
+            'description' => 'تطوّر الشركة مجمعات سكنية متوسطة الحجم وتبيع وحداتها على الخريطة، مع التزام بتسليم البنية التحتية قبل بدء البيع.'],
+        ['slug' => 'ruqaym-data', 'name' => 'رُقيم للبيانات', 'type' => CompanyType::Startup, 'industry' => 'retail', 'founded' => 2022,
+            'short' => 'أدوات تحليل مبيعات ومخزون لمتاجر التجزئة.',
+            'description' => 'تجمع المنصة بيانات نقاط البيع والمخزون لمتاجر التجزئة الصغيرة وتحوّلها إلى توصيات طلب أسبوعية.'],
+        ['slug' => 'athla-agritech', 'name' => 'أثلة للزراعة الذكية', 'type' => CompanyType::Startup, 'industry' => 'food-and-agriculture', 'founded' => 2023,
+            'short' => 'أنظمة ري واستشعار للمزارع في المناطق الجافة.',
+            'description' => 'تبيع الشركة حساسات رطوبة وأنظمة ري موقوتة للمزارع الصغيرة، وتشترك مع مزارعي التمور في تجارب لخفض استهلاك المياه.'],
+        ['slug' => 'mirqah-learning', 'name' => 'مرقاة للتعليم الرقمي', 'type' => CompanyType::Startup, 'industry' => 'education', 'founded' => 2020,
+            'short' => 'برامج تدريب مهني قصيرة عبر الإنترنت.',
+            'description' => 'تقدّم المنصة برامج تدريب مهني قصيرة تُصمَّم مع أصحاب العمل، وتربط المتدرّبين بفرص عمل لدى الشركات الشريكة.'],
+    ];
 
     /**
-     * @return Collection<int, Industry>
+     * The demo's people: invented, each tied to an invented company, never an
+     * expert (`is_expert` asserts a real, consenting, quotable person) and
+     * never quoted. A person's page says they are fictional.
+     *
+     * @var array<int, array{slug: string, name: string, title: string, company: string}>
      */
-    private function seedIndustries(): Collection
-    {
-        return collect(ArabicContent::INDUSTRY_NAMES)->map(function (string $name, int $i): Industry {
-            $industry = Industry::firstOrCreate(['slug' => 'industry-'.($i + 1)]);
-            $industry->translations()->updateOrCreate(['locale' => 'ar'], ['name' => $name]);
-
-            return $industry;
-        });
-    }
+    public const PEOPLE = [
+        ['slug' => 'lama-al-harbi', 'name' => 'لمى الحربي', 'title' => 'الرئيسة التنفيذية', 'company' => 'zayzafoon-sands'],
+        ['slug' => 'hind-al-zahrani', 'name' => 'هند الزهراني', 'title' => 'المديرة المالية', 'company' => 'zayzafoon-sands'],
+        ['slug' => 'majed-al-qahtani', 'name' => 'ماجد القحطاني', 'title' => 'المؤسس الشريك والرئيس التنفيذي', 'company' => 'durraq-payments'],
+        ['slug' => 'turki-al-subaie', 'name' => 'تركي السبيعي', 'title' => 'الرئيس التنفيذي', 'company' => 'sadafat-al-qulzum'],
+        ['slug' => 'nouf-al-shehri', 'name' => 'نوف الشهري', 'title' => 'المؤسسة والمديرة العامة', 'company' => 'dar-al-qamariya'],
+        ['slug' => 'khalid-al-ghamdi', 'name' => 'خالد الغامدي', 'title' => 'الرئيس التنفيذي', 'company' => 'shuaa-al-nafud'],
+        ['slug' => 'reem-al-dosari', 'name' => 'ريم الدوسري', 'title' => 'المؤسسة الشريكة', 'company' => 'athla-agritech'],
+        ['slug' => 'saad-al-mutairi', 'name' => 'سعد المطيري', 'title' => 'الرئيس التنفيذي', 'company' => 'arasat-development'],
+    ];
 
     /**
-     * @return Collection<int, Market>
-     */
-    private function seedMarkets(): Collection
-    {
-        return collect(ArabicContent::MARKET_NAMES)->map(function (string $name, int $i): Market {
-            $market = Market::firstOrCreate(
-                ['slug' => 'market-'.($i + 1)],
-                ['code' => ArabicContent::MARKET_CODES[$i] ?? null],
-            );
-            $market->translations()->updateOrCreate(['locale' => 'ar'], ['name' => $name]);
-
-            return $market;
-        });
-    }
-
-    /**
-     * @return Collection<int, Topic>
-     */
-    private function seedTopics(): Collection
-    {
-        return collect(ArabicContent::TOPIC_NAMES)->map(function (string $name, int $i): Topic {
-            $topic = Topic::firstOrCreate(
-                ['slug' => 'topic-'.($i + 1)],
-                ['is_featured' => $i < 5],
-            );
-            $topic->translations()->updateOrCreate(['locale' => 'ar'], ['name' => $name]);
-
-            return $topic;
-        });
-    }
-
-    /**
-     * @param  Collection<int, Industry>  $industries
+     * @param  Collection<string, Industry>  $industries  keyed by slug
      * @param  Collection<int, Country>  $countries
-     * @return Collection<int, Company>
+     * @return Collection<string, Company> keyed by slug
      */
     private function seedCompanies(Collection $industries, Collection $countries): Collection
     {
-        $saudi = $countries->first();
+        $saudi = $countries->firstWhere('code', 'SA') ?? $countries->first();
 
-        return collect(ArabicContent::COMPANY_NAMES)->map(function (string $name, int $i) use ($industries, $countries, $saudi): Company {
+        return collect(self::COMPANIES)->mapWithKeys(function (array $row) use ($industries, $saudi): array {
             $company = Company::firstOrCreate(
-                ['slug' => 'company-'.($i + 1)],
+                ['slug' => $row['slug']],
                 [
                     // A startup is a company with type = startup, never its own table.
-                    'type' => $i >= 8 ? CompanyType::Startup : CompanyType::Company,
-                    'industry_id' => $industries->random()->id,
-                    // Saudi-primary: most coverage is domestic, a minority regional.
-                    'country_id' => $i < 9 ? $saudi->id : $countries->random()->id,
-                    'founded_year' => $i >= 8 ? rand(2019, 2024) : rand(1978, 2015),
-                    'website' => 'https://example.test/company-'.($i + 1),
-                    'ticker' => $i < 4 ? (string) (1010 + $i) : null,
-                    'is_verified' => $i < 4,
+                    'type' => $row['type'],
+                    'industry_id' => $industries[$row['industry']]?->id,
+                    'country_id' => $saudi?->id,
+                    'founded_year' => $row['founded'],
+                    // `.example` is reserved and resolves nowhere.
+                    'website' => 'https://'.$row['slug'].'.example',
+                    'ticker' => null,
+                    'is_verified' => false,
                 ],
             );
 
             $company->translations()->updateOrCreate(['locale' => 'ar'], [
-                'name' => $name,
-                'short_description' => 'شركة عاملة في السوق المحلية ضمن قطاعها التشغيلي.',
-                'description' => ArabicContent::PARAGRAPHS[array_rand(ArabicContent::PARAGRAPHS)],
+                'name' => $row['name'],
+                'short_description' => $row['short'],
+                'description' => $row['description'],
             ]);
 
-            return $company;
+            return [$row['slug'] => $company];
         });
     }
 
     /**
-     * @param  Collection<int, Company>  $companies
+     * @param  Collection<string, Company>  $companies  keyed by slug
      * @return Collection<int, Person>
      */
     private function seedPeople(Collection $companies): Collection
     {
-        // is_expert stays false: it asserts a real, consenting, quotable person,
-        // and seeded demo people are none of those things.
-        return Person::factory()
-            ->count(8)
-            ->state(fn (): array => ['company_id' => $companies->random()->id])
-            ->create();
+        return collect(self::PEOPLE)->map(function (array $row) use ($companies): Person {
+            $person = Person::firstOrCreate(
+                ['slug' => $row['slug']],
+                ['company_id' => $companies[$row['company']]->id, 'is_expert' => false, 'linkedin' => null],
+            );
+
+            $person->translations()->updateOrCreate(['locale' => 'ar'], [
+                'name' => $row['name'],
+                'title' => $row['title'],
+                'bio' => null,
+            ]);
+
+            return $person;
+        });
     }
 
     /**
@@ -271,11 +283,15 @@ class DemoContentSeeder extends Seeder
 
         foreach ($plan as $group) {
             for ($i = 0; $i < $group['count']; $i++) {
+                $title = ArabicContent::headline();
+
                 $article = Article::factory()
                     ->withBlocks()
                     ->withSources()
                     ->withHeroImage()
                     ->create([
+                        'title' => $title,
+                        'slug' => $this->slugFor($title, Article::class),
                         'category_id' => $categories->random()->id,
                         'author_id' => $author->id,
                         'editor_id' => $editor->id,
@@ -377,12 +393,16 @@ class DemoContentSeeder extends Seeder
         $publish = app(PublishArticle::class);
 
         foreach (range(1, 2) as $ignored) {
+            $title = ArabicContent::headline();
+
             $article = Article::factory()
                 ->sponsored()
                 ->withBlocks()
                 ->withSources()
                 ->withHeroImage()
                 ->create([
+                    'title' => $title,
+                    'slug' => $this->slugFor($title, Article::class),
                     'category_id' => $categories->random()->id,
                     'author_id' => $author->id,
                 ]);
@@ -412,7 +432,7 @@ class DemoContentSeeder extends Seeder
      * years is fixed so the timeline always has something to draw, while the
      * day and hour vary so the front page does not look generated.
      *
-     * @var array<int, int>  year => how many of the archive sits in it
+     * @var array<int, int> year => how many of the archive sits in it
      */
     private const ARCHIVE_SHAPE = [
         2026 => 30,
@@ -492,17 +512,10 @@ class DemoContentSeeder extends Seeder
         app(SyncArticleEntities::class)($article->refresh(), $mentions);
         app(SyncArticleTopics::class)($article, $topics->random(random_int(2, 4))->pluck('id')->all());
 
-        // The expert insight names its person explicitly rather than the page
-        // pairing a loose quote with whoever happens to be the most prominent
-        // mention. An attribution nobody chose is a fabricated one.
-        $article->blocks()->create([
-            'type' => 'expert',
-            'data' => [
-                'person_id' => $person->getKey(),
-                'text' => fake()->randomElement(ArabicContent::EXPERT_NOTES),
-            ],
-            'sort_order' => (int) $article->blocks()->max('sort_order') + 1,
-        ]);
+        // No expert block. It used to pin an invented quote on a named demo
+        // person, and a fabricated quote under a real-sounding name is exactly
+        // what the sourcing rule forbids — fictional or not, it survives a
+        // screenshot without the label that says so.
     }
 
     /**
@@ -561,6 +574,7 @@ class DemoContentSeeder extends Seeder
                 ->withHeroImage()
                 ->create([
                     'title' => "[بوابة النشر] مادة {$label}",
+                    'slug' => $this->slugFor("بوابة النشر مادة {$label}", Article::class),
                     'category_id' => $categories->random()->id,
                     'author_id' => $author->id,
                 ]);
@@ -587,7 +601,8 @@ class DemoContentSeeder extends Seeder
             $potential = $potentials[$i % count($potentials)];
 
             Opportunity::factory()->create([
-                'slug' => 'opportunity-'.($i + 1),
+                'slug' => $this->slugFor($template['title'], Opportunity::class),
+                'official_source_url' => 'https://opportunities.example/listing-'.($i + 1),
                 'title' => $template['title'],
                 'summary' => $template['summary'],
                 'opportunity_type' => $template['type'],
@@ -611,86 +626,12 @@ class DemoContentSeeder extends Seeder
     }
 
     /**
-     * @param  Collection<int, Category>  $categories
-     */
-    private function seedMenus(Collection $categories): void
-    {
-        $menus = [
-            'header' => ['name' => 'القائمة الرئيسية', 'desktop' => true, 'mobile' => false],
-            'footer_explore' => ['name' => 'تذييل — استكشف', 'desktop' => true, 'mobile' => true],
-            'footer_company' => ['name' => 'تذييل — المنصة', 'desktop' => true, 'mobile' => true],
-            'mobile' => ['name' => 'قائمة الجوال', 'desktop' => false, 'mobile' => true],
-        ];
-
-        foreach ($menus as $key => $config) {
-            $menu = Menu::firstOrCreate(['key' => $key], ['name' => $config['name']]);
-
-            // footer_company is the only menu that is not a category list.
-            if ($key === 'footer_company') {
-                $this->seedCompanyMenuItems($menu);
-
-                continue;
-            }
-
-            foreach ($categories as $index => $category) {
-                // linkable_* rather than a hand-typed url: the item follows the
-                // category when its slug changes, instead of rotting into a 404.
-                $menu->items()->updateOrCreate(
-                    [
-                        'linkable_type' => $category->getMorphClass(),
-                        'linkable_id' => $category->getKey(),
-                    ],
-                    [
-                        'label' => [
-                            'ar' => $category->translate('name', 'ar') ?? $category->slug,
-                            'en' => ucfirst(str_replace('-', ' ', $category->slug)),
-                        ],
-                        'url' => null,
-                        'sort_order' => $index + 1,
-                        'is_active' => true,
-                        'show_desktop' => $config['desktop'],
-                        'show_mobile' => $config['mobile'],
-                    ],
-                );
-            }
-        }
-    }
-
-    /**
-     * Static pages have no entity to point at yet, so these carry a url until
-     * the pages exist as real records.
-     */
-    private function seedCompanyMenuItems(Menu $menu): void
-    {
-        $items = [
-            ['ar' => 'عن مسار', 'en' => 'About', 'url' => '/ar/about'],
-            ['ar' => 'فريق التحرير', 'en' => 'Editorial team', 'url' => '/ar/team'],
-            ['ar' => 'سياسة التصحيح', 'en' => 'Corrections policy', 'url' => '/ar/corrections'],
-            ['ar' => 'أعلن معنا', 'en' => 'Advertise', 'url' => '/ar/advertise'],
-            ['ar' => 'اتصل بنا', 'en' => 'Contact', 'url' => '/ar/contact'],
-        ];
-
-        foreach ($items as $index => $item) {
-            $menu->items()->updateOrCreate(
-                ['url' => $item['url']],
-                [
-                    'label' => ['ar' => $item['ar'], 'en' => $item['en']],
-                    'sort_order' => $index + 1,
-                    'is_active' => true,
-                    'show_desktop' => true,
-                    'show_mobile' => true,
-                ],
-            );
-        }
-    }
-
-    /**
-     * The homepage as designed: one active layout, nineteen ordered sections.
+     * Pin the newest published articles into the homepage's manual sections.
      *
-     * `source` decides who fills each one — manual (an editor pinned content),
-     * auto (a query in `config`), or mixed (pinned first, query fills the rest).
+     * The sections themselves are structure (SiteStructureSeeder) and survive
+     * the purge; these ids are demo and `masar:purge-demo` takes them out.
      */
-    private function seedHomepage(): void
+    private function pinHomepage(): void
     {
         // Manual sections are meaningless without picks: an empty big_story makes
         // the composer look broken rather than unconfigured.
@@ -702,46 +643,23 @@ class DemoContentSeeder extends Seeder
             ->pluck('id')
             ->all();
 
-        $layout = HomepageLayout::firstOrCreate(
-            ['name' => 'التخطيط الافتراضي'],
-            ['is_active' => true, 'starts_at' => null, 'ends_at' => null],
-        );
+        $slices = ['big_story' => [0, 3], 'leads' => [3, 2], 'video' => [5, 3], 'issue' => [8, 6]];
 
-        $sections = [
-            // Three slides, and the carousel's controls only exist because there
-            // are three. A layout pinned to one renders without them.
-            ['type' => 'big_story', 'title' => 'القصة الكبرى', 'source' => 'manual', 'config' => ['limit' => 3, 'article_ids' => array_slice($picks, 0, 3)]],
-            ['type' => 'tiles', 'title' => 'استكشف مسار', 'source' => 'auto', 'config' => ['limit' => 6, 'only_featured' => true]],
-            ['type' => 'leads', 'title' => 'الأبرز', 'source' => 'mixed', 'config' => ['limit' => 3, 'article_ids' => array_slice($picks, 3, 2)]],
-            ['type' => 'saudi', 'title' => 'السعودية', 'source' => 'auto', 'config' => ['limit' => 6, 'category_slug' => 'saudi']],
-            ['type' => 'markets', 'title' => 'الأسواق', 'source' => 'auto', 'config' => ['limit' => 5]],
-            ['type' => 'business', 'title' => 'الأعمال والشركات', 'source' => 'auto', 'config' => ['limit' => 3, 'category_slug' => 'business']],
-            ['type' => 'opportunities', 'title' => 'فرص', 'source' => 'auto', 'config' => ['limit' => 6]],
-            ['type' => 'intelligence', 'title' => 'مسار الاستخباري', 'source' => 'auto', 'config' => ['limit' => 4, 'content_type' => 'analysis']],
-            ['type' => 'insights', 'title' => 'رؤى وتحليلات', 'source' => 'auto', 'config' => ['limit' => 4, 'category_slug' => 'insights']],
-            ['type' => 'stories', 'title' => 'قصص نجاح', 'source' => 'auto', 'config' => ['limit' => 5, 'category_slug' => 'stories']],
-            ['type' => 'most_read', 'title' => 'الأكثر قراءة', 'source' => 'auto', 'config' => ['limit' => 10]],
-            ['type' => 'editors_picks', 'title' => 'اختيارات المحرر', 'source' => 'auto', 'config' => ['limit' => 5]],
-            ['type' => 'video', 'title' => 'مسار مرئي', 'source' => 'mixed', 'config' => ['limit' => 6, 'article_ids' => array_slice($picks, 5, 3)]],
-            ['type' => 'reports', 'title' => 'تقارير', 'source' => 'auto', 'config' => ['limit' => 5, 'content_type' => 'report']],
-            ['type' => 'data', 'title' => 'بيانات', 'source' => 'auto', 'config' => ['limit' => 5, 'content_type' => 'explainer']],
-            ['type' => 'issue', 'title' => 'عدد مسار 001', 'source' => 'manual', 'config' => ['limit' => 6, 'article_ids' => array_slice($picks, 8, 6)]],
-            ['type' => 'companies', 'title' => 'شركات في الأخبار', 'source' => 'auto', 'config' => ['limit' => 8]],
-            ['type' => 'newsletter', 'title' => 'النشرة البريدية', 'source' => 'manual', 'config' => ['variant' => 'inline']],
-        ];
-
-        foreach ($sections as $index => $section) {
-            $layout->sections()->updateOrCreate(
-                ['type' => $section['type']],
-                [
-                    'title' => ['ar' => $section['title']],
-                    'source' => $section['source'],
-                    'config' => $section['config'],
-                    'sort_order' => $index + 1,
-                    'is_visible' => true,
-                ],
-            );
+        foreach (HomepageSection::query()->whereIn('type', array_keys($slices))->get() as $section) {
+            [$offset, $length] = $slices[$section->type];
+            $section->update(['config' => [...(array) $section->config, 'article_ids' => array_slice($picks, $offset, $length)]]);
         }
+    }
+
+    /**
+     * The system's suggested slug for generated content: a transliteration of
+     * the title, made unique. Hand-written content chooses its own (§2).
+     *
+     * @param  class-string  $modelClass
+     */
+    private function slugFor(string $title, string $modelClass): string
+    {
+        return app(GenerateSlug::class)($title, 'ar', $modelClass);
     }
 
     /**

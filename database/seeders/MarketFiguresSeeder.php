@@ -30,6 +30,24 @@ class MarketFiguresSeeder extends Seeder
             return;
         }
 
+        $values = $this->values();
+
+        // Written through Settings::setMany, the same path the settings screen
+        // uses — so the rows are shaped and audited exactly as an editor's would
+        // be, rather than shaped the way a seeder guessed.
+        app(Settings::class)->setMany($values);
+
+        $this->command?->info('Market figures: '.count($values).' settings rows, labelled as sample data.');
+    }
+
+    /**
+     * The sample figures, separate from run() so the suite can check them
+     * without the local-only guard.
+     *
+     * @return array<string, mixed>
+     */
+    public function values(): array
+    {
         /*
          * Every instrument here is a sample one, and every figure in `data`
          * belongs to the fictional companies in FlagshipStoriesSeeder. These
@@ -39,7 +57,7 @@ class MarketFiguresSeeder extends Seeder
          * survives once screenshotted. The USD/SAR peg stays: 3.75 is a fixed,
          * public fact, not a reading.
          */
-        $values = [
+        return [
             'market.as_of' => now()->subHours(3)->format('Y-m-d H:i'),
             'market.source' => 'أرقام تجريبية — ليست قراءة سوق',
 
@@ -104,12 +122,5 @@ class MarketFiguresSeeder extends Seeder
                 ['label' => 'نُزل دار القمرية', 'value' => '9', 'change' => null],
             ],
         ];
-
-        // Written through Settings::setMany, the same path the settings screen
-        // uses — so the rows are shaped and audited exactly as an editor's would
-        // be, rather than shaped the way a seeder guessed.
-        app(Settings::class)->setMany($values);
-
-        $this->command?->info('Market figures: '.count($values).' settings rows, labelled as sample data.');
     }
 }

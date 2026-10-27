@@ -12,17 +12,13 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            // Structure: what the site is made of. Not demo, never purged.
             RoleSeeder::class,
             CategorySeeder::class,
-            DemoContentSeeder::class,
+            SiteStructureSeeder::class,
 
-            // After the demo content: the image library needs the homepage
-            // layout to exist before it can promise that no hero repeats
-            // inside one of its sections.
-            ImageLibrarySeeder::class,
-            VideoLibrarySeeder::class,
-            MarketFiguresSeeder::class,
-            IntelligenceSeeder::class,
+            // Demo content, every row of it flagged and purgeable.
+            DemoSeeder::class,
         ]);
 
         /*

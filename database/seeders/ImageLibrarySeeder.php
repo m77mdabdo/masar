@@ -272,7 +272,7 @@ class ImageLibrarySeeder extends Seeder
         Article::query()
             ->whereNotNull('hero_media_id')
             ->orderBy('id')
-            ->select(['id', 'category_id'])
+            ->select(['id', 'slug', 'category_id'])
             ->with('category:id,slug')
             ->chunk(100, function (Collection $chunk) use ($catalogue, &$assigned, &$usageCount): void {
                 foreach ($chunk as $article) {
@@ -325,6 +325,14 @@ class ImageLibrarySeeder extends Seeder
      */
     private function pick(Collection $catalogue, Article $article, array $usedHere, array $usageCount): string
     {
+        // A hand-written article names its photograph; that choice wins over
+        // affinity, but never over the no-repeat rule inside a section.
+        $chosen = FlagshipStoriesSeeder::HEROES[(string) $article->slug] ?? null;
+
+        if ($chosen !== null && $catalogue->has($chosen) && ! isset($usedHere[$chosen])) {
+            return $chosen;
+        }
+
         $slug = $article->category?->slug ?? '';
         $wanted = ImageCatalogue::affinity()[$slug] ?? [];
 
