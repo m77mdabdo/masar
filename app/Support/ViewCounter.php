@@ -67,6 +67,27 @@ final class ViewCounter
     }
 
     /**
+     * Drop buffered reads for articles that are being removed, so a later
+     * flush has nothing to say about rows that no longer exist.
+     *
+     * @param  array<int, int>  $articleIds
+     */
+    public function forget(array $articleIds): int
+    {
+        $redis = Redis::connection();
+        $ids = array_flip(array_map('strval', $articleIds));
+        $dropped = 0;
+
+        foreach (array_keys((array) $redis->hgetall(self::BUFFER)) as $field) {
+            if (isset($ids[explode(':', (string) $field, 2)[0]])) {
+                $dropped += (int) $redis->hdel(self::BUFFER, (string) $field);
+            }
+        }
+
+        return $dropped;
+    }
+
+    /**
      * Move the buffer into `article_views` and the lifetime total.
      *
      * Read-and-decrement per field rather than clearing the hash, so reads
