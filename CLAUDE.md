@@ -81,13 +81,21 @@ Every ratio above is measured, and the suite re-measures them. Change a token an
 the contrast test tells you what broke.
 
 **Homepage hero, text over the photograph** — measured 2026-10-27 off the rendered
-pixels behind each element (text hidden), against the *lightest* pixel it sits on,
-at 375 · 430 · 768 · 1024 · 1280 · 1440 · 1920: headline ≥ 11.11, its mint closing
-word ≥ 5.74, step labels ≥ 15.96, numerals 01–03 ≥ 5.07. Before that pass the
-scrim was sized in percentages of a full-bleed section and the text drifted out of
-it on wide screens: headline 2.07 and mint word 1.0 at 1920, numerals 1.31 at 1440.
-These are not in the suite — the ground is a photograph — so re-measure if
-`.hero-scrim` or `.steps-scrim` move.
+pixels behind each element (text hidden), against the *lightest* pixel under its
+worst line box, on all three demo slides:
+
+| width | headline | standfirst | byline | step label | step body | numerals 01–03 |
+|---|---|---|---|---|---|---|
+| 375 | 7.89 | 5.76 | 4.86 | 11.71 | 10.57 | 5.38 |
+| 768 | 7.86 | 5.74 | 4.83 | 11.36 | 10.15 | 5.47 |
+| 1440 | 14.58 | 8.80 | 6.99 | 16.10 | 14.55 | 5.10 |
+
+On slide one at every width 375–1920, the mint closing word ≥ 5.74. Before the
+October pass the scrim was sized in percentages of a full-bleed section and the text
+drifted out of it on wide screens: headline 2.07 and mint word 1.0 at 1920, numerals
+1.31 at 1440. An earlier version of this paragraph gave "headline ≥ 11.11" — that was
+slide one only. These are not in the suite — the ground is a photograph — so
+re-measure if `.hero-scrim` or `.steps-scrim` move.
 
 ---
 

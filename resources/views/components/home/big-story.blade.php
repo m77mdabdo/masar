@@ -2,10 +2,12 @@
 {{-- contrast-safe: every foreground sits on the scrimmed photograph, so the
      ground is the picture and not a token. Measured 2026-10-27 off the
      rendered pixels behind each element, text hidden, against the lightest
-     pixel it sits on, at 375 / 430 / 768 / 1024 / 1280 / 1440 / 1920:
-     headline ≥ 11.11, its mint closing word ≥ 5.74, step labels ≥ 15.96,
-     numerals 01–03 ≥ 5.07. The scrim stops in app.css are what hold those;
-     re-measure if they move. --}}
+     pixel under its worst line box, on all three demo slides:
+       375   headline 7.89 · standfirst 5.76 · byline 4.86 · step label 11.71 · step body 10.57 · numerals 5.38
+       768   headline 7.86 · standfirst 5.74 · byline 4.83 · step label 11.36 · step body 10.15 · numerals 5.47
+       1440  headline 14.58 · standfirst 8.80 · byline 6.99 · step label 16.10 · step body 14.55 · numerals 5.10
+     Slide one alone, at every width 375–1920: mint closing word ≥ 5.74.
+     The scrim stops in app.css are what hold these; re-measure if they move. --}}
 @php
     use App\Enums\ArticleSection;
 
@@ -65,7 +67,10 @@
         over it and the grid on top. Full bleed to the viewport edges and flush
         with the ticker above — no inset, no radius, no gap.
     --}}
-    <section class="full-bleed relative isolate" aria-labelledby="big-story-heading"
+    {{-- One slide: the headline names the section. Several: the group's own
+         label does, because aria-labelledby keeps resolving to slide one's
+         headline after the reader has moved to slide three. --}}
+    <section class="full-bleed relative isolate" @if ($count === 1) aria-labelledby="big-story-heading" @endif
              @if ($count > 1)
                  x-data="{ i: 0, n: {{ $count }}, go(d) { this.i = (this.i + d + this.n) % this.n } }"
                  role="group" aria-roledescription="عرض متتابع" aria-label="{{ $section['title'] }}"
@@ -73,6 +78,9 @@
         @foreach ($slides as $k => $slide)
             <div class="hero-photo absolute inset-0 z-0"
                  @if ($count > 1) x-show="i === {{ $k }}" @if ($k > 0) style="display:none" @endif @endif>
+                {{-- `ratio` does not shape this box: with :fill the parent owns it,
+                     and the ratio only sets the img's width/height attributes,
+                     which the cover CSS overrides. The crop is `focal`'s. --}}
                 <x-ui.responsive-image
                     :media="$slide['image']"
                     :alt="$slide['alt']"
@@ -117,12 +125,12 @@
             {{-- gap-6: when the column is no taller than its content (below
                  lg) justify-between distributes nothing, and the label sat on
                  the headline with no space at all. --}}
-            <div class="flex flex-col justify-between gap-6 p-7 sm:p-11">
+            <div class="flex flex-col justify-between gap-4 p-7 sm:gap-6 sm:p-11">
                 <p class="font-display text-[0.75rem] font-semibold uppercase tracking-[0.2em] text-white">
                     {{ $section['title'] }}
                 </p>
 
-                <div>
+                <div @if ($count > 1) aria-live="polite" @endif>
                 @foreach ($slides as $k => $slide)
                     <div class="text-cream" @if ($count > 1) x-show="i === {{ $k }}" @if ($k > 0) style="display:none" @endif @endif>
                         {{-- 68px over 14ch, swept against all 72 demo
@@ -137,13 +145,17 @@
                              leaves the column into the questions beside it. --}}
                         <{{ $k === 0 ? 'h1' : 'h2' }}
                             @if ($k === 0) id="big-story-heading" @endif
-                            {{-- 1.2, not 1.1: Readex Pro's Arabic marks reach past
+                            {{-- 14ch from lg only: it keeps the headline out of
+                                 the questions column beside it, which below lg
+                                 is under it. At 375 the cap clamped 1 of the 83
+                                 demo headlines at five lines; without it, none.
+                                 1.2, not 1.1: Readex Pro's Arabic marks reach past
                                  a 1.1 line box, and the clamp's overflow cut the
                                  dots under the last line and the tops of the
                                  first. The padding gives the ink room inside the
                                  clamp; the matching negative margin keeps the
                                  block where it was. --}}
-                            class="-my-[0.15em] line-clamp-4 max-w-[14ch] py-[0.15em] font-display text-[2.1rem] font-semibold leading-[1.2] sm:text-[2.6rem] lg:text-[clamp(2rem,3.33vw,3rem)]">
+                            class="-my-[0.15em] line-clamp-4 py-[0.15em] lg:max-w-[14ch] font-display text-[2.1rem] font-semibold leading-[1.2] sm:text-[2.6rem] lg:text-[clamp(2rem,3.33vw,3rem)]">
                             <a href="{{ $slide['url'] }}" class="transition hover:text-cream/85">
                                 {{ $slide['lead'] }}@if ($slide['emphasis']) <span class="text-mint">{{ $slide['emphasis'] }}</span>@endif
                             </a>
@@ -183,13 +195,21 @@
             {{-- The carousel controls sit over this column's bottom edge. Below
                  lg the column is last in the stack, and between lg and xl the
                  stage is short and the answers run to three lines; in both the
-                 controls covered the third question. pb-24 keeps them clear. --}}
-            <div @class(['relative flex flex-col justify-center p-7 text-cream sm:p-9', 'pb-24 sm:pb-24 xl:pb-9' => $count > 1])>
+                 controls covered the third question. pb-24 keeps them clear.
+                 It releases at xl, not lg, on purpose: at 1024 with 36px the
+                 controls covered the third answer; from 1280 answers are two
+                 lines and the tightest gap measured is 40px.
+                 `sm:pb-24` duplicates `pb-24` and is load-bearing: `sm:p-9` is in
+                 a later media query at equal specificity and would otherwise
+                 reset the bottom to 36px from 640px up. Do not tidy it away. --}}
+            <div @class(['relative flex flex-col justify-center p-7 pt-5 text-cream sm:p-9', 'pb-24 sm:pb-24 xl:pb-9' => $count > 1])>
                 {{-- Local, and only as wide as this column: the frame is not
                      tinted to rescue three lines of text. --}}
                 <span class="steps-scrim pointer-events-none absolute" aria-hidden="true"></span>
                 @foreach ($slides as $k => $slide)
-                    <ol class="relative space-y-[3.75rem]"
+                    {{-- 60px fills the side column's height at lg+; stacked
+                         under the headline there is no slack to fill. --}}
+                    <ol class="relative space-y-10 lg:space-y-[3.75rem]"
                         @if ($count > 1) x-show="i === {{ $k }}" @if ($k > 0) style="display:none" @endif @endif>
                         @foreach ($slide['steps'] as $step)
                             <li class="grid grid-cols-[auto_1fr] gap-4">
@@ -223,12 +243,16 @@
             </div>
 
             @if ($count > 1)
+                {{-- The circles are 36px (under the 44px touch minimum); a 5px
+                     pseudo-element ring makes each hit area 46×46 without
+                     changing what is drawn. Verified by clicking 21px off
+                     centre on all four sides at 375, 768 and 1440. --}}
                 {{-- Real controls for a real carousel. The thumbnail is the
                      slide the next button goes to, so the affordance is not
                      decoration. --}}
                 <div class="absolute bottom-7 end-7 z-10 flex items-center gap-3 sm:bottom-8 sm:end-8">
                     <button type="button" @click="go(-1)" aria-label="الشريحة السابقة"
-                            class="flex h-9 w-9 items-center justify-center rounded-full border border-white/70 text-white transition hover:bg-white/10">
+                            class="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/70 text-white transition before:absolute before:-inset-[5px] before:content-[''] hover:bg-white/10">
                         <span aria-hidden="true" class="inline-block rtl:-scale-x-100">←</span>
                     </button>
 
@@ -246,7 +270,7 @@
                     @endforeach
 
                     <button type="button" @click="go(1)" aria-label="الشريحة التالية"
-                            class="flex h-9 w-9 items-center justify-center rounded-full border border-white/70 text-white transition hover:bg-white/10">
+                            class="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/70 text-white transition before:absolute before:-inset-[5px] before:content-[''] hover:bg-white/10">
                         <span aria-hidden="true" class="inline-block rtl:-scale-x-100">→</span>
                     </button>
                 </div>
