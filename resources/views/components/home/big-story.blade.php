@@ -1,9 +1,11 @@
 @props(['section', 'backdrop' => null, 'sizes' => '(max-width: 1024px) 100vw, 96vw'])
 {{-- contrast-safe: every foreground sits on the scrimmed photograph, so the
-     ground is the picture and not a token. Measured off the rendered pixels of
-     all three demo slides, worst line box of each run: headline 7.65:1,
-     standfirst 7.67:1, byline 6.4:1, step label 12.41:1, step body 10.22:1.
-     The scrim's stops in app.css are what hold those; re-measure if they move. --}}
+     ground is the picture and not a token. Measured 2026-10-27 off the
+     rendered pixels behind each element, text hidden, against the lightest
+     pixel it sits on, at 375 / 430 / 768 / 1024 / 1280 / 1440 / 1920:
+     headline ≥ 11.11, its mint closing word ≥ 5.74, step labels ≥ 15.96,
+     numerals 01–03 ≥ 5.07. The scrim stops in app.css are what hold those;
+     re-measure if they move. --}}
 @php
     use App\Enums\ArticleSection;
 
@@ -69,7 +71,7 @@
                  role="group" aria-roledescription="عرض متتابع" aria-label="{{ $section['title'] }}"
              @endif>
         @foreach ($slides as $k => $slide)
-            <div class="absolute inset-0 z-0"
+            <div class="hero-photo absolute inset-0 z-0"
                  @if ($count > 1) x-show="i === {{ $k }}" @if ($k > 0) style="display:none" @endif @endif>
                 <x-ui.responsive-image
                     :media="$slide['image']"
@@ -103,12 +105,19 @@
              section showing. At 620 the stack came to 854 and left 46px of it —
              which is not "beginning to show", and on a real 900px window, once
              browser chrome is taken off, the button was below the fold. --}}
-        <div class="relative z-10 mx-auto grid min-h-[34rem] w-full max-w-[1300px] lg:min-h-[37.5rem] lg:grid-cols-[1.36fr_0.64fr]">
+        {{-- …and on a short screen it gives way: at 1024×768 the 600px stage
+             put the button 29px below the fold. Below 840px of viewport height
+             the stage is the viewport less the 15rem stack above it, down to
+             32rem, where the questions column still fits. --}}
+        <div class="relative z-10 mx-auto grid min-h-[34rem] w-full max-w-[1300px] lg:min-h-[clamp(32rem,calc(100svh_-_15rem),37.5rem)] lg:grid-cols-[1.36fr_0.64fr]">
             {{-- The label sits at the top of the column and the story at the
                  bottom, so the space between them is the section's height doing
                  the work rather than a margin. It is the same label on every
                  slide, so it lives outside the slide loop. --}}
-            <div class="flex flex-col justify-between p-7 sm:p-11">
+            {{-- gap-6: when the column is no taller than its content (below
+                 lg) justify-between distributes nothing, and the label sat on
+                 the headline with no space at all. --}}
+            <div class="flex flex-col justify-between gap-6 p-7 sm:p-11">
                 <p class="font-display text-[0.75rem] font-semibold uppercase tracking-[0.2em] text-white">
                     {{ $section['title'] }}
                 </p>
@@ -128,7 +137,13 @@
                              leaves the column into the questions beside it. --}}
                         <{{ $k === 0 ? 'h1' : 'h2' }}
                             @if ($k === 0) id="big-story-heading" @endif
-                            class="line-clamp-4 max-w-[14ch] font-display text-[2.1rem] font-semibold leading-[1.1] sm:text-[2.6rem] lg:text-[clamp(2rem,3.33vw,3rem)]">
+                            {{-- 1.2, not 1.1: Readex Pro's Arabic marks reach past
+                                 a 1.1 line box, and the clamp's overflow cut the
+                                 dots under the last line and the tops of the
+                                 first. The padding gives the ink room inside the
+                                 clamp; the matching negative margin keeps the
+                                 block where it was. --}}
+                            class="-my-[0.15em] line-clamp-4 max-w-[14ch] py-[0.15em] font-display text-[2.1rem] font-semibold leading-[1.2] sm:text-[2.6rem] lg:text-[clamp(2rem,3.33vw,3rem)]">
                             <a href="{{ $slide['url'] }}" class="transition hover:text-cream/85">
                                 {{ $slide['lead'] }}@if ($slide['emphasis']) <span class="text-mint">{{ $slide['emphasis'] }}</span>@endif
                             </a>
@@ -165,10 +180,14 @@
             {{-- The three questions, on the photograph. Each numeral carries its
                  own hairline rather than one rule running the column, so a step
                  with two lines and a step with four still read as equals. --}}
-            <div class="relative flex flex-col justify-center p-7 text-cream sm:p-9">
+            {{-- The carousel controls sit over this column's bottom edge. Below
+                 lg the column is last in the stack, and between lg and xl the
+                 stage is short and the answers run to three lines; in both the
+                 controls covered the third question. pb-24 keeps them clear. --}}
+            <div @class(['relative flex flex-col justify-center p-7 text-cream sm:p-9', 'pb-24 sm:pb-24 xl:pb-9' => $count > 1])>
                 {{-- Local, and only as wide as this column: the frame is not
                      tinted to rescue three lines of text. --}}
-                <span class="steps-scrim pointer-events-none absolute inset-0" aria-hidden="true"></span>
+                <span class="steps-scrim pointer-events-none absolute" aria-hidden="true"></span>
                 @foreach ($slides as $k => $slide)
                     <ol class="relative space-y-[3.75rem]"
                         @if ($count > 1) x-show="i === {{ $k }}" @if ($k > 0) style="display:none" @endif @endif>
@@ -190,7 +209,10 @@
                                          text sits at the far edge of the
                                          photograph where the scrim is doing
                                          the least work. --}}
-                                    <p class="line-clamp-2 text-[0.84375rem] leading-[1.65] text-cream">
+                                    {{-- Three lines between lg and xl: the column is
+                                         328px at 1024 and two lines cut every
+                                         answer mid-sentence. --}}
+                                    <p class="line-clamp-3 text-[0.84375rem] leading-[1.65] text-cream xl:line-clamp-2">
                                         {{ $step['text'] }}
                                     </p>
                                 </div>

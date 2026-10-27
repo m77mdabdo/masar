@@ -80,6 +80,15 @@ say so explicitly and wait — do not silently implement an alternative.
 Every ratio above is measured, and the suite re-measures them. Change a token and
 the contrast test tells you what broke.
 
+**Homepage hero, text over the photograph** — measured 2026-10-27 off the rendered
+pixels behind each element (text hidden), against the *lightest* pixel it sits on,
+at 375 · 430 · 768 · 1024 · 1280 · 1440 · 1920: headline ≥ 11.11, its mint closing
+word ≥ 5.74, step labels ≥ 15.96, numerals 01–03 ≥ 5.07. Before that pass the
+scrim was sized in percentages of a full-bleed section and the text drifted out of
+it on wide screens: headline 2.07 and mint word 1.0 at 1920, numerals 1.31 at 1440.
+These are not in the suite — the ground is a photograph — so re-measure if
+`.hero-scrim` or `.steps-scrim` move.
+
 ---
 
 ## 3. Architecture

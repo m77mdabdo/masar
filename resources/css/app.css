@@ -194,32 +194,37 @@
      * sunset went muted, the towers flattened into one teal mass and the whole
      * frame read as tinted rather than lit. Black darkens. Green tints.
      *
-     * It is also confined now: solid at the headline edge, gone by 45%, and
-     * nothing at all after that. The remaining 55% is the photograph at full
-     * saturation, which is the composition — the questions column sits over
-     * sky that is dark in the picture itself.
+     * The dark plateau ends where the text ends, in lengths, not percentages.
+     * Its stops were percentages of a full-bleed section while the text sits in
+     * a centred 1300px column, so the wider the screen, the further the
+     * headline drifted into the clear part of the gradient: measured against
+     * the brightest pixel behind it, the mint closing word fell to 3.77:1 at
+     * 1024 and 1.0:1 at 1920, over the sunset. `--scrim-edge` is the gutter
+     * beyond 1300px, plus the column's 2.75rem padding, plus the wider of the
+     * standfirst (26rem) and the headline (14ch ≈ 9.1em of its clamped size).
+     * Past it the photograph fades back in over 8rem and is left alone — a
+     * longer fade dimmed the tower the headline sits beside.
      */
     .hero-scrim {
+        --scrim-edge: calc(max(0px, (100vw - 1300px) / 2) + 2.75rem + max(26rem, 9.1 * clamp(2rem, 3.33vw, 3rem)));
         background-image: linear-gradient(
             270deg,
-            rgb(0 0 0 / 0.90) 0%,
-            rgb(0 0 0 / 0.84) 16%,
-            rgb(0 0 0 / 0.66) 28%,
-            rgb(0 0 0 / 0.38) 37%,
-            rgb(0 0 0 / 0.12) 42%,
-            transparent 45%
+            rgb(0 0 0 / 0.90) 0,
+            rgb(0 0 0 / 0.86) var(--scrim-edge),
+            rgb(0 0 0 / 0.45) calc(var(--scrim-edge) + 3rem),
+            rgb(0 0 0 / 0.12) calc(var(--scrim-edge) + 6rem),
+            transparent calc(var(--scrim-edge) + 8rem)
         );
     }
 
     [dir='ltr'] .hero-scrim {
         background-image: linear-gradient(
             90deg,
-            rgb(0 0 0 / 0.90) 0%,
-            rgb(0 0 0 / 0.84) 16%,
-            rgb(0 0 0 / 0.66) 28%,
-            rgb(0 0 0 / 0.38) 37%,
-            rgb(0 0 0 / 0.12) 42%,
-            transparent 45%
+            rgb(0 0 0 / 0.90) 0,
+            rgb(0 0 0 / 0.86) var(--scrim-edge),
+            rgb(0 0 0 / 0.45) calc(var(--scrim-edge) + 3rem),
+            rgb(0 0 0 / 0.12) calc(var(--scrim-edge) + 6rem),
+            transparent calc(var(--scrim-edge) + 8rem)
         );
     }
 
@@ -228,31 +233,42 @@
      *
      * With the main scrim confined to the headline edge, the questions sit over
      * the bare photograph — fine on a night skyline, 1.10:1 on a slide whose
-     * sky is blown out. This darkens that column alone and fades to nothing
-     * before it reaches the picture, rather than tinting the whole frame to
-     * rescue three lines of text.
+     * sky is blown out. This darkens that column alone rather than tinting the
+     * whole frame to rescue three lines of text.
+     *
+     * It used to fade in across the column itself, which put the numerals —
+     * at the column's start — on its weakest stop: 01/02/03 measured 1.31:1
+     * against the brightest pixel behind them. The fade now happens in the
+     * 4rem before the column, so the column is evenly dark from its edge. On
+     * the far side it stopped dead at the container, a hard vertical seam on
+     * any screen wider than 1300px; it now fades out past it.
      */
     .steps-scrim {
+        /* How far past the container it runs: the gutter, but never more than
+           6rem, so it fades out instead of ending in a seam and the far edge of
+           a wide screen keeps its photograph. 0 at 1300px and below. */
+        --bleed: min(6rem, max(0px, (100vw - 1300px) / 2));
+        inset-block: 0;
+        inset-inline-start: -4rem;
+        inset-inline-end: calc(-1 * var(--bleed));
         background-image: linear-gradient(
             270deg,
-            transparent 0%,
-            rgb(0 0 0 / 0.22) 10%,
-            rgb(0 0 0 / 0.52) 22%,
-            rgb(0 0 0 / 0.72) 34%,
-            rgb(0 0 0 / 0.80) 60%,
-            rgb(0 0 0 / 0.82) 100%
+            transparent 0,
+            rgb(0 0 0 / 0.55) 2rem,
+            rgb(0 0 0 / 0.86) 4.5rem,
+            rgb(0 0 0 / 0.86) calc(100% - var(--bleed)),
+            transparent 100%
         );
     }
 
     [dir='ltr'] .steps-scrim {
         background-image: linear-gradient(
             90deg,
-            transparent 0%,
-            rgb(0 0 0 / 0.22) 10%,
-            rgb(0 0 0 / 0.52) 22%,
-            rgb(0 0 0 / 0.72) 34%,
-            rgb(0 0 0 / 0.80) 60%,
-            rgb(0 0 0 / 0.82) 100%
+            transparent 0,
+            rgb(0 0 0 / 0.55) 2rem,
+            rgb(0 0 0 / 0.86) 4.5rem,
+            rgb(0 0 0 / 0.86) calc(100% - var(--bleed)),
+            transparent 100%
         );
     }
 
@@ -262,6 +278,10 @@
      * at 400px before this existed: the headline sat at 1.39:1 and the step
      * text at 1.02:1. A flat wash is the honest shape for a layout with no
      * empty side to leave alone.
+     *
+     * The questions block, stacked under the headline, fades in from its top
+     * edge rather than starting at full strength: a horizontal gradient there
+     * drew a hard line across the photograph.
      */
     @media (width < 64rem) {
         .hero-scrim,
@@ -269,6 +289,31 @@
             background-image: none;
             background-color: color-mix(in srgb, var(--color-g-950) 78%, transparent);
         }
+
+        .steps-scrim,
+        [dir='ltr'] .steps-scrim {
+            inset: 0;
+            background-image: linear-gradient(
+                180deg,
+                transparent 0,
+                rgb(0 0 0 / 0.45) 1.75rem,
+                rgb(0 0 0 / 0.55) 4rem,
+                rgb(0 0 0 / 0.55) 100%
+            );
+        }
+    }
+
+    /*
+     * The photograph layer, and nothing that holds text.
+     *
+     * A small lift in the shadows: contrast below 1 raises black toward a very
+     * dark grey, so the unlit side of the skyline keeps its shapes instead of
+     * reading as a flat black mass. Brightness stays near 1 so the highlights
+     * do not wash out. The scrims sit above this layer and are what the text
+     * contrast is measured against.
+     */
+    .hero-photo {
+        filter: contrast(0.92) brightness(1.06);
     }
 
     /*
