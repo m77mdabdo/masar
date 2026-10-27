@@ -1,5 +1,10 @@
 # MASAR — project status
 
+> **Frozen snapshot — the 14 September 2026 audit.** Superseded by
+> [`STATUS-OCT.md`](STATUS-OCT.md). Kept unedited as the record of what we
+> believed on that date; every forward-looking statement below ("next",
+> "nobody has examined", "will") is historical, not current.
+
 Audit date: 2026-09-14. Every number here was measured today, not recalled.
 
 Method, so you can judge the numbers: row counts come from a throwaway database
