@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Models\Article;
+use App\Support\EntityUrl;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Http\Kernel as HttpKernel;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Route;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 /**
@@ -156,6 +161,7 @@ class DecayCheck extends Command
             ])->run('php artisan migrate:fresh --seed --force');
 
             $rows = 0;
+            $published = 0;
             if ($result->successful()) {
                 config(["database.connections.{$connection}.database" => $scratch]);
                 DB::purge($connection);
@@ -163,13 +169,22 @@ class DecayCheck extends Command
                     $name = array_values((array) $table)[0];
                     $rows += (int) DB::table($name)->count();
                 }
+
+                // An exit code of 0 is the process's claim, not the seed's
+                // result. A run that migrated and seeded nothing used to read
+                // "ok · 0 rows".
+                if (DB::getSchemaBuilder()->hasTable('articles')) {
+                    $published = (int) DB::table('articles')->where('status', 'published')->count();
+                }
             }
+
+            $seeded = $result->successful() && $rows > 0 && $published > 0;
 
             $this->record(
                 'migrate:fresh --seed',
-                $result->successful() ? 'ok' : 'FAIL',
+                $seeded ? 'ok' : 'FAIL',
                 $result->successful()
-                    ? "clean on scratch db · {$rows} rows"
+                    ? "scratch db · {$rows} rows · {$published} published articles"
                     : trim(substr($result->errorOutput() ?: $result->output(), -160)),
             );
         } catch (Throwable $e) {
@@ -186,24 +201,56 @@ class DecayCheck extends Command
     }
 
     /**
-     * The seven flows from tasks/STATUS.md §2, checked at their thinnest point
-     * rather than driven through a browser.
+     * The flows from tasks/STATUS.md §2, each checked against what a reader
+     * would actually get.
+     *
+     * Every row here must be able to go FAIL, and each has a test in
+     * tests/Feature/DecayCheckTest.php that breaks the thing and watches it
+     * fail. Three rows used to report "ok" without observing anything — a row
+     * count for publishing, a route's existence for the newsletter, and a
+     * redirect check that passed because there were no redirects. A row with
+     * nothing to observe says SKIP; it never says ok.
      */
     private function checkFlows(): void
     {
         $locale = (string) config('masar.default_locale', 'ar');
 
-        $this->flow('publish an article', function () {
-            $published = DB::table('articles')->where('status', 'published')->count();
+        $this->flow('published article is served', function () use ($locale) {
+            $article = Article::query()->published()->where('locale', $locale)
+                ->latest('published_at')->first();
 
-            return [$published > 0, "{$published} published"];
+            if ($article === null) {
+                return [false, 'no published article to serve'];
+            }
+
+            $url = app(EntityUrl::class)->for($article, $locale);
+            $html = $url === null ? null : $this->render($url);
+
+            if ($html === null) {
+                return [false, "#{$article->id} did not render at {$url}"];
+            }
+
+            $ok = str_contains($html, e($article->title));
+
+            return [$ok, $ok ? "#{$article->id} renders with its headline" : "#{$article->id} rendered without its headline"];
         });
 
-        $this->flow('article on the homepage', function () use ($locale) {
-            $sections = DB::table('homepage_sections')->count();
-            $ok = $sections > 0 && $this->getsOk("/{$locale}");
+        $this->flow('homepage links published articles', function () use ($locale) {
+            $html = $this->render("/{$locale}");
 
-            return [$ok, "{$sections} sections"];
+            if ($html === null) {
+                return [false, 'homepage did not render'];
+            }
+
+            $urls = Article::query()->published()->where('locale', $locale)
+                ->with('category:id,slug')->latest('published_at')->limit(50)->get()
+                ->map(fn (Article $a): ?string => app(EntityUrl::class)->for($a, $locale))
+                ->filter();
+
+            $linked = $urls->filter(fn (string $url): bool => str_contains($html, 'href="'.e(url($url)).'"')
+                || str_contains($html, 'href="'.e($url).'"'))->count();
+
+            return [$linked > 0, "{$linked} of the latest {$urls->count()} published articles linked from /{$locale}"];
         });
 
         /*
@@ -232,26 +279,69 @@ class DecayCheck extends Command
             return [$links >= 4, "{$links} links in <header>, {$expected} menu items in db"];
         });
 
-        $this->flow('homepage order is editable', function () {
-            $ordered = DB::table('homepage_sections')->distinct()->count('sort_order');
+        // A data check, named as one. Editability is the composer's job and is
+        // covered by the suite; what can decay at rest is two sections sharing
+        // a position, which renders them in whatever order MySQL returns.
+        $this->flow('homepage sections have distinct positions', function () {
+            $layout = DB::table('homepage_layouts')->where('is_active', true)->value('id');
+            $total = DB::table('homepage_sections')->where('layout_id', $layout)->count();
+            $distinct = DB::table('homepage_sections')->where('layout_id', $layout)->distinct()->count('sort_order');
 
-            return [$ordered > 0, "{$ordered} distinct positions"];
+            if ($total === 0) {
+                return [false, 'active layout has no sections'];
+            }
+
+            return [$total === $distinct, "{$distinct} distinct positions for {$total} sections"];
         });
 
-        $this->flow('newsletter stores a subscriber', function () {
-            // The check that started all of this: the route must exist and be
-            // a POST, not merely a page that renders.
-            $route = Route::getRoutes()->getByName('web.newsletter.subscribe');
-            $ok = $route !== null && in_array('POST', $route->methods(), true);
+        // The check that started all of this: a form on every page that looked
+        // like it subscribed and posted nowhere. Read off the rendered page,
+        // then resolved against the router as the browser would submit it.
+        $this->flow('newsletter form posts to the subscribe route', function () use ($locale) {
+            $html = $this->render("/{$locale}");
 
-            return [$ok, $ok ? 'POST route present' : 'NO POST ROUTE'];
+            if ($html === null) {
+                return [false, 'homepage did not render'];
+            }
+
+            preg_match_all('/<form\b[^>]*>/i', $html, $forms);
+
+            foreach ($forms[0] as $tag) {
+                $method = preg_match('/\bmethod\s*=\s*["\']?(\w+)/i', $tag, $m) === 1 ? strtoupper($m[1]) : 'GET';
+                $action = preg_match('/\baction\s*=\s*["\']([^"\']*)/i', $tag, $a) === 1 ? html_entity_decode($a[1]) : '';
+
+                if ($method !== 'POST' || $action === '') {
+                    continue;
+                }
+
+                try {
+                    $route = Route::getRoutes()->match(Request::create($action, 'POST'));
+                } catch (Throwable) {
+                    continue;
+                }
+
+                if ($route->getName() === 'web.newsletter.subscribe') {
+                    return [true, 'rendered form POSTs to web.newsletter.subscribe'];
+                }
+            }
+
+            return [false, count($forms[0]).' form(s) on /'.$locale.', none POSTs to web.newsletter.subscribe'];
         });
 
-        $this->flow('source poll reaches the inbox', function () {
-            $sources = DB::table('sources')->where('is_active', true)->count();
-            $items = DB::table('intelligence_items')->count();
+        $this->flow('source polling succeeds', function () {
+            $active = DB::table('sources')->where('is_active', true)->get(['last_success_at', 'poll_frequency_minutes']);
 
-            return [$sources > 0, "{$sources} active sources · {$items} inbox items"];
+            // Polling is off until the crawler's contact details resolve
+            // (CLAUDE.md §5). Off means nothing is polled, so there is nothing
+            // to observe — which is not the same as healthy.
+            if (! config('masar.intelligence.polling_enabled')) {
+                return ['SKIP', "polling disabled — {$active->count()} active sources, none polled"];
+            }
+
+            $fresh = $active->filter(fn ($s): bool => $s->last_success_at !== null
+                && now()->diffInMinutes($s->last_success_at, true) <= 2 * max(1, (int) $s->poll_frequency_minutes))->count();
+
+            return [$active->isNotEmpty() && $fresh > 0, "{$fresh} of {$active->count()} active sources succeeded within twice their interval"];
         });
 
         $this->flow('market ticker renders', function () use ($locale) {
@@ -269,41 +359,73 @@ class DecayCheck extends Command
             return [$rendered, $rendered ? 'rendered' : 'market.as_of is set but no ticker on the page'];
         });
 
-        $this->flow('redirect becomes a 301', function () {
-            $redirects = DB::table('redirects')->count();
+        // Requests each configured redirect through the HTTP kernel, where
+        // HandleMissingPages lives, inside a rolled-back transaction so the
+        // probe does not count as traffic.
+        $this->flow('configured redirects answer', function () {
+            $redirects = DB::table('redirects')->orderBy('id')->limit(20)->get();
 
-            return [true, "{$redirects} redirects configured"];
+            if ($redirects->isEmpty()) {
+                return ['SKIP', '0 redirects configured — nothing to observe'];
+            }
+
+            $broken = [];
+
+            foreach ($redirects as $redirect) {
+                DB::beginTransaction();
+
+                try {
+                    $response = $this->fetch($redirect->from_path);
+                } finally {
+                    DB::rollBack();
+                }
+
+                $location = $response?->headers->get('Location') ?? '';
+
+                if ($response?->getStatusCode() !== (int) $redirect->status_code || ! str_ends_with($location, $redirect->to_path)) {
+                    $broken[] = $redirect->from_path.' → '.($response?->getStatusCode() ?? 'error');
+                }
+            }
+
+            return $broken === []
+                ? [true, "{$redirects->count()} of {$redirects->count()} answered with their status"]
+                : [false, implode(' · ', array_slice($broken, 0, 3))];
         });
     }
 
     /**
-     * @param  callable(): array{0: bool, 1: string}  $probe
+     * @param  callable(): array{0: bool|string, 1: string}  $probe  true/false, or a state such as 'SKIP'
      */
     private function flow(string $label, callable $probe): void
     {
         try {
-            [$ok, $detail] = $probe();
-            $this->record("flow: {$label}", $ok ? 'ok' : 'FAIL', $detail);
+            [$state, $detail] = $probe();
+            $this->record("flow: {$label}", is_string($state) ? $state : ($state ? 'ok' : 'FAIL'), $detail);
         } catch (Throwable $e) {
             $this->record("flow: {$label}", 'FAIL', $e->getMessage());
         }
     }
 
-    private function getsOk(string $path): bool
+    /**
+     * A public page as a reader gets it: through the HTTP kernel, so global
+     * middleware runs. The router alone skips HandleMissingPages, which is
+     * where redirects are served.
+     */
+    private function fetch(string $path): ?Response
     {
-        return $this->render($path) !== null;
+        try {
+            return app(HttpKernel::class)->handle(Request::create($path, 'GET'));
+        } catch (Throwable) {
+            return null;
+        }
     }
 
     /** The rendered HTML of a public page, or null if it did not render. */
     private function render(string $path): ?string
     {
-        try {
-            $response = app('router')->dispatch(\Illuminate\Http\Request::create($path, 'GET'));
+        $response = $this->fetch($path);
 
-            return $response->getStatusCode() === 200 ? (string) $response->getContent() : null;
-        } catch (Throwable) {
-            return null;
-        }
+        return $response?->getStatusCode() === 200 ? (string) $response->getContent() : null;
     }
 
     /**
@@ -318,7 +440,11 @@ class DecayCheck extends Command
         $problems = [];
         $forms = 0;
 
-        foreach (File::allFiles(resource_path('views')) as $file) {
+        // The configured view paths, not a hard-coded directory: the same paths
+        // the renderer reads, and the seam the test uses to plant a bad form.
+        $files = collect((array) config('view.paths'))->flatMap(fn (string $path): array => File::allFiles($path));
+
+        foreach ($files as $file) {
             if (! str_ends_with($file->getFilename(), '.blade.php')) {
                 continue;
             }
