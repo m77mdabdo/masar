@@ -99,9 +99,12 @@ class IntelligenceSeeder extends Seeder
     private function sources(): Collection
     {
         $definitions = [
-            'ministry' => ['وزارة الصناعة والثروة المعدنية', SourceType::Rss, 5, null],
-            'authority' => ['هيئة السوق المالية', SourceType::Rss, 5, null],
-            'exchange' => ['السوق المالية السعودية', SourceType::Api, 5, 'earnings'],
+            // Fictional throughout. These were named after a real ministry, the
+            // CMA and the Saudi Exchange, with invented headlines filed under
+            // them — internal-only, but still a fabricated source.
+            'ministry' => ['جهة حكومية تخيّلية للعرض', SourceType::Rss, 5, null],
+            'authority' => ['هيئة تنظيمية تخيّلية للعرض', SourceType::Rss, 5, null],
+            'exchange' => ['سوق مالية تخيّلية للعرض', SourceType::Api, 5, 'earnings'],
             'agency' => ['وكالة الأنباء', SourceType::Atom, 4, null],
             'paper' => ['صحيفة اقتصادية', SourceType::Sitemap, 3, null],
             'wire' => ['خدمة أنباء إقليمية', SourceType::Rss, 2, null],

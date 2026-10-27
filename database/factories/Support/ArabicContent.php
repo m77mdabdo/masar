@@ -289,10 +289,21 @@ final class ArabicContent
         'مدير عام العمليات', 'رئيس وحدة التحول الرقمي', 'مستشار اقتصادي',
     ];
 
-    /** @var array<int, string> */
+    /**
+     * Who a generated source is said to come from. Every name is explicitly
+     * fictional.
+     *
+     * These were six real Saudi authorities — the CMA, GASTAT, the central
+     * bank, two ministries — each paired with a random Faker URL, so every
+     * generated article cited a real regulator for a document it never
+     * published. Generated content may never attribute anything to a real
+     * body: the rows sit in a database that later becomes production.
+     *
+     * @var array<int, string>
+     */
     public const SOURCE_PUBLISHERS = [
-        'هيئة السوق المالية', 'وزارة الاستثمار', 'الهيئة العامة للإحصاء',
-        'البنك المركزي', 'وزارة الصناعة والثروة المعدنية', 'المركز الوطني للتنافسية',
+        'مصدر تخيّلي — مكتب دراسات للعرض', 'مصدر تخيّلي — نشرة قطاعية للعرض',
+        'مصدر تخيّلي — بيان شركة للعرض', 'مصدر تخيّلي — قاعدة بيانات للعرض',
     ];
 
     /** @var array<int, string> */
@@ -307,19 +318,21 @@ final class ArabicContent
      * however plausible each half looks alone.
      *
      * `unit` says what shape the value takes. `source` is the attribution the
-     * figure carries to the reader; every figure here names a body that
-     * publishes the kind of number it is.
+     * figure carries to the reader, and it is always explicitly fictional: a
+     * generated number attributed to Tadawul, GASTAT or a ministry is a
+     * fabricated statistic with a real authority's name on it, which is what
+     * these sources used to be.
      *
      * @var array<int, array{label: string, unit: string, source: string}>
      */
     public const KEY_NUMBERS = [
-        ['label' => 'حجم التداول اليومي', 'unit' => 'sar_billions', 'source' => 'تداول السعودية'],
-        ['label' => 'النمو السنوي', 'unit' => 'percent', 'source' => 'الهيئة العامة للإحصاء'],
-        ['label' => 'عدد الشركات المرخصة', 'unit' => 'count', 'source' => 'وزارة الاستثمار'],
-        ['label' => 'قيمة الاستثمارات', 'unit' => 'sar_billions', 'source' => 'وزارة الاستثمار'],
-        ['label' => 'الحصة السوقية', 'unit' => 'percent', 'source' => 'الهيئة العامة للإحصاء'],
-        ['label' => 'معدل التشغيل', 'unit' => 'percent', 'source' => 'الهيئة العامة للإحصاء'],
-        ['label' => 'عدد الوظائف المستحدثة', 'unit' => 'count', 'source' => 'صندوق تنمية الموارد البشرية'],
-        ['label' => 'حجم الإنفاق الرأسمالي', 'unit' => 'sar_billions', 'source' => 'وزارة المالية'],
+        ['label' => 'حجم التداول اليومي', 'unit' => 'sar_billions', 'source' => 'مصدر تخيّلي لأغراض العرض'],
+        ['label' => 'النمو السنوي', 'unit' => 'percent', 'source' => 'مصدر تخيّلي لأغراض العرض'],
+        ['label' => 'عدد الشركات المرخصة', 'unit' => 'count', 'source' => 'مصدر تخيّلي لأغراض العرض'],
+        ['label' => 'قيمة الاستثمارات', 'unit' => 'sar_billions', 'source' => 'مصدر تخيّلي لأغراض العرض'],
+        ['label' => 'الحصة السوقية', 'unit' => 'percent', 'source' => 'مصدر تخيّلي لأغراض العرض'],
+        ['label' => 'معدل التشغيل', 'unit' => 'percent', 'source' => 'مصدر تخيّلي لأغراض العرض'],
+        ['label' => 'عدد الوظائف المستحدثة', 'unit' => 'count', 'source' => 'مصدر تخيّلي لأغراض العرض'],
+        ['label' => 'حجم الإنفاق الرأسمالي', 'unit' => 'sar_billions', 'source' => 'مصدر تخيّلي لأغراض العرض'],
     ];
 }

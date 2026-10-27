@@ -310,8 +310,10 @@ class ArticleFactory extends Factory
 
             for ($i = 0; $i < $count; $i++) {
                 $article->sources()->create([
-                    'title' => 'بيان صادر عن الجهة المختصة',
-                    'url' => fake()->url(),
+                    'title' => 'وثيقة تخيّلية لأغراض العرض',
+                    // `.example` is reserved (RFC 2606) and can never resolve to
+                    // a real site; fake()->url() produced live-looking domains.
+                    'url' => 'https://'.fake()->slug(2).'.example/'.fake()->slug(3),
                     'publisher' => fake()->randomElement(ArabicContent::SOURCE_PUBLISHERS),
                     'source_type' => fake()->randomElement([
                         'official_document', 'press_release', 'interview', 'report', 'data',

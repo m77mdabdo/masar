@@ -30,6 +30,15 @@ class MarketFiguresSeeder extends Seeder
             return;
         }
 
+        /*
+         * Every instrument here is a sample one, and every figure in `data`
+         * belongs to the fictional companies in FlagshipStoriesSeeder. These
+         * rows used to carry TASI, Nomu, Brent and gold at invented levels, a
+         * Saudi market move, and Saudi non-oil growth, FDI and unemployment —
+         * fabricated statistics under real names, which no "sample data" label
+         * survives once screenshotted. The USD/SAR peg stays: 3.75 is a fixed,
+         * public fact, not a reading.
+         */
         $values = [
             'market.as_of' => now()->subHours(3)->format('Y-m-d H:i'),
             'market.source' => 'أرقام تجريبية — ليست قراءة سوق',
@@ -46,16 +55,16 @@ class MarketFiguresSeeder extends Seeder
                 // actually type, and it is what the amplitude damping reads: a
                 // series is scaled against its own level, so a normal trading
                 // day fills the box and a pegged rate stays flat.
-                ['label' => 'تاسي', 'value' => '11,234.56', 'change' => 1.24,
+                ['label' => 'المؤشر التجريبي', 'value' => '11,234.56', 'change' => 1.24,
                     // low early, run up, pullback, close near the high
                     'series' => '11150,11120,11165,11210,11255,11238,11205,11248,11290,11272,11255,11235'],
-                ['label' => 'نمو', 'value' => '26,310', 'change' => 0.63,
+                ['label' => 'مؤشر النمو التجريبي', 'value' => '26,310', 'change' => 0.63,
                     // shallower and choppier
                     'series' => '26150,26110,26180,26250,26215,26285,26250,26320,26290,26350,26320,26310'],
-                ['label' => 'برنت', 'value' => '82.14', 'change' => -0.31,
+                ['label' => 'خام تجريبي', 'value' => '82.14', 'change' => -0.31,
                     // falling, through a failed recovery in the middle
                     'series' => '82.95,83.10,82.80,82.45,82.70,82.98,82.72,82.30,81.95,82.10,81.88,82.14'],
-                ['label' => 'الذهب', 'value' => '2,328.50', 'change' => 0.82,
+                ['label' => 'معدن تجريبي', 'value' => '2,328.50', 'change' => 0.82,
                     // rising steadily, small oscillations
                     'series' => '2312,2308,2318,2327,2322,2331,2327,2336,2331,2338,2332,2328'],
                 // The riyal is pegged, and this is its real band. A dead
@@ -67,7 +76,7 @@ class MarketFiguresSeeder extends Seeder
             ],
 
             'market.index' => [
-                'label' => 'المؤشر العام للسوق',
+                'label' => 'المؤشر العام التجريبي',
                 'value' => '11,234.56',
                 'change' => 1.24,
                 // A shape, not a series: the chart is drawn without a value axis.
@@ -75,24 +84,24 @@ class MarketFiguresSeeder extends Seeder
             ],
 
             'market.instruments' => [
-                ['label' => 'برنت', 'value' => '82.14', 'change' => -0.31],
-                ['label' => 'الذهب', 'value' => '2,328.50', 'change' => 0.82],
+                ['label' => 'خام تجريبي', 'value' => '82.14', 'change' => -0.31],
+                ['label' => 'معدن تجريبي', 'value' => '2,328.50', 'change' => 0.82],
                 ['label' => 'دولار/ريال', 'value' => '3.75', 'change' => null],
-                ['label' => 'نمو', 'value' => '26,310', 'change' => 0.63],
+                ['label' => 'مؤشر النمو التجريبي', 'value' => '26,310', 'change' => 0.63],
             ],
 
             'market.pulse' => [
-                ['label' => 'السعودية', 'value' => '+1.24%', 'change' => 1.24],
-                ['label' => 'الإمارات', 'value' => '+0.63%', 'change' => 0.63],
-                ['label' => 'مصر', 'value' => '−0.18%', 'change' => -0.18],
-                ['label' => 'عالميًا', 'value' => '+0.41%', 'change' => 0.41],
+                ['label' => 'سوق تجريبية أ', 'value' => '+1.24%', 'change' => 1.24],
+                ['label' => 'سوق تجريبية ب', 'value' => '+0.63%', 'change' => 0.63],
+                ['label' => 'سوق تجريبية ج', 'value' => '−0.18%', 'change' => -0.18],
+                ['label' => 'سوق تجريبية د', 'value' => '+0.41%', 'change' => 0.41],
             ],
 
             'market.data' => [
-                ['label' => 'الناتج غير النفطي', 'value' => '+4.6%', 'change' => null],
-                ['label' => 'الاستثمار الأجنبي', 'value' => '34 مليار دولار', 'change' => null],
-                ['label' => 'تراخيص جديدة', 'value' => '3,210', 'change' => null],
-                ['label' => 'البطالة', 'value' => '6.9%', 'change' => null],
+                ['label' => 'قدرة زيزفون الرمال المركّبة', 'value' => '420 ميغاواط', 'change' => null],
+                ['label' => 'مدفوعات دراق الشهرية', 'value' => '1.4 مليار ريال', 'change' => null],
+                ['label' => 'خطوط صدفة القلزم المنتظمة', 'value' => '6', 'change' => null],
+                ['label' => 'نُزل دار القمرية', 'value' => '9', 'change' => null],
             ],
         ];
 
