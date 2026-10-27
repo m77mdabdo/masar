@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\HandleMissingPages;
 use App\Http\Middleware\IssueVisitorId;
+use App\Http\Middleware\ServeMaintenancePage;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -28,6 +29,9 @@ return Application::configure(basePath: dirname(__DIR__))
          * prepended so a POST that subscribes can read the id it just issued.
          */
         $middleware->web(prepend: [IssueVisitorId::class]);
+
+        // The editor's maintenance switch. Admin paths are exempt inside it.
+        $middleware->web(append: [ServeMaintenancePage::class]);
 
         // The locale segment is user input; SetLocale is what validates it.
         $middleware->alias([
