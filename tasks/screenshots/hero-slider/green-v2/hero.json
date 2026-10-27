@@ -1,0 +1,744 @@
+{
+ "375|home-backdrop-dusk": [
+  {
+   "heroH": 796,
+   "img": "home-backdrop-dusk-thumb.webp",
+   "objectPosition": "56% 50%",
+   "ctaBottom": 739,
+   "overlap": false,
+   "docW": 375,
+   "contrast": {
+    "headline": 10.77,
+    "mint word": 5.78,
+    "standfirst": 6.68,
+    "byline": 5.43,
+    "step label": 13.49,
+    "step body": 11.9,
+    "numeral": 5.02
+   }
+  },
+  {
+   "heroH": 796,
+   "img": "pexels-aburhman187-29859597-thumb.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 739,
+   "overlap": false,
+   "docW": 375,
+   "contrast": {
+    "headline": 9.79,
+    "mint word": 5.19,
+    "standfirst": 6.7,
+    "byline": 5.58,
+    "step label": 12.77,
+    "step body": 11.27,
+    "numeral": 4.95
+   }
+  },
+  {
+   "heroH": 796,
+   "img": "pexels-tima-miroshnichenko-5717315-thumb.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 739,
+   "overlap": false,
+   "docW": 375,
+   "contrast": {
+    "headline": 9.79,
+    "mint word": 4.74,
+    "standfirst": 8.04,
+    "byline": 5.34,
+    "step label": 12.86,
+    "step body": 11.65,
+    "numeral": 5.07
+   }
+  }
+ ],
+ "375|home-backdrop": [
+  {
+   "heroH": 796,
+   "img": "home-backdrop-thumb.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 739,
+   "overlap": false,
+   "docW": 375,
+   "contrast": {
+    "headline": 12.92,
+    "mint word": 6.82,
+    "standfirst": 7.53,
+    "byline": 5.76,
+    "step label": 14.47,
+    "step body": 12.61,
+    "numeral": 5.01
+   }
+  },
+  {
+   "heroH": 796,
+   "img": "pexels-aburhman187-29859597-thumb.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 739,
+   "overlap": false,
+   "docW": 375,
+   "contrast": {
+    "headline": 9.79,
+    "mint word": 5.19,
+    "standfirst": 6.7,
+    "byline": 5.58,
+    "step label": 12.77,
+    "step body": 11.27,
+    "numeral": 4.95
+   }
+  },
+  {
+   "heroH": 796,
+   "img": "pexels-tima-miroshnichenko-5717315-thumb.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 739,
+   "overlap": false,
+   "docW": 375,
+   "contrast": {
+    "headline": 9.79,
+    "mint word": 4.74,
+    "standfirst": 8.04,
+    "byline": 5.34,
+    "step label": 12.86,
+    "step body": 11.65,
+    "numeral": 5.07
+   }
+  }
+ ],
+ "430|home-backdrop-dusk": [
+  {
+   "heroH": 770,
+   "img": "home-backdrop-dusk-medium.webp",
+   "objectPosition": "56% 50%",
+   "ctaBottom": 713,
+   "overlap": false,
+   "docW": 430,
+   "contrast": {
+    "headline": 10.31,
+    "mint word": 5.1,
+    "standfirst": 6.6,
+    "byline": 5.33,
+    "step label": 13,
+    "step body": 11.56,
+    "numeral": 5.07
+   }
+  },
+  {
+   "heroH": 770,
+   "img": "pexels-aburhman187-29859597-medium.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 687,
+   "overlap": false,
+   "docW": 430,
+   "contrast": {
+    "headline": 9.81,
+    "mint word": 5.09,
+    "standfirst": 6.7,
+    "byline": 5.59,
+    "step label": 12.77,
+    "step body": 11.13,
+    "numeral": 5.01
+   }
+  },
+  {
+   "heroH": 770,
+   "img": "pexels-tima-miroshnichenko-5717315-medium.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 687,
+   "overlap": false,
+   "docW": 430,
+   "contrast": {
+    "headline": 9.81,
+    "mint word": 4.74,
+    "standfirst": 7.59,
+    "byline": 5.41,
+    "step label": 12.45,
+    "step body": 11.66,
+    "numeral": 5.11
+   }
+  }
+ ],
+ "430|home-backdrop": [
+  {
+   "heroH": 770,
+   "img": "home-backdrop-medium.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 713,
+   "overlap": false,
+   "docW": 430,
+   "contrast": {
+    "headline": 12.86,
+    "mint word": 6.24,
+    "standfirst": 7.45,
+    "byline": 5.59,
+    "step label": 13.17,
+    "step body": 11.44,
+    "numeral": 5.06
+   }
+  },
+  {
+   "heroH": 770,
+   "img": "pexels-aburhman187-29859597-medium.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 687,
+   "overlap": false,
+   "docW": 430,
+   "contrast": {
+    "headline": 9.81,
+    "mint word": 5.09,
+    "standfirst": 6.7,
+    "byline": 5.59,
+    "step label": 12.77,
+    "step body": 11.13,
+    "numeral": 5.01
+   }
+  },
+  {
+   "heroH": 770,
+   "img": "pexels-tima-miroshnichenko-5717315-medium.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 687,
+   "overlap": false,
+   "docW": 430,
+   "contrast": {
+    "headline": 9.81,
+    "mint word": 4.74,
+    "standfirst": 7.59,
+    "byline": 5.41,
+    "step label": 12.45,
+    "step body": 11.66,
+    "numeral": 5.11
+   }
+  }
+ ],
+ "768|home-backdrop-dusk": [
+  {
+   "heroH": 738,
+   "img": "home-backdrop-dusk-medium.webp",
+   "objectPosition": "56% 50%",
+   "ctaBottom": 636,
+   "overlap": false,
+   "docW": 768,
+   "contrast": {
+    "headline": 10.31,
+    "mint word": 4.98,
+    "standfirst": 6.69,
+    "byline": 5.26,
+    "step label": 12.5,
+    "step body": 11.17,
+    "numeral": 5.07
+   }
+  },
+  {
+   "heroH": 738,
+   "img": "pexels-aburhman187-29859597-medium.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 636,
+   "overlap": false,
+   "docW": 768,
+   "contrast": {
+    "headline": 9.79,
+    "mint word": 4.73,
+    "standfirst": 6.71,
+    "byline": 5.58,
+    "step label": 12.27,
+    "step body": 10.99,
+    "numeral": 5.01
+   }
+  },
+  {
+   "heroH": 738,
+   "img": "pexels-tima-miroshnichenko-5717315-medium.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 636,
+   "overlap": false,
+   "docW": 768,
+   "contrast": {
+    "headline": 9.79,
+    "mint word": 4.74,
+    "standfirst": 7.13,
+    "byline": 5.77,
+    "step label": 12.26,
+    "step body": 10.95,
+    "numeral": 5.23
+   }
+  }
+ ],
+ "768|home-backdrop": [
+  {
+   "heroH": 738,
+   "img": "home-backdrop-medium.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 636,
+   "overlap": false,
+   "docW": 768,
+   "contrast": {
+    "headline": 12.84,
+    "mint word": 6.28,
+    "standfirst": 7.45,
+    "byline": 5.5,
+    "step label": 12.8,
+    "step body": 11.25,
+    "numeral": 5.29
+   }
+  },
+  {
+   "heroH": 738,
+   "img": "pexels-aburhman187-29859597-medium.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 636,
+   "overlap": false,
+   "docW": 768,
+   "contrast": {
+    "headline": 9.79,
+    "mint word": 4.73,
+    "standfirst": 6.71,
+    "byline": 5.58,
+    "step label": 12.27,
+    "step body": 10.99,
+    "numeral": 5.01
+   }
+  },
+  {
+   "heroH": 738,
+   "img": "pexels-tima-miroshnichenko-5717315-medium.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 636,
+   "overlap": false,
+   "docW": 768,
+   "contrast": {
+    "headline": 9.79,
+    "mint word": 4.74,
+    "standfirst": 7.13,
+    "byline": 5.77,
+    "step label": 12.26,
+    "step body": 10.95,
+    "numeral": 5.23
+   }
+  }
+ ],
+ "1024|home-backdrop-dusk": [
+  {
+   "heroH": 527,
+   "img": "home-backdrop-dusk-large.webp",
+   "objectPosition": "56% 50%",
+   "ctaBottom": 724,
+   "overlap": false,
+   "docW": 1024,
+   "contrast": {
+    "headline": 11.01,
+    "mint word": 5.32,
+    "standfirst": 6.74,
+    "byline": 6.01,
+    "step label": 15.47,
+    "step body": 13.31,
+    "numeral": 4.88
+   }
+  },
+  {
+   "heroH": 527,
+   "img": "pexels-aburhman187-29859597-large.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 724,
+   "overlap": false,
+   "docW": 1024,
+   "contrast": {
+    "headline": 11.43,
+    "mint word": 5.68,
+    "standfirst": 6.73,
+    "byline": 5.71,
+    "step label": 14.84,
+    "step body": 13.31,
+    "numeral": 4.81
+   }
+  },
+  {
+   "heroH": 527,
+   "img": "pexels-tima-miroshnichenko-5717315-large.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 724,
+   "overlap": false,
+   "docW": 1024,
+   "contrast": {
+    "headline": 12.24,
+    "mint word": 6,
+    "standfirst": 7.18,
+    "byline": 6.09,
+    "step label": 15.1,
+    "step body": 13.47,
+    "numeral": 4.86
+   }
+  }
+ ],
+ "1024|home-backdrop": [
+  {
+   "heroH": 527,
+   "img": "home-backdrop-large.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 724,
+   "overlap": false,
+   "docW": 1024,
+   "contrast": {
+    "headline": 11.55,
+    "mint word": 6.15,
+    "standfirst": 7.84,
+    "byline": 6.32,
+    "step label": 16.37,
+    "step body": 13.94,
+    "numeral": 5
+   }
+  },
+  {
+   "heroH": 527,
+   "img": "pexels-aburhman187-29859597-large.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 724,
+   "overlap": false,
+   "docW": 1024,
+   "contrast": {
+    "headline": 11.43,
+    "mint word": 5.68,
+    "standfirst": 6.73,
+    "byline": 5.71,
+    "step label": 14.84,
+    "step body": 13.31,
+    "numeral": 4.81
+   }
+  },
+  {
+   "heroH": 527,
+   "img": "pexels-tima-miroshnichenko-5717315-large.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 724,
+   "overlap": false,
+   "docW": 1024,
+   "contrast": {
+    "headline": 12.24,
+    "mint word": 6,
+    "standfirst": 7.18,
+    "byline": 6.09,
+    "step label": 15.1,
+    "step body": 13.47,
+    "numeral": 4.86
+   }
+  }
+ ],
+ "1280|home-backdrop-dusk": [
+  {
+   "heroH": 560,
+   "img": "home-backdrop-dusk-large.webp",
+   "objectPosition": "56% 50%",
+   "ctaBottom": 757,
+   "overlap": false,
+   "docW": 1280,
+   "contrast": {
+    "headline": 11.47,
+    "mint word": 5.54,
+    "standfirst": 7.02,
+    "byline": 5.98,
+    "step label": 15.11,
+    "step body": 13.16,
+    "numeral": 4.88
+   }
+  },
+  {
+   "heroH": 560,
+   "img": "pexels-aburhman187-29859597-large.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 757,
+   "overlap": false,
+   "docW": 1280,
+   "contrast": {
+    "headline": 11.4,
+    "mint word": 5.62,
+    "standfirst": 7.04,
+    "byline": 5.9,
+    "step label": 15.06,
+    "step body": 13.45,
+    "numeral": 4.87
+   }
+  },
+  {
+   "heroH": 560,
+   "img": "pexels-tima-miroshnichenko-5717315-large.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 757,
+   "overlap": false,
+   "docW": 1280,
+   "contrast": {
+    "headline": 11.92,
+    "mint word": 5.91,
+    "standfirst": 7.69,
+    "byline": 6.42,
+    "step label": 15.08,
+    "step body": 13.46,
+    "numeral": 5
+   }
+  }
+ ],
+ "1280|home-backdrop": [
+  {
+   "heroH": 560,
+   "img": "home-backdrop-large.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 757,
+   "overlap": false,
+   "docW": 1280,
+   "contrast": {
+    "headline": 11.79,
+    "mint word": 6.16,
+    "standfirst": 7.98,
+    "byline": 6.6,
+    "step label": 16.94,
+    "step body": 13.96,
+    "numeral": 4.93
+   }
+  },
+  {
+   "heroH": 560,
+   "img": "pexels-aburhman187-29859597-large.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 757,
+   "overlap": false,
+   "docW": 1280,
+   "contrast": {
+    "headline": 11.4,
+    "mint word": 5.62,
+    "standfirst": 7.04,
+    "byline": 5.9,
+    "step label": 15.06,
+    "step body": 13.45,
+    "numeral": 4.87
+   }
+  },
+  {
+   "heroH": 560,
+   "img": "pexels-tima-miroshnichenko-5717315-large.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 757,
+   "overlap": false,
+   "docW": 1280,
+   "contrast": {
+    "headline": 11.92,
+    "mint word": 5.91,
+    "standfirst": 7.69,
+    "byline": 6.42,
+    "step label": 15.08,
+    "step body": 13.46,
+    "numeral": 5
+   }
+  }
+ ],
+ "1440|home-backdrop-dusk": [
+  {
+   "heroH": 630,
+   "img": "home-backdrop-dusk-large.webp",
+   "objectPosition": "56% 50%",
+   "ctaBottom": 827,
+   "overlap": false,
+   "docW": 1440,
+   "contrast": {
+    "headline": 10.65,
+    "mint word": 5.58,
+    "standfirst": 6.74,
+    "byline": 6.02,
+    "step label": 15.65,
+    "step body": 13.31,
+    "numeral": 4.88
+   }
+  },
+  {
+   "heroH": 630,
+   "img": "pexels-aburhman187-29859597-large.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 827,
+   "overlap": false,
+   "docW": 1440,
+   "contrast": {
+    "headline": 11.08,
+    "mint word": 5.62,
+    "standfirst": 7.03,
+    "byline": 5.91,
+    "step label": 14.88,
+    "step body": 13.44,
+    "numeral": 4.81
+   }
+  },
+  {
+   "heroH": 630,
+   "img": "pexels-tima-miroshnichenko-5717315-large.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 827,
+   "overlap": false,
+   "docW": 1440,
+   "contrast": {
+    "headline": 12.09,
+    "mint word": 6.82,
+    "standfirst": 7.82,
+    "byline": 6.43,
+    "step label": 15.26,
+    "step body": 13.66,
+    "numeral": 4.81
+   }
+  }
+ ],
+ "1440|home-backdrop": [
+  {
+   "heroH": 630,
+   "img": "home-backdrop-large.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 827,
+   "overlap": false,
+   "docW": 1440,
+   "contrast": {
+    "headline": 11.42,
+    "mint word": 5.77,
+    "standfirst": 7.81,
+    "byline": 6.43,
+    "step label": 16.94,
+    "step body": 13.94,
+    "numeral": 5.05
+   }
+  },
+  {
+   "heroH": 630,
+   "img": "pexels-aburhman187-29859597-large.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 827,
+   "overlap": false,
+   "docW": 1440,
+   "contrast": {
+    "headline": 11.08,
+    "mint word": 5.62,
+    "standfirst": 7.03,
+    "byline": 5.91,
+    "step label": 14.88,
+    "step body": 13.44,
+    "numeral": 4.81
+   }
+  },
+  {
+   "heroH": 630,
+   "img": "pexels-tima-miroshnichenko-5717315-large.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 827,
+   "overlap": false,
+   "docW": 1440,
+   "contrast": {
+    "headline": 12.09,
+    "mint word": 6.82,
+    "standfirst": 7.82,
+    "byline": 6.43,
+    "step label": 15.26,
+    "step body": 13.66,
+    "numeral": 4.81
+   }
+  }
+ ],
+ "1920|home-backdrop-dusk": [
+  {
+   "heroH": 840,
+   "img": "home-backdrop-dusk-large.webp",
+   "objectPosition": "56% 50%",
+   "ctaBottom": 1037,
+   "overlap": false,
+   "docW": 1920,
+   "contrast": {
+    "headline": 10.79,
+    "mint word": 5.21,
+    "standfirst": 6.85,
+    "byline": 5.85,
+    "step label": 15.84,
+    "step body": 13.31,
+    "numeral": 4.87
+   }
+  },
+  {
+   "heroH": 840,
+   "img": "pexels-aburhman187-29859597-large.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 1037,
+   "overlap": false,
+   "docW": 1920,
+   "contrast": {
+    "headline": 10.46,
+    "mint word": 5.36,
+    "standfirst": 6.68,
+    "byline": 5.63,
+    "step label": 14.89,
+    "step body": 13.15,
+    "numeral": 4.92
+   }
+  },
+  {
+   "heroH": 840,
+   "img": "pexels-tima-miroshnichenko-5717315-large.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 1037,
+   "overlap": false,
+   "docW": 1920,
+   "contrast": {
+    "headline": 11.45,
+    "mint word": 5.53,
+    "standfirst": 7.37,
+    "byline": 6,
+    "step label": 15.46,
+    "step body": 13.12,
+    "numeral": 4.81
+   }
+  }
+ ],
+ "1920|home-backdrop": [
+  {
+   "heroH": 840,
+   "img": "home-backdrop-large.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 1037,
+   "overlap": false,
+   "docW": 1920,
+   "contrast": {
+    "headline": 11.12,
+    "mint word": 6.21,
+    "standfirst": 7.34,
+    "byline": 6.43,
+    "step label": 16.9,
+    "step body": 14.64,
+    "numeral": 5.05
+   }
+  },
+  {
+   "heroH": 840,
+   "img": "pexels-aburhman187-29859597-large.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 1037,
+   "overlap": false,
+   "docW": 1920,
+   "contrast": {
+    "headline": 10.46,
+    "mint word": 5.36,
+    "standfirst": 6.68,
+    "byline": 5.63,
+    "step label": 14.89,
+    "step body": 13.15,
+    "numeral": 4.92
+   }
+  },
+  {
+   "heroH": 840,
+   "img": "pexels-tima-miroshnichenko-5717315-large.webp",
+   "objectPosition": "50% 40%",
+   "ctaBottom": 1037,
+   "overlap": false,
+   "docW": 1920,
+   "contrast": {
+    "headline": 11.45,
+    "mint word": 5.53,
+    "standfirst": 7.37,
+    "byline": 6,
+    "step label": 15.46,
+    "step body": 13.12,
+    "numeral": 4.81
+   }
+  }
+ ]
+}

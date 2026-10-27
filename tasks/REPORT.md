@@ -216,3 +216,41 @@ only). `public/build/*` rebuilt; every new utility confirmed in the compiled CSS
 - Day 7: **done** (`2671a60` … `99d7d16`).
 - Task 2: **done**, including 2.9 (`9267962`, `fb6ea10`, `30a216a`, `220381b`, and this commit).
 - Deployment: **not started** — blocked on domain, VPS and email provider.
+
+---
+
+# Hero slider — second backdrop, owner's heights, green scrim (2026-10-27)
+
+Owner's rulings (asked before building): the new image is a **second illustrative
+backdrop behind slide one**, rotating per page load; the **height targets are a
+maximum** with the fold rule kept; the scrim is **dark green with the ≥ 4.5:1 gate
+holding**; the carousel **stays manual** (it never had autoplay).
+
+- **The image.** `Riyadh Skyline at Golden Dusk.png` (the text-free one; the file
+  named `…From Growth to Profitability.png` is the mockup with text baked in and was
+  not used). Both carry an OpenAI `gpt-image` C2PA manifest, so the CLAUDE.md
+  generated-image rule applies: layout-owned, `is_illustrative`, credited «صورة
+  تعبيرية», alt text naming no city. Shipped as `public/images/home-dusk.jpg`
+  (1893×831, 654 KB). Dev database: one media row added (id 649, flagged demo); no
+  article or section was touched.
+- **Heights.** `clamp(32rem, min(max(32.5rem, 43.75vw), 100svh − 15rem), 52.5rem)`.
+  Measured: 527 @1024×768, 560 @1280×800, 630 @1440, 840 @1920 — the backdrops'
+  own 2.28:1 at desktop, so they are not cropped. Mobile stays content-height.
+- **No height change between slides.** Below lg it changed (375: 796 → 770px):
+  each slide was `display:none`. All slides now share one grid cell and hide with
+  `visibility`; measured one height per width across all slides and both backdrops.
+- **Lighting.** Black → `--color-g-950`; questions column 0.86 → 0.93, mobile wash
+  78% → 84%, mobile numeral strip 0.5 → 0.6 — each by measurement. Worst values
+  (all slides, both backdrops): mint word 4.73, numerals 4.81; table in CLAUDE.md
+  §2. Found on the way: the mint word on the two daylight article slides had been
+  at 3.80 on mobile — slide one was all any earlier sweep measured.
+- **Honest cost.** Slide one reads like the reference: bright middle, green edges.
+  On slides two and three (daylight article photographs) the gate needs the full
+  plateau, and the edges read as heavy green bands with a visible fade edge.
+- Screenshots: `tasks/screenshots/hero-slider/green-v2/` — every slide, both
+  backdrops, all seven widths. `green-v1/` is the first attempt (black's stops in
+  green), kept because it shows why the opacities rose.
+- Tests: 3 new in `IllustrativeMediaTest` (seeded backdrops name no city; several
+  backdrops, one served per load; slides stacked, never `display:none`).
+  Suite 961 passed; `masar:decay` green. Backup of the pre-change files:
+  scratchpad `backup-hero-2227` (and git, `d5fbcdf`).
