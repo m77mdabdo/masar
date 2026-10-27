@@ -309,6 +309,14 @@ run. APP_URL unchanged.
 | `/ar/business` × 2 | 4059 · 4059 | 1814–2269 | 0.000 | 1 | 4–17 ms |
 | `/ar` (control) × 2 | 3086 · 3089 | 2111–2114 | 0.006–0.009 | 1 | 5 ms |
 
+**Correction (Task 1.5, item 7):** the `load delay` column above is the
+*observed* phase from an unthrottled load, while the LCP column is Lighthouse's
+*simulation* (`throttlingMethod: simulate`). They are not the same quantity and
+must not sit side by side. The model's own breakdown for `/ar/saudi` is TTFB 455 ·
+load delay 1,142 · load time 116 · render delay 1,973 ms. Identical LCP across
+runs is the simulation being deterministic over an unchanged request graph, not
+three agreeing measurements. CLAUDE.md §9 now says so.
+
 This reproduces the uncommitted figures already in the row (saudi 3685/3686/3764,
 business 3910–4062, home 3095). The edit folds these runs into the row's *After*
 sentence and names the harness. Before: 3725 ms, category page, 2026-09-14 audit;
