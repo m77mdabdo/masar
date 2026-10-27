@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use App\Models\Setting;
 use App\Support\Settings;
 use BackedEnum;
 use Filament\Forms\Components\DateTimePicker;
@@ -24,6 +25,7 @@ use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Facades\Gate;
 use UnitEnum;
 
 /**
@@ -65,7 +67,7 @@ class ManageSettings extends Page implements HasSchemas
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('settings.manage') ?? false;
+        return auth()->user()?->can('viewAny', Setting::class) ?? false;
     }
 
     public function mount(): void
@@ -294,7 +296,7 @@ class ManageSettings extends Page implements HasSchemas
 
     public function save(): void
     {
-        abort_unless(static::canAccess(), 403);
+        Gate::authorize('update', Setting::class);
 
         $state = $this->form->getState();
         $settings = app(Settings::class);

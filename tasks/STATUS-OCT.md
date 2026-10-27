@@ -204,12 +204,15 @@ Caveats, measured not assumed:
 - The 7 resource-gated resources have **no per-record check**: whoever passes
   `canViewAny` may create/edit/delete any row (Activity and Intelligence override
   `canCreate`/`canEdit`; the other five do not).
-- Pages: all 6 override `canAccess()`. `ManageSettings` re-checks it on save
-  (`ManageSettings.php:297`). **`NavigationManager` checks it only in `mount()`;
-  its Livewire actions `saveTree()`, `toggleItem()`, `deleteItem()`
-  (`NavigationManager.php:162,312,325`) do not re-check**, so a user demoted while
-  the page is open keeps write access to the menus until they reload. Low, not
-  open to strangers.
+- Pages: all 6 override `canAccess()`.
+- **Correction (same day, Task 1.5 item 2):** this section first claimed that
+  `NavigationManager`'s Livewire actions did not re-check access, so a demoted
+  user kept write access until reload. **That was wrong.** Filament's
+  `CanAuthorizeAccess::hydrateCanAuthorizeAccess()` re-runs `canAccess()` on
+  every Livewire request
+  (`vendor/filament/filament/src/Pages/Concerns/CanAuthorizeAccess.php:12–15`).
+  I read the page's methods and not the package's lifecycle hooks; a test that
+  demotes a user mid-session and watches the call be refused showed it.
 
 ## 6. Orphan check
 

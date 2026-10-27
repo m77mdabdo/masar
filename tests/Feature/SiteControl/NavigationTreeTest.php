@@ -26,11 +26,17 @@ function menuWithItems(int $count = 3, ?string $key = null): Menu
     return $menu->refresh();
 }
 
+/** Saves as someone allowed to: these tests are about the tree, not the permission. */
+function saveMenuTree(Menu $menu, array $tree): void
+{
+    app(SaveMenuTree::class)($menu, $tree, staff('editor_in_chief'));
+}
+
 it('reorders items within a level', function (): void {
     $menu = menuWithItems();
     [$a, $b, $c] = $menu->items()->orderBy('sort_order')->get()->all();
 
-    app(SaveMenuTree::class)($menu, [
+    saveMenuTree($menu, [
         ['id' => $c->id, 'children' => []],
         ['id' => $a->id, 'children' => []],
         ['id' => $b->id, 'children' => []],
@@ -44,7 +50,7 @@ it('reparents an item under another', function (): void {
     $menu = menuWithItems();
     [$a, $b] = $menu->items()->orderBy('sort_order')->get()->all();
 
-    app(SaveMenuTree::class)($menu, [
+    saveMenuTree($menu, [
         ['id' => $a->id, 'children' => [['id' => $b->id, 'children' => []]]],
     ]);
 
@@ -56,7 +62,7 @@ it('accepts a tree at the maximum depth', function (): void {
     $menu = menuWithItems();
     [$a, $b, $c] = $menu->items()->orderBy('sort_order')->get()->all();
 
-    app(SaveMenuTree::class)($menu, [
+    saveMenuTree($menu, [
         ['id' => $a->id, 'children' => [
             ['id' => $b->id, 'children' => [
                 ['id' => $c->id, 'children' => []],
@@ -71,7 +77,7 @@ it('rejects a tree deeper than the limit', function (): void {
     $menu = menuWithItems(4);
     [$a, $b, $c, $d] = $menu->items()->orderBy('sort_order')->get()->all();
 
-    expect(fn () => app(SaveMenuTree::class)($menu, [
+    expect(fn () => saveMenuTree($menu, [
         ['id' => $a->id, 'children' => [
             ['id' => $b->id, 'children' => [
                 ['id' => $c->id, 'children' => [
@@ -89,7 +95,7 @@ it('rejects an item that is its own parent', function (): void {
     $menu = menuWithItems();
     $a = $menu->items()->first();
 
-    expect(fn () => app(SaveMenuTree::class)($menu, [
+    expect(fn () => saveMenuTree($menu, [
         ['id' => $a->id, 'children' => [['id' => $a->id, 'children' => []]]],
     ]))->toThrow(InvalidMenuTree::class);
 });
@@ -108,7 +114,7 @@ it('rejects an item belonging to another menu', function (): void {
 
     $stranger = $other->items()->first();
 
-    expect(fn () => app(SaveMenuTree::class)($menu, [
+    expect(fn () => saveMenuTree($menu, [
         ['id' => $stranger->id, 'children' => []],
     ]))->toThrow(InvalidMenuTree::class);
 });

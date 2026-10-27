@@ -25,6 +25,7 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Gate;
 use UnitEnum;
 
 /**
@@ -60,7 +61,7 @@ class NavigationManager extends Page
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('navigation.manage') ?? false;
+        return auth()->user()?->can('viewAny', MenuItem::class) ?? false;
     }
 
     public function mount(): void
@@ -168,7 +169,7 @@ class NavigationManager extends Page
         }
 
         try {
-            app(SaveMenuTree::class)($menu, $tree);
+            app(SaveMenuTree::class)($menu, $tree, auth()->user());
 
             Notification::make()->success()->title('حُفظ ترتيب القائمة')->send();
         } catch (InvalidMenuTree $e) {
@@ -263,6 +264,8 @@ class NavigationManager extends Page
                 DateTimePicker::make('ends_at')->label('ينتهي الظهور')->seconds(false),
             ])
             ->action(function (array $data): void {
+                Gate::authorize('create', MenuItem::class);
+
                 $menu = $this->currentMenu();
 
                 if ($menu === null) {
@@ -317,6 +320,10 @@ class NavigationManager extends Page
             return;
         }
 
+        // Filament's hydrate hook re-asks canAccess() (viewAny) on every
+        // request; this asks the verb the write actually is.
+        Gate::authorize('update', $item);
+
         $item->forceFill(['is_active' => ! $item->is_active])->save();
 
         app(FlushNavigationCache::class)($this->currentMenu());
@@ -329,6 +336,8 @@ class NavigationManager extends Page
         if ($item === null || (int) $item->menu_id !== (int) $this->currentMenu()?->getKey()) {
             return;
         }
+
+        Gate::authorize('delete', $item);
 
         // Children cascade at the database level; deleting a parent from the UI
         // deletes the branch, which is what the tree shows.

@@ -6,8 +6,10 @@ namespace App\Actions\Navigation;
 
 use App\Exceptions\InvalidMenuTree;
 use App\Models\Menu;
-use App\Models\MenuItem;
+use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 /**
  * Persists a reordered/reparented menu tree in one transaction.
@@ -27,8 +29,9 @@ class SaveMenuTree
      * @param  array<int, array{id: int|string, children?: array<int, mixed>}>  $tree
      *
      * @throws InvalidMenuTree
+     * @throws AuthorizationException
      */
-    public function __invoke(Menu $menu, array $tree): void
+    public function __invoke(Menu $menu, array $tree, User $actor): void
     {
         $problems = ($this->validate)($tree);
 
@@ -47,14 +50,21 @@ class SaveMenuTree
             }
         }
 
-        DB::transaction(function () use ($flat): void {
+        $items = $menu->items()->get()->keyBy('id');
+
+        foreach ($flat as $row) {
+            Gate::forUser($actor)->authorize('update', $items[$row['id']]);
+        }
+
+        // Through the model, not a bulk update: a query-builder update fires
+        // no model events, so every reorder of the site's navigation used to
+        // leave no audit entry. Unchanged rows are not dirty and log nothing.
+        DB::transaction(function () use ($flat, $items): void {
             foreach ($flat as $row) {
-                MenuItem::query()
-                    ->whereKey($row['id'])
-                    ->update([
-                        'parent_id' => $row['parent_id'],
-                        'sort_order' => $row['sort_order'],
-                    ]);
+                $items[$row['id']]->forceFill([
+                    'parent_id' => $row['parent_id'],
+                    'sort_order' => $row['sort_order'],
+                ])->save();
             }
         });
 
