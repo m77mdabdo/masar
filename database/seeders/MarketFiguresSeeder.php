@@ -49,7 +49,10 @@ class MarketFiguresSeeder extends Seeder
     public function values(): array
     {
         /*
-         * Every instrument here is a sample one, and every figure in `data`
+         * Every instrument here is a sample one — named «مؤشر أ», «سلعة ب» and
+         * so on, short because the ticker cells were sized for four-letter
+         * names like «تاسي» and truncated anything longer to two letters — and
+         * every figure in `data`
          * belongs to the fictional companies in FlagshipStoriesSeeder. These
          * rows used to carry TASI, Nomu, Brent and gold at invented levels, a
          * Saudi market move, and Saudi non-oil growth, FDI and unemployment —
@@ -73,16 +76,16 @@ class MarketFiguresSeeder extends Seeder
                 // actually type, and it is what the amplitude damping reads: a
                 // series is scaled against its own level, so a normal trading
                 // day fills the box and a pegged rate stays flat.
-                ['label' => 'المؤشر التجريبي', 'value' => '11,234.56', 'change' => 1.24,
+                ['label' => 'مؤشر أ', 'value' => '11,234.56', 'change' => 1.24,
                     // low early, run up, pullback, close near the high
                     'series' => '11150,11120,11165,11210,11255,11238,11205,11248,11290,11272,11255,11235'],
-                ['label' => 'مؤشر النمو التجريبي', 'value' => '26,310', 'change' => 0.63,
+                ['label' => 'مؤشر ب', 'value' => '26,310', 'change' => 0.63,
                     // shallower and choppier
                     'series' => '26150,26110,26180,26250,26215,26285,26250,26320,26290,26350,26320,26310'],
-                ['label' => 'خام تجريبي', 'value' => '82.14', 'change' => -0.31,
+                ['label' => 'سلعة أ', 'value' => '82.14', 'change' => -0.31,
                     // falling, through a failed recovery in the middle
                     'series' => '82.95,83.10,82.80,82.45,82.70,82.98,82.72,82.30,81.95,82.10,81.88,82.14'],
-                ['label' => 'معدن تجريبي', 'value' => '2,328.50', 'change' => 0.82,
+                ['label' => 'سلعة ب', 'value' => '2,328.50', 'change' => 0.82,
                     // rising steadily, small oscillations
                     'series' => '2312,2308,2318,2327,2322,2331,2327,2336,2331,2338,2332,2328'],
                 // The riyal is pegged, and this is its real band. A dead
@@ -102,10 +105,10 @@ class MarketFiguresSeeder extends Seeder
             ],
 
             'market.instruments' => [
-                ['label' => 'خام تجريبي', 'value' => '82.14', 'change' => -0.31],
-                ['label' => 'معدن تجريبي', 'value' => '2,328.50', 'change' => 0.82],
+                ['label' => 'سلعة أ', 'value' => '82.14', 'change' => -0.31],
+                ['label' => 'سلعة ب', 'value' => '2,328.50', 'change' => 0.82],
                 ['label' => 'دولار/ريال', 'value' => '3.75', 'change' => null],
-                ['label' => 'مؤشر النمو التجريبي', 'value' => '26,310', 'change' => 0.63],
+                ['label' => 'مؤشر ب', 'value' => '26,310', 'change' => 0.63],
             ],
 
             'market.pulse' => [
