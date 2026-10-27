@@ -47,6 +47,11 @@ return [
 
         'min_summary_points' => 2,
         'max_summary_points' => 5,
+
+        // A scheduled article this many hours overdue is not published by the
+        // scheduler. After an outage the first tick would otherwise publish a
+        // backlog in one minute, each stamped with a date nobody chose.
+        'stale_schedule_hours' => 24,
     ],
 
     /*

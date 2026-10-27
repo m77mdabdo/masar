@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Actions\Articles\PublishArticle;
+use App\Actions\Articles\TransitionArticleStatus;
 use App\Enums\ArticleStatus;
 use App\Exceptions\PublishGateFailed;
 use App\Models\Article;
 use App\Models\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -41,9 +43,29 @@ class PublishScheduledArticles extends Command
 
         $published = 0;
         $skipped = 0;
+        $held = 0;
+        $staleBefore = now()->subHours((int) config('masar.publish_gate.stale_schedule_hours', 24));
 
         foreach ($due as $article) {
             $actor = $this->actorFor($article);
+
+            // Overdue past the threshold means the scheduler was not running
+            // when the moment came. Publishing now would put the story out with
+            // today's date on a decision made for another day, so it goes back
+            // to an editor instead.
+            if ($article->scheduled_for->lt($staleBefore)) {
+                $held++;
+
+                if ($this->option('dry-run')) {
+                    $this->line("would hold #{$article->getKey()} — overdue since {$article->scheduled_for}");
+
+                    continue;
+                }
+
+                $this->holdForReview($article, $actor);
+
+                continue;
+            }
 
             if ($actor === null) {
                 $skipped++;
@@ -79,9 +101,52 @@ class PublishScheduledArticles extends Command
             }
         }
 
-        $this->info("Published {$published}, skipped {$skipped}.");
+        $this->info("Published {$published}, skipped {$skipped}, held {$held} for review.");
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Returns a stale scheduled article to `ready` — unscheduled, not public,
+     * back in the editors' queue — and records why, so the editor who finds it
+     * there can see it missed its slot rather than wondering who unscheduled it.
+     */
+    private function holdForReview(Article $article, ?User $actor): void
+    {
+        $missed = $article->scheduled_for;
+
+        if ($actor === null) {
+            Log::warning('Stale scheduled article left scheduled: no actor with publish rights to return it.', [
+                'article_id' => $article->getKey(),
+            ]);
+
+            return;
+        }
+
+        try {
+            DB::transaction(function () use ($article, $actor, $missed): void {
+                $article->forceFill(['scheduled_for' => null])->save();
+
+                app(TransitionArticleStatus::class)($article, ArticleStatus::Ready, $actor,
+                    'فات موعد النشر المجدول ولم يُنشر تلقائياً — يحتاج قرار محرّر');
+
+                activity()
+                    ->performedOn($article)
+                    ->causedBy($actor)
+                    ->event('schedule_stale')
+                    ->withProperties([
+                        'scheduled_for' => $missed->toDateTimeString(),
+                        'held_at' => now()->toDateTimeString(),
+                        'threshold_hours' => (int) config('masar.publish_gate.stale_schedule_hours', 24),
+                    ])
+                    ->log('فات موعد النشر المجدول — أُعيدت للمراجعة دون نشر');
+            });
+        } catch (Throwable $e) {
+            Log::error('Stale scheduled article could not be held for review.', [
+                'article_id' => $article->getKey(),
+                'exception' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**

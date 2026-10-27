@@ -174,3 +174,75 @@ it('falls back to inference for rows scheduled before the column existed', funct
 
     expect($article->fresh()->status)->toBe(ArticleStatus::Published);
 });
+
+/*
+ * After an outage the first scheduler tick used to publish the whole backlog in
+ * one minute, each article stamped with today's date. Past the threshold the
+ * scheduler hands the article back to an editor instead.
+ */
+it('holds an article overdue past the stale threshold instead of publishing it', function (): void {
+    $chief = staff('editor_in_chief');
+    $article = publishableArticle(['status' => ArticleStatus::Ready, 'editor_id' => $chief->id]);
+
+    schedule()($article, now()->addMinutes(5), $chief);
+    $missed = $article->fresh()->scheduled_for;
+
+    $this->travelTo(now()->addHours(25));
+    $this->artisan('masar:publish-scheduled')->assertSuccessful();
+
+    $article->refresh();
+
+    expect($article->status)->toBe(ArticleStatus::Ready)
+        ->and($article->published_at)->toBeNull()
+        ->and($article->scheduled_for)->toBeNull();
+
+    $entry = Activity::query()
+        ->where('subject_id', $article->id)
+        ->where('event', 'schedule_stale')
+        ->sole();
+
+    expect($entry->causer_id)->toBe($chief->id)
+        ->and($entry->properties['scheduled_for'])->toBe($missed->toDateTimeString())
+        ->and($entry->properties['threshold_hours'])->toBe(24);
+});
+
+it('still publishes an article that is late but inside the threshold', function (): void {
+    $chief = staff('editor_in_chief');
+    $article = publishableArticle(['status' => ArticleStatus::Ready, 'editor_id' => $chief->id]);
+
+    schedule()($article, now()->addMinutes(5), $chief);
+
+    $this->travelTo(now()->addHours(23));
+    $this->artisan('masar:publish-scheduled')->assertSuccessful();
+
+    expect($article->fresh()->status)->toBe(ArticleStatus::Published)
+        ->and(Activity::query()->where('event', 'schedule_stale')->exists())->toBeFalse();
+});
+
+it('reads the stale threshold from config rather than assuming 24 hours', function (): void {
+    config(['masar.publish_gate.stale_schedule_hours' => 1]);
+
+    $chief = staff('editor_in_chief');
+    $article = publishableArticle(['status' => ArticleStatus::Ready, 'editor_id' => $chief->id]);
+
+    schedule()($article, now()->addMinutes(5), $chief);
+
+    $this->travelTo(now()->addHours(2));
+    $this->artisan('masar:publish-scheduled')->assertSuccessful();
+
+    expect($article->fresh()->status)->toBe(ArticleStatus::Ready);
+});
+
+it('reports a stale article on a dry run without touching it', function (): void {
+    $chief = staff('editor_in_chief');
+    $article = publishableArticle(['status' => ArticleStatus::Ready, 'editor_id' => $chief->id]);
+
+    schedule()($article, now()->addMinutes(5), $chief);
+
+    $this->travelTo(now()->addHours(25));
+    $this->artisan('masar:publish-scheduled --dry-run')
+        ->expectsOutputToContain("would hold #{$article->id}")
+        ->assertSuccessful();
+
+    expect($article->fresh()->status)->toBe(ArticleStatus::Scheduled);
+});
