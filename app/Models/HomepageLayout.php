@@ -43,8 +43,9 @@ class HomepageLayout extends Model implements HasMedia
      */
     public function registerMediaCollections(): void
     {
+        // Not single-file: the layout may hold several backdrops, and the
+        // lead slide shows one of them per page load (backdrop()).
         $this->addMediaCollection('backdrop')
-            ->singleFile()
             ->acceptsMimeTypes(config('masar.media.accepted'));
     }
 
@@ -53,10 +54,19 @@ class HomepageLayout extends Model implements HasMedia
         MediaConversions::register($this, 'backdrop');
     }
 
+    /**
+     * One of the layout's backdrops, chosen per page load.
+     *
+     * Called once per request — home.blade.php hands the same instance to the
+     * LCP preload and to the big story — so the preloaded file is always the
+     * one painted.
+     */
     public function backdrop(): ?Media
     {
+        $backdrops = $this->getMedia('backdrop');
+
         /** @var Media|null $media */
-        $media = $this->getFirstMedia('backdrop');
+        $media = $backdrops->isEmpty() ? null : $backdrops->random();
 
         return $media;
     }

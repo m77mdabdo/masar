@@ -98,16 +98,25 @@ class ImageLibrarySeeder extends Seeder
      * Riyadh; the arrangement of towers is not a real one, and captioning it as
      * a real place would turn a mood image into a false claim about a location.
      */
+    /**
+     * Generated skylines behind the lead slide. Both are AI-generated (the
+     * second carries an OpenAI C2PA manifest), which is why they live here and
+     * nowhere else: owned by the layout, flagged illustrative, credited
+     * «صورة تعبيرية», and described without naming a city — the towers are an
+     * invention, so a place name would be a claim the pixels do not support.
+     *
+     * `focal` is per image: on a phone the stage is portrait and `cover` keeps
+     * a vertical band of each picture, so the band is centred on its tower.
+     */
+    private const BACKDROPS = [
+        ['file' => 'home.jpg', 'name' => 'home-backdrop.jpg', 'focal' => '50% 40%',
+            'alt' => 'أفق مدينة عند الغروب، تنخفض الشمس عند الأفق وتضيء الأبراج من الداخل وتسير حركة المرور على الطرق أدناه.'],
+        ['file' => 'home-dusk.jpg', 'name' => 'home-backdrop-dusk.jpg', 'focal' => '56% 50%',
+            'alt' => 'أفق مدينة عند الغسق تتوسطه ناطحة سحاب تنفتح قمتها على شكل قوس، وتمتد أمامها طرق مضاءة وصفوف من أشجار النخيل.'],
+    ];
+
     private function registerBackdrop(): void
     {
-        $file = public_path('images/home.jpg');
-
-        if (! File::isFile($file)) {
-            $this->command?->warn('Backdrop skipped: public/images/home.jpg not found.');
-
-            return;
-        }
-
         $layout = HomepageLayout::query()->where('is_active', true)->first();
 
         if ($layout === null) {
@@ -116,22 +125,33 @@ class ImageLibrarySeeder extends Seeder
 
         $layout->clearMediaCollection('backdrop');
 
-        $media = $layout->addMedia($file)
-            ->preservingOriginal()
-            ->usingFileName('home-backdrop.jpg')
-            ->withCustomProperties([
-                'alt' => 'أفق مدينة عند الغروب، تنخفض الشمس عند الأفق وتضيء الأبراج من الداخل وتسير حركة المرور على الطرق أدناه.',
-                'credit' => 'صورة تعبيرية',
-                'source_file' => 'home.jpg',
-            ])
-            ->toMediaCollection('backdrop');
+        foreach (self::BACKDROPS as $backdrop) {
+            $file = public_path('images/'.$backdrop['file']);
 
-        // Set after the record exists: the guard on Media rejects an
-        // illustrative image owned by an article, and this one is owned by the
-        // layout, so the flag is safe to write here.
-        $media->forceFill(['is_illustrative' => true])->save();
+            if (! File::isFile($file)) {
+                $this->command?->warn("Backdrop skipped: public/images/{$backdrop['file']} not found.");
 
-        $this->command?->info('Backdrop: home.jpg registered as illustrative.');
+                continue;
+            }
+
+            $media = $layout->addMedia($file)
+                ->preservingOriginal()
+                ->usingFileName($backdrop['name'])
+                ->withCustomProperties([
+                    'alt' => $backdrop['alt'],
+                    'credit' => 'صورة تعبيرية',
+                    'focal' => $backdrop['focal'],
+                    'source_file' => $backdrop['file'],
+                ])
+                ->toMediaCollection('backdrop');
+
+            // Set after the record exists: the guard on Media rejects an
+            // illustrative image owned by an article, and this one is owned by
+            // the layout, so the flag is safe to write here.
+            $media->forceFill(['is_illustrative' => true])->save();
+
+            $this->command?->info("Backdrop: {$backdrop['file']} registered as illustrative.");
+        }
     }
 
     /**

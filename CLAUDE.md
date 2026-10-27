@@ -82,20 +82,26 @@ the contrast test tells you what broke.
 
 **Homepage hero, text over the photograph** — measured 2026-10-27 off the rendered
 pixels behind each element (text hidden), against the *lightest* pixel under its
-worst line box, on all three demo slides:
+worst line box, worst case over all three slides **and both lead-slide backdrops**,
+with the dark-green scrim (owner's ruling: `--color-g-950`, not black):
 
-| width | headline | standfirst | byline | step label | step body | numerals 01–03 |
-|---|---|---|---|---|---|---|
-| 375 | 7.89 | 5.76 | 4.86 | 11.71 | 10.57 | 5.38 |
-| 768 | 7.86 | 5.74 | 4.83 | 11.36 | 10.15 | 5.47 |
-| 1440 | 14.58 | 8.80 | 6.99 | 16.10 | 14.55 | 5.10 |
+| width | headline | mint word | standfirst | byline | step label | step body | numerals 01–03 |
+|---|---|---|---|---|---|---|---|
+| 375 | 9.79 | 4.74 | 6.68 | 5.34 | 12.77 | 11.27 | 4.95 |
+| 430 | 9.81 | 4.74 | 6.60 | 5.33 | 12.45 | 11.13 | 5.01 |
+| 768 | 9.79 | 4.73 | 6.69 | 5.26 | 12.26 | 10.95 | 5.01 |
+| 1024 | 11.01 | 5.32 | 6.73 | 5.71 | 14.84 | 13.31 | 4.81 |
+| 1280 | 11.40 | 5.54 | 7.02 | 5.90 | 15.06 | 13.16 | 4.87 |
+| 1440 | 10.65 | 5.58 | 6.74 | 5.91 | 14.88 | 13.31 | 4.81 |
+| 1920 | 10.46 | 5.21 | 6.68 | 5.63 | 14.89 | 13.12 | 4.81 |
 
-On slide one at every width 375–1920, the mint closing word ≥ 5.74. Before the
-October pass the scrim was sized in percentages of a full-bleed section and the text
-drifted out of it on wide screens: headline 2.07 and mint word 1.0 at 1920, numerals
-1.31 at 1440. An earlier version of this paragraph gave "headline ≥ 11.11" — that was
-slide one only. These are not in the suite — the ground is a photograph — so
-re-measure if `.hero-scrim` or `.steps-scrim` move.
+Green is lighter than black at equal opacity, so the green scrim needs more of it:
+at black's stops the numerals fell to 3.92:1. Before the October passes the scrim
+was sized in percentages of a full-bleed section: headline 2.07 and mint word 1.0 at
+1920, numerals 1.31 at 1440. Earlier figures in this paragraph ("headline ≥ 11.11",
+then a black-scrim table) are superseded. These are not in the suite — the ground is
+a photograph — so re-measure if `.hero-scrim` or `.steps-scrim` move, or a backdrop
+is added.
 
 ---
 
@@ -279,7 +285,7 @@ settings, and carries a date and a source.
 - **Self-hosted video:** `<video>` with `preload="none"`, `playsinline`, a poster that is a real media conversion, and explicit dimensions. Autoplay is always muted. A clip over `masar.media.max_video_kb` is reported, not shipped.
 - **YouTube is a facade.** Poster plus click-to-load, `youtube-nocookie`, and **no third-party request of any kind before a click** — the poster is ours, not `i.ytimg.com`.
 - **AI-generated imagery does not ship as reportage.** A rendered market figure, a real company's logo on a facility that does not exist, or a national flag redrawn by a model are all fabrications, whatever the prompt said.
-- **One exception, and it is enforced by a column.** A generated image may be the decorative backdrop behind the big story, where it carries mood rather than documenting a place. It is flagged `media.is_illustrative`, owned by the homepage layout and never by an article, credited «صورة تعبيرية» so the admin shows what it is, and **its alt text names no city** — the moment a generated skyline is captioned as a real place it becomes a claim the pixels do not support. A model guard rejects illustrative media on any article collection, so the rule survives whoever joins next.
+- **One exception, and it is enforced by a column.** A generated image may be the decorative backdrop behind the big story (the layout may hold several; the lead slide shows one per page load), where it carries mood rather than documenting a place. It is flagged `media.is_illustrative`, owned by the homepage layout and never by an article, credited «صورة تعبيرية» so the admin shows what it is, and **its alt text names no city** — the moment a generated skyline is captioned as a real place it becomes a claim the pixels do not support. A model guard rejects illustrative media on any article collection, so the rule survives whoever joins next.
 
 ### RTL and Arabic
 - Use Tailwind **logical properties** (`ms-`, `me-`, `ps-`, `pe-`, `start-`, `end-`) from the first line. Never `ml-`/`mr-`/`pl-`/`pr-`.

@@ -233,3 +233,57 @@ it('keeps every seeded answer inside the two-line budget', function (): void {
         expect(mb_strlen($answer))->toBeLessThanOrEqual(88, "too long for two lines: {$answer}");
     }
 });
+
+it('describes every seeded backdrop without naming a city', function (): void {
+    // The seeded backdrops are AI-generated (one carries an OpenAI C2PA
+    // manifest). Checked on the seeder's own list, so a third added later is
+    // held to the same rule without anyone remembering to add a fixture.
+    $backdrops = (new ReflectionClassConstant(Database\Seeders\ImageLibrarySeeder::class, 'BACKDROPS'))->getValue();
+
+    expect($backdrops)->toHaveCount(2);
+
+    foreach ($backdrops as $backdrop) {
+        foreach (['الرياض', 'جدة', 'الدمام', 'Riyadh', 'Jeddah'] as $place) {
+            expect($backdrop['alt'])->not->toContain($place);
+        }
+
+        expect($backdrop['alt'])->toContain('مدينة')
+            ->and(public_path('images/'.$backdrop['file']))->toBeFile();
+    }
+});
+
+it('holds several backdrops and serves one of them per page load', function (): void {
+    $layout = HomepageLayout::factory()->create(['is_active' => true]);
+
+    $ids = collect(['a.jpg', 'b.jpg'])->map(fn (string $name): int => $layout
+        ->addMedia(UploadedFile::fake()->image($name, 120, 53))
+        ->withCustomProperties(['alt' => 'أفق مدينة.', 'credit' => 'صورة تعبيرية'])
+        ->toMediaCollection('backdrop')->getKey());
+
+    // Not single-file any more: adding the second kept the first.
+    expect($layout->fresh()->getMedia('backdrop')->modelKeys())->toEqualCanonicalizing($ids->all());
+
+    $served = collect(range(1, 40))->map(fn (): int => $layout->fresh()->backdrop()->getKey())->unique();
+
+    expect($served->sort()->values()->all())->toEqual($ids->sort()->values()->all());
+});
+
+it('keeps every slide in the layout so turning the carousel cannot change the height', function (): void {
+    $slides = collect(range(1, 3))->map(fn (): Article => Article::factory()->withHeroImage()->create());
+
+    $html = view('components.home.big-story', [
+        'section' => ['title' => 'القصة الكبرى', 'items' => $slides],
+        'backdrop' => null,
+        'attributes' => new ComponentAttributeBag,
+    ])->render();
+
+    // Hidden with visibility, never display: a display:none slide takes no
+    // space, so the hero took the height of whichever slide was showing.
+    preg_match_all('/<div class="self-end text-cream \[grid-area:1\/1\]"[^>]*>/', $html, $text);
+    preg_match_all('/<ol class="[^"]*\[grid-area:1\/1\][^"]*"[^>]*>/', $html, $steps);
+
+    expect($text[0])->toHaveCount(3)->and($steps[0])->toHaveCount(3)
+        ->and(implode('', [...$text[0], ...$steps[0]]))->not->toContain('display:none')
+        ->and($text[0][1])->toContain('visibility:hidden')
+        ->and($text[0][0])->not->toContain('style="visibility:hidden"');
+});

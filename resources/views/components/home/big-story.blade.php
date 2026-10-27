@@ -2,12 +2,12 @@
 {{-- contrast-safe: every foreground sits on the scrimmed photograph, so the
      ground is the picture and not a token. Measured 2026-10-27 off the
      rendered pixels behind each element, text hidden, against the lightest
-     pixel under its worst line box, on all three demo slides:
-       375   headline 7.89 · standfirst 5.76 · byline 4.86 · step label 11.71 · step body 10.57 · numerals 5.38
-       768   headline 7.86 · standfirst 5.74 · byline 4.83 · step label 11.36 · step body 10.15 · numerals 5.47
-       1440  headline 14.58 · standfirst 8.80 · byline 6.99 · step label 16.10 · step body 14.55 · numerals 5.10
-     Slide one alone, at every width 375–1920: mint closing word ≥ 5.74.
-     The scrim stops in app.css are what hold these; re-measure if they move. --}}
+     pixel under its worst line box — worst over all three slides and both
+     lead-slide backdrops, dark-green scrim — at 375 / 430 / 768 / 1024 /
+     1280 / 1440 / 1920: headline ≥ 9.79, mint word ≥ 4.73, standfirst ≥ 6.60,
+     byline ≥ 5.26, step label ≥ 12.26, step body ≥ 10.95, numerals ≥ 4.81.
+     The per-width table is in CLAUDE.md §2. The scrim stops in app.css are
+     what hold these; re-measure if they move or a backdrop is added. --}}
 @php
     use App\Enums\ArticleSection;
 
@@ -51,6 +51,11 @@
             'alt' => $i === 0 && $backdrop
                 ? (string) $backdrop->getCustomProperty('alt')
                 : ($article->hero_alt ?? ''),
+            // A backdrop carries its own focal point (its tower's position);
+            // article photographs keep the stage's default.
+            'focal' => $i === 0 && $backdrop
+                ? (string) $backdrop->getCustomProperty('focal', '50% 40%')
+                : '50% 40%',
             'lead' => implode(' ', $words),
             'emphasis' => $emphasis,
             'steps' => $stepsFor($article),
@@ -93,7 +98,7 @@
                          tower complete from its top to its base, the sunset
                          behind it, and the lit streets along the bottom edge —
                          centred, the frame lost all three. --}}
-                    focal="50% 40%"
+                    :focal="$slide['focal']"
                 />
             </div>
         @endforeach
@@ -104,20 +109,17 @@
         {{-- Everything readable sits on the page's own grid, so the headline
              lines up with the sections below it while the picture runs past
              them to the viewport edge. --}}
-        {{-- 600px at desktop, and the number is an outcome rather than a
-             choice. At 520 the stage was 2.77:1 against a 1.775:1 photograph and
-             `cover` showed 64% of its height — a zoomed slice with the towers
-             cut top and bottom. 600 shows 74%, which is what it takes for the
-             tower to read whole. The constraint is the whole stack: topbar 49 + masthead 80
-             + ticker 60 + big story must clear a 900px viewport with the next
-             section showing. At 620 the stack came to 854 and left 46px of it —
-             which is not "beginning to show", and on a real 900px window, once
-             browser chrome is taken off, the button was below the fold. --}}
-        {{-- …and on a short screen it gives way: at 1024×768 the 600px stage
-             put the button 29px below the fold. Below 840px of viewport height
-             the stage is the viewport less the 15rem stack above it, down to
-             32rem, where the questions column still fits. --}}
-        <div class="relative z-10 mx-auto grid min-h-[34rem] w-full max-w-[1300px] lg:min-h-[clamp(32rem,calc(100svh_-_15rem),37.5rem)] lg:grid-cols-[1.36fr_0.64fr]">
+        {{-- The stage was a fixed 600px, chosen so the whole stack cleared a
+             900px viewport with the next section showing. Superseded by the
+             owner's height targets below, which trade that peek for a stage at
+             the backdrops' own proportion. --}}
+        {{-- Owner's targets (2026-10-27): the stage keeps the backdrops' own
+             2.28:1 — 43.75vw, so 630 at 1440 and 840 at 1920 — and never less
+             than 32.5rem (520 at 1024). On a short screen it gives way to the
+             fold: never taller than the viewport less the 15rem stack above
+             it, down to 32rem, where the questions column still fits — at
+             1024×768 a fixed stage put the button below the fold. --}}
+        <div class="relative z-10 mx-auto grid min-h-[34rem] w-full max-w-[1300px] lg:min-h-[clamp(32rem,min(max(32.5rem,43.75vw),calc(100svh_-_15rem)),52.5rem)] lg:grid-cols-[1.36fr_0.64fr]">
             {{-- The label sits at the top of the column and the story at the
                  bottom, so the space between them is the section's height doing
                  the work rather than a margin. It is the same label on every
@@ -130,9 +132,15 @@
                     {{ $section['title'] }}
                 </p>
 
-                <div @if ($count > 1) aria-live="polite" @endif>
+                {{-- Every slide sits in the same grid cell and is hidden with
+                     visibility, not display: the cell is as tall as the
+                     tallest slide, so turning the carousel never changes the
+                     hero's height (it did below lg, 796 → 770px at 375), and
+                     each slide is bottom-aligned so the button stays put. --}}
+                <div class="grid" @if ($count > 1) aria-live="polite" @endif>
                 @foreach ($slides as $k => $slide)
-                    <div class="text-cream" @if ($count > 1) x-show="i === {{ $k }}" @if ($k > 0) style="display:none" @endif @endif>
+                    <div class="self-end text-cream [grid-area:1/1]"
+                         @if ($count > 1) :style="{ visibility: i === {{ $k }} ? 'visible' : 'hidden' }" @if ($k > 0) style="visibility:hidden" @endif @endif>
                         {{-- 68px over 14ch, swept against all 72 demo
                              headlines at the 620px stage. The narrower measure
                              is what produces the reference's four-line rhythm:
@@ -206,11 +214,12 @@
                 {{-- Local, and only as wide as this column: the frame is not
                      tinted to rescue three lines of text. --}}
                 <span class="steps-scrim pointer-events-none absolute" aria-hidden="true"></span>
+                <div class="relative grid">
                 @foreach ($slides as $k => $slide)
                     {{-- 60px fills the side column's height at lg+; stacked
                          under the headline there is no slack to fill. --}}
-                    <ol class="relative space-y-10 lg:space-y-[3.75rem]"
-                        @if ($count > 1) x-show="i === {{ $k }}" @if ($k > 0) style="display:none" @endif @endif>
+                    <ol class="relative space-y-10 self-center [grid-area:1/1] lg:space-y-[3.75rem]"
+                        @if ($count > 1) :style="{ visibility: i === {{ $k }} ? 'visible' : 'hidden' }" @if ($k > 0) style="visibility:hidden" @endif @endif>
                         @foreach ($slide['steps'] as $step)
                             <li class="grid grid-cols-[auto_1fr] gap-4">
                                 <span class="flex items-stretch gap-4" aria-hidden="true">
@@ -240,6 +249,7 @@
                         @endforeach
                     </ol>
                 @endforeach
+                </div>
             </div>
 
             @if ($count > 1)
