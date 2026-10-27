@@ -1,7 +1,16 @@
-@import 'tailwindcss';
+/*
+ * source(none) turns off Tailwind v4's automatic detection, which scans every
+ * file git does not ignore. With it on, CLAUDE.md, REPORT.md and the test
+ * files fed class names into the public bundle — a forbidden
+ * `focus:outline-none` rule among them — so the CSS depended on documentation
+ * and was not reproducible from the source it is built from. The three paths
+ * below are the only places public markup lives.
+ */
+@import 'tailwindcss' source(none);
 @import './masar-fonts.css';
 
 @source '../views';
+@source '../js';
 @source '../../app/View';
 
 /*
