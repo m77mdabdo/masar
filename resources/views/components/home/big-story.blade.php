@@ -81,12 +81,22 @@
          the whole slide sideways. A clipped one cannot be scrolled at all. --}}
     <section class="full-bleed relative isolate overflow-clip" @if ($count === 1) aria-labelledby="big-story-heading" @endif
              @if ($count > 1)
-                 x-data="{ i: 0, n: {{ $count }}, go(d) { this.i = (this.i + d + this.n) % this.n } }"
+                 {{-- Auto-advancing with a drift (Task 2.10): the logic and its
+                      reasoning are resources/js/big-story.js, loaded after the
+                      page's load event by the script below — `x-ignore` holds
+                      the section until it arrives. Hover and keyboard focus hold it; leaving
+                      releases it. --}}
+                 x-data="bigStory({{ $count }})" data-carousel x-ignore x-bind="root"
                  role="group" aria-roledescription="عرض متتابع" aria-label="{{ $section['title'] }}"
              @endif>
         @foreach ($slides as $k => $slide)
-            <div class="hero-photo absolute inset-0 z-0"
-                 @if ($count > 1) x-show="i === {{ $k }}" @if ($k > 0) style="display:none" @endif @endif>
+            {{-- Stacked, and cross-faded rather than swapped: the incoming slide
+                 fades in over the outgoing one, which stays opaque beneath it,
+                 so the frame never dips. Only the current, outgoing and next
+                 slides are in the tree, so only the next image is fetched. --}}
+            <div @class(['hero-photo absolute inset-0 z-0', 'is-armed' => $count > 1 && $k === 0])
+                 style="--focal: {{ $slide['focal'] ?? '50% 50%' }};@if ($count > 1 && $k > 0) display:none @endif"
+                 @if ($count > 1) x-bind="photo({{ $k }})" @endif>
                 {{-- `ratio` does not shape this box: with :fill the parent owns it,
                      and the ratio only sets the img's width/height attributes,
                      which the cover CSS overrides. The crop is `focal`'s. --}}
@@ -143,7 +153,9 @@
                      tallest slide, so turning the carousel never changes the
                      hero's height (it did below lg, 796 → 770px at 375), and
                      each slide is bottom-aligned so the button stays put. --}}
-                <div class="relative grid" @if ($count > 1) aria-live="polite" @endif>
+                {{-- Announces the reader's own navigation only: `live` is off
+                     while the carousel advances by itself. --}}
+                <div class="relative grid" @if ($count > 1) aria-live="off" x-bind="announcer" @endif>
                     {{-- The scrims sit at z-0 and every text block at z-[1]: they reach 5rem
                          past their own block, and painting in DOM order put
                          them over the kicker and the button. --}}
@@ -287,12 +299,30 @@
                         </span>
                     @endforeach
 
-                    <button type="button" @click="go(1)" aria-label="الشريحة التالية"
+                    <button type="button" @click="go(1)" aria-label="الشريحة التالية" data-next
                             class="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/70 text-white transition before:absolute before:-inset-[5px] before:content-[''] hover:bg-white/10">
                         <span aria-hidden="true" class="inline-block rtl:-scale-x-100">→</span>
                     </button>
+
+                    {{-- The pause control (WCAG 2.2.2) is added by big-story.js,
+                         after the load event, with this cluster's own button
+                         class: before then nothing moves, so there is nothing
+                         to stop, and its markup would sit in front of the LCP
+                         image for nothing. --}}
                 </div>
             @endif
         </div>
     </section>
+    @if ($count > 1)
+        {{-- After the photograph above has painted, so the carousel's bytes are
+             never in front of the LCP paint. The load event alone was not late
+             enough: measured, it fired at 243ms and the hero painted at 262ms,
+             and the chunk was requested in between. Load, then the image's
+             decode, then two frames, so at least one has been painted. --}}
+        <script type="module">
+            const load = () => (document.querySelector('[data-carousel] img')?.decode() ?? Promise.resolve()).catch(() => {})
+                .then(() => requestAnimationFrame(() => requestAnimationFrame(() => import(@js(Vite::asset('resources/js/big-story.js'))))));
+            document.readyState === 'complete' ? load() : addEventListener('load', load, { once: true });
+        </script>
+    @endif
 @endif

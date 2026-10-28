@@ -128,7 +128,7 @@ slides, same method, both backdrops:
 | 1440 | 7.23 | 10.13 | 4.91 | 6.50 | 5.87 | 11.74 | 9.98 | 6.65 | 5.52 |
 | 1920 | 5.75 | 9.56 | 4.93 | 6.51 | 5.71 | 11.52 | 9.84 | 6.86 | 5.13 |
 
-`.questions-scrim` is a blurred field at 0.90 where the numerals sit, easing to 0.70
+`.questions-scrim` is a blurred field at 0.92 where the numerals sit, easing to 0.70
 under the text, and the numerals are solid `--gold`. At 1440 the photograph keeps
 ~71% of its brightness behind the headline column (55% under the old band on slide
 one) and ~60% behind the questions (32–51%). Tightest figure: the mint word, 4.90.
@@ -137,6 +137,68 @@ and 0.65 flat behind the questions put a numeral at 2.50. Text-shadow alone, wit
 field, measured 1.0–1.7 on the daylight photographs. Re-measure if any opacity, the
 halo or `--q-*` move. Re-measure if any local scrim's inset, blur or
 opacity moves.
+
+**The big story moves (owner's ruling, Task 2.10).** Each photograph drifts from
+`scale(1.06)` to `scale(1.0)`, then cross-fades to the next.
+- **Timing.** Dwell **8s**: long enough to read a headline and its standfirst,
+  where 3s would be a billboard and 9s read as stalled. The fade is **800ms**,
+  linear, and the incoming slide fades in over the outgoing one, which stays
+  opaque beneath it. The drift runs dwell + fade (8.8s) so the outgoing picture is
+  still settling under the incoming one. It is linear, never below 1.0, and its
+  origin is the slide's focal point. A test ties the CSS duration to the JS
+  timings.
+- **Compositor only.** It animates `transform` on the image layer only. Traced:
+  zero main-thread paints during the drift. The only paints come at a slide
+  change, when the incoming layer is first rasterised. No `compositeFailed`, so
+  no `will-change`.
+- **Contrast across the motion.** It holds at every point, not only on one
+  frame. Measured at the drift's start (1.06), middle (1.03) and end (1.0), plus
+  two cross-fade frames: the incoming text over the outgoing picture (α 0), and
+  over a 50/50 blend (α 0.5). All three slides, both backdrops; worst element per
+  width:
+
+  | width | start 1.06 | mid 1.03 | end 1.0 | fade α 0 | fade α 0.5 |
+  |---|---|---|---|---|---|
+  | 375 | 4.90 | 4.90 | 4.90 | 4.90 | 5.12 |
+  | 430 | 4.91 | 4.90 | 4.91 | 4.91 | 5.19 |
+  | 768 | 4.90 | 4.90 | 4.90 | 4.90 | 5.06 |
+  | 1024 | 4.70 | 4.98 | 4.91 | 4.89 | 5.24 |
+  | 1280 | 4.92 | 4.91 | 4.91 | 4.89 | 5.19 |
+  | 1440 | 4.98 | 4.92 | 4.91 | 4.92 | 5.19 |
+  | 1920 | 4.98 | 4.93 | 4.93 | 4.90 | 5.06 |
+
+  The floor is 4.70: a numeral at 1024 on slide two, at 1.06. It was 4.55 with the
+  numeral field at 0.90, which is why `--q-num` is 0.92.
+- **Framing.** Checked at both ends of the drift for all four images (two
+  backdrops, two article photographs). At 1.06 the tower is whole and the article
+  subjects stay in frame. The range is not to be widened without redoing that
+  check.
+- **LCP.** The carousel is its own Vite entry (`resources/js/big-story.js`), not
+  part of `app.js`, which builds byte-identical. A loader of a few lines inside the
+  component imports it only after the load event, the hero image's `decode()` and
+  two animation frames. The load event alone was too early: it fired at 243ms
+  and the hero painted at 262ms. Until the chunk arrives the section is
+  `x-ignore`d and shows the server frame: slide one, still, at 1.06.
+  - The pause control and every binding come from the chunk, so the page carries
+    about 310 B gzipped more HTML than before.
+  - Lighthouse (simulate, three runs per backdrop): plain 3235 / 3158 / 3162 →
+    3241 / 3158 / 3163; dusk 3607 / 3683 / 3682 → 3607 / 3679 / 3681. No
+    difference the harness can resolve.
+- **Reduced motion.** Nothing applies: no drift, no advance, and no pause control
+  (there is nothing to stop). Measured: 0 pixels change in 10s. Prev and next
+  remain.
+- **Pausing and taking control.**
+  - Hover and keyboard focus anywhere in the section freeze both the drift and
+    the timer, via `animation-play-state`. Removing the class would snap the
+    picture to its rest scale.
+  - Prev or next stops the advance for the session (`sessionStorage`) and does
+    not give it back. Only the reader pressing play resumes it.
+  - The live region is `off` while it advances on its own and `polite` once the
+    reader navigates, so an auto-advance announces nothing.
+  - The pause button's label states what it will do, and a status line states
+    what it did.
+- **Data.** Only the next slide is fetched, half a dwell in. Across three slide
+  changes no media URL was requested twice.
 
 ---
 

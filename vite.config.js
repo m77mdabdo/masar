@@ -5,7 +5,10 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js', 'resources/css/filament/admin/theme.css'],
+            // big-story.js is its own entry, not an import of app.js: it is
+            // fetched after the load event by the component itself, so not one
+            // byte of it sits in front of the LCP image (Task 2.10).
+            input: ['resources/css/app.css', 'resources/js/app.js', 'resources/js/big-story.js', 'resources/css/filament/admin/theme.css'],
             refresh: true,
         }),
         tailwindcss(),

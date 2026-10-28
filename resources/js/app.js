@@ -5,7 +5,8 @@ import focus from '@alpinejs/focus';
 /*
  * Alpine is the entire client-side budget. The site is server-rendered; this
  * drives the mega-menu, the mobile drawer and the article table of contents,
- * and nothing else.
+ * and nothing else. The homepage carousel is resources/js/big-story.js, a
+ * separate entry fetched after the load event.
  */
 /*
  * The focus plugin is here for one reason: the mobile drawer declares
