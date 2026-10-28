@@ -123,4 +123,12 @@ return [
         'pending' => 'تصدیق کا انتظار',
         'unsubscribed' => 'سبسکرپشن ختم',
     ],
+    'translation_status' => [
+        'awaiting_translator' => 'مترجم کا انتظار',
+        'failed' => 'ناکام',
+        'needs_review' => 'جائزہ درکار',
+        'processing' => 'جاری',
+        'queued' => 'قطار میں',
+        'reviewed' => 'جائزہ مکمل',
+    ],
 ];

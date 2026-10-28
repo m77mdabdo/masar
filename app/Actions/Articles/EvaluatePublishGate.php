@@ -52,6 +52,7 @@ class EvaluatePublishGate
         $this->checkFactCheck($article, $gate, $failures);
         $this->checkWhyItMatters($article, $gate, $failures);
         $this->checkSponsorship($article, $gate, $failures);
+        $this->checkTranslation($article, $gate, $failures);
 
         return $failures;
     }
@@ -178,6 +179,26 @@ class EvaluatePublishGate
 
         if ($article->is_sponsored && blank($article->sponsor_name)) {
             $failures[] = ['rule' => 'sponsor_name', 'message' => 'حدّد اسم الجهة الراعية؛ المحتوى المدفوع يجب أن يُفصح عنه للقارئ.'];
+        }
+    }
+
+    /**
+     * A translation publishes only once a person has reviewed it. Machine
+     * output — and, with the null provider, the source's own text sitting in
+     * a draft waiting for a translator — must never reach readers as if it
+     * were a checked edition.
+     *
+     * @param  array<string, mixed>  $gate
+     * @param  array<int, array{rule: string, message: string}>  $failures
+     */
+    private function checkTranslation(Article $article, array $gate, array &$failures): void
+    {
+        if (! ($gate['require_translation_review'] ?? true) || ! $article->isTranslation()) {
+            return;
+        }
+
+        if ($article->translation_status !== \App\Enums\TranslationStatus::Reviewed) {
+            $failures[] = ['rule' => 'translation_review', 'message' => __('admin.gate.translation_unreviewed')];
         }
     }
 }

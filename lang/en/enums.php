@@ -123,4 +123,12 @@ return [
         'pending' => 'Awaiting confirmation',
         'unsubscribed' => 'Unsubscribed',
     ],
+    'translation_status' => [
+        'awaiting_translator' => 'Awaiting a translator',
+        'failed' => 'Failed',
+        'needs_review' => 'Needs review',
+        'processing' => 'Processing',
+        'queued' => 'Queued',
+        'reviewed' => 'Reviewed',
+    ],
 ];

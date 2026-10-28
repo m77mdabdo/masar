@@ -45,6 +45,58 @@ return [
     | the Filament UI. Turning a rule off here turns it off everywhere.
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Translation
+    |--------------------------------------------------------------------------
+    | Machine translation produces drafts, never publications. A translated
+    | article is its own row in the source's translation group and passes the
+    | same workflow and gate as any other — plus `require_translation_review`,
+    | which refuses one no person has signed off.
+    |
+    | `driver` is `null` by the owner's ruling (2026-10-28): no outside service.
+    | The null provider declines, and the draft waits for a person to translate
+    | it. `allow_external` is a second, independent switch: even with a real
+    | driver configured, no article text leaves the server until it is true.
+    */
+
+    'translation' => [
+        'driver' => env('MASAR_TRANSLATION_DRIVER', 'null'),
+        'allow_external' => (bool) env('MASAR_TRANSLATION_ALLOW_EXTERNAL', false),
+
+        // Open a draft in every enabled edition when an original is first
+        // published. Not on creation: an unpublished draft is the newsroom's
+        // and is not sent anywhere until it is public.
+        'auto_on_publish' => (bool) env('MASAR_TRANSLATION_AUTO_ON_PUBLISH', false),
+
+        // Re-run a translation when its source text changes. Never touches one
+        // a person has reviewed: that one is flagged as outdated instead.
+        'auto_retranslate' => (bool) env('MASAR_TRANSLATION_AUTO_RETRANSLATE', false),
+
+        // Provider calls per minute, across all workers.
+        'per_minute' => (int) env('MASAR_TRANSLATION_PER_MINUTE', 10),
+
+        /*
+         * Terms whose rendering is an editorial decision, not a dictionary
+         * lookup. Sent to any provider with every request. Only institutions'
+         * own published names in each language; where an institution
+         * publishes no name in a language, the term is left out for that
+         * language rather than invented.
+         */
+        'glossary' => [
+            'رؤية السعودية 2030' => ['en' => 'Saudi Vision 2030'],
+            'صندوق الاستثمارات العامة' => ['en' => 'Public Investment Fund'],
+            'هيئة السوق المالية' => ['en' => 'Capital Market Authority'],
+            'البنك المركزي السعودي' => ['en' => 'Saudi Central Bank'],
+            'السوق المالية السعودية (تداول)' => ['en' => 'Saudi Exchange (Tadawul)'],
+            'الهيئة العامة للإحصاء' => ['en' => 'General Authority for Statistics'],
+            'وزارة الاستثمار' => ['en' => 'Ministry of Investment'],
+            'هيئة الزكاة والضريبة والجمارك' => ['en' => 'Zakat, Tax and Customs Authority'],
+            'صكوك' => ['en' => 'sukuk', 'fr' => 'sukuk'],
+            'الطرح العام الأولي' => ['en' => 'initial public offering', 'fr' => 'introduction en bourse'],
+        ],
+    ],
+
     'publish_gate' => [
         'require_summary' => true,
         'require_source' => true,
@@ -60,6 +112,10 @@ return [
 
         // Paid placement must be disclosed to the reader, every time.
         'require_sponsor_name' => true,
+
+        // A translated article publishes only once a person has reviewed it.
+        // Machine output is a draft (CLAUDE.md §1: AI assists, a human approves).
+        'require_translation_review' => true,
 
         'min_summary_points' => 2,
         'max_summary_points' => 5,

@@ -92,6 +92,21 @@ class ArticlePolicy
         return $user->can('article.seo');
     }
 
+    /** Open, or re-run, a translation of this article in another edition. */
+    public function translate(User $user, Article $article): bool
+    {
+        return $user->can('article.translate');
+    }
+
+    /**
+     * Sign a translation off. The translator is not the reviewer, for the
+     * reason a writer is not their own fact-checker.
+     */
+    public function reviewTranslation(User $user, Article $article): bool
+    {
+        return $user->can('article.translation.review') && ! $this->owns($user, $article);
+    }
+
     /**
      * Lead byline or credited co-author both count as ownership.
      */

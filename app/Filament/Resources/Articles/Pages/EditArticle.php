@@ -14,6 +14,7 @@ use App\Actions\Articles\UpdateGateFailuresCount;
 use App\Filament\Resources\Articles\ArticleResource;
 use App\Filament\Resources\Articles\Support\ArticleTransitionActions;
 use App\Filament\Resources\Articles\Support\GateTabMap;
+use App\Filament\Resources\Articles\Support\TranslationActions;
 use App\Models\Article;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
@@ -35,8 +36,38 @@ class EditArticle extends EditRecord
     {
         return [
             ...ArticleTransitionActions::for($this->getRecord()),
+            ...TranslationActions::for($this->getRecord()),
             DeleteAction::make()->label('حذف'),
         ];
+    }
+
+    /**
+     * Which edition this is, and how its other editions stand. One record, so
+     * the outdated check may load the source's blocks here; a list may not.
+     */
+    public function getSubheading(): ?string
+    {
+        /** @var Article $article */
+        $article = $this->getRecord();
+        $name = fn (Article $a): string => \App\Support\Locales::name($a->locale);
+        $state = fn (Article $a): string => trim(($a->translation_status?->label() ?? '')
+            .($a->translationIsOutdated() ? ' · '.__('admin.translation.outdated') : ''), ' ·');
+
+        if ($article->isTranslation()) {
+            return __('admin.translation.subheading_translation', [
+                'language' => $name($article),
+                'source' => $article->source ? $name($article->source) : '—',
+                'state' => $state($article),
+            ]);
+        }
+
+        $versions = Article::query()->with('source.blocks')
+            ->where('translation_group_id', $article->translation_group_id)
+            ->whereKeyNot($article->getKey())->get();
+
+        return $versions->isEmpty() ? null : __('admin.translation.subheading_original', [
+            'versions' => $versions->map(fn (Article $v): string => $name($v).' ('.$state($v).')')->implode('، '),
+        ]);
     }
 
     /**

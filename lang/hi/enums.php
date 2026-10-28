@@ -123,4 +123,12 @@ return [
         'pending' => 'पुष्टि की प्रतीक्षा',
         'unsubscribed' => 'सदस्यता समाप्त',
     ],
+    'translation_status' => [
+        'awaiting_translator' => 'अनुवादक की प्रतीक्षा',
+        'failed' => 'विफल',
+        'needs_review' => 'समीक्षा आवश्यक',
+        'processing' => 'प्रक्रिया में',
+        'queued' => 'कतार में',
+        'reviewed' => 'समीक्षित',
+    ],
 ];

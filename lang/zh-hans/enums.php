@@ -123,4 +123,12 @@ return [
         'pending' => '待确认',
         'unsubscribed' => '已退订',
     ],
+    'translation_status' => [
+        'awaiting_translator' => '待人工翻译',
+        'failed' => '失败',
+        'needs_review' => '待审核',
+        'processing' => '处理中',
+        'queued' => '排队中',
+        'reviewed' => '已审核',
+    ],
 ];

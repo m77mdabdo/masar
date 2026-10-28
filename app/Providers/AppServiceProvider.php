@@ -48,6 +48,12 @@ class AppServiceProvider extends ServiceProvider
         // measures exactly what an AI provider would be paid to do.
         $this->app->bind(AiProvider::class, NullAiProvider::class);
 
+        // One driver ships, by ruling: no outside translation service. A real
+        // one is added to this match and selected in config, never hard-wired.
+        $this->app->bind(\App\Services\Translation\TranslationProvider::class, fn () => match (config('masar.translation.driver')) {
+            default => new \App\Services\Translation\NullTranslationProvider,
+        });
+
         // One instance per request: settings are read on nearly every page and
         // the day-long cache should be consulted once, not per call site.
         $this->app->singleton(Settings::class);
@@ -139,6 +145,9 @@ class AppServiceProvider extends ServiceProvider
         // Search is a read, so this is a capacity control, not a safety one:
         // every query is a LIKE scan until Scout replaces it.
         RateLimiter::for('search', fn (Request $request) => Limit::perMinute(30)->by($request->ip()));
+
+        // Provider quota, shared by every worker: one key, not per request.
+        RateLimiter::for('translation', fn () => Limit::perMinute(max(1, (int) config('masar.translation.per_minute', 10)))->by('translation-provider'));
     }
 
     /**

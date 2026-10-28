@@ -84,6 +84,26 @@ class ArticlesTable
                     ->sortable()
                     ->toggleable(),
 
+                TextColumn::make('locale')
+                    ->label(__('admin.translation.language'))
+                    ->formatStateUsing(fn (?string $state): string => \App\Support\Locales::name((string) $state))
+                    ->toggleable(),
+
+                // The stored status only. "Outdated" needs the source's blocks,
+                // which a list must not load; it is shown on the article itself.
+                TextColumn::make('translation_status')
+                    ->label(__('admin.translation.status'))
+                    ->badge()
+                    ->formatStateUsing(fn ($state): string => $state?->label() ?? '')
+                    ->color(fn ($state): string => match ($state) {
+                        \App\Enums\TranslationStatus::Reviewed => 'success',
+                        \App\Enums\TranslationStatus::Failed => 'danger',
+                        \App\Enums\TranslationStatus::NeedsReview, \App\Enums\TranslationStatus::AwaitingTranslator => 'warning',
+                        default => 'gray',
+                    })
+                    ->placeholder(__('admin.translation.original'))
+                    ->toggleable(),
+
                 IconColumn::make('is_featured')
                     ->label('مميزة')
                     ->boolean()
@@ -114,9 +134,13 @@ class ArticlesTable
 
                 SelectFilter::make('locale')
                     ->label('اللغة')
-                    ->options(fn (): array => collect(config('masar.locales'))
-                        ->map(fn (array $l): string => $l['name'])
+                    ->options(fn (): array => collect(\App\Support\Locales::codes())
+                        ->mapWithKeys(fn (string $c): array => [$c => \App\Support\Locales::name($c)])
                         ->all()),
+
+                SelectFilter::make('translation_status')
+                    ->label(__('admin.translation.status'))
+                    ->options(\App\Enums\TranslationStatus::options()),
 
                 SelectFilter::make('content_type')
                     ->label('نوع المحتوى')

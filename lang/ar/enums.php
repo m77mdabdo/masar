@@ -126,4 +126,12 @@ return [
         'pending' => 'بانتظار التأكيد',
         'unsubscribed' => 'ألغى الاشتراك',
     ],
+    'translation_status' => [
+        'awaiting_translator' => 'بانتظار مترجم',
+        'failed' => 'فشلت',
+        'needs_review' => 'تحتاج مراجعة',
+        'processing' => 'قيد الترجمة',
+        'queued' => 'في الانتظار',
+        'reviewed' => 'رُوجعت',
+    ],
 ];

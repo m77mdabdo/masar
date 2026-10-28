@@ -123,4 +123,12 @@ return [
         'pending' => 'En attente de confirmation',
         'unsubscribed' => 'Désabonné',
     ],
+    'translation_status' => [
+        'awaiting_translator' => 'En attente d’un traducteur',
+        'failed' => 'Échec',
+        'needs_review' => 'À relire',
+        'processing' => 'En cours',
+        'queued' => 'En file d’attente',
+        'reviewed' => 'Relue',
+    ],
 ];

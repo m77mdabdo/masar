@@ -37,6 +37,15 @@ class Article extends Model implements HasMedia
     protected $fillable = [
         'locale',
         'translation_group_id',
+        'source_article_id',
+        'translation_status',
+        'translation_origin',
+        'source_hash',
+        'translation_error',
+        'translation_attempts',
+        'translated_at',
+        'translation_reviewed_by_id',
+        'translation_reviewed_at',
         'category_id',
         'author_id',
         'editor_id',
@@ -91,6 +100,10 @@ class Article extends Model implements HasMedia
             'scheduled_for' => 'datetime',
             'updated_content_at' => 'datetime',
             'fact_checked_at' => 'datetime',
+            'translation_status' => \App\Enums\TranslationStatus::class,
+            'translation_attempts' => 'integer',
+            'translated_at' => 'datetime',
+            'translation_reviewed_at' => 'datetime',
         ];
     }
 
@@ -248,6 +261,35 @@ class Article extends Model implements HasMedia
     public function mentions(): MorphMany
     {
         return $this->morphMany(EntityMention::class, 'mentionable');
+    }
+
+    /** The version this one was translated from. Null on an original. */
+    public function source(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'source_article_id');
+    }
+
+    public function translationReviewer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'translation_reviewed_by_id');
+    }
+
+    public function isTranslation(): bool
+    {
+        return $this->source_article_id !== null;
+    }
+
+    /**
+     * True when the source has changed since this translation was made or
+     * last reviewed. Computed, never stored: see TranslationStatus.
+     */
+    public function translationIsOutdated(): bool
+    {
+        if (! $this->isTranslation() || $this->source === null || $this->source_hash === null) {
+            return false;
+        }
+
+        return ! hash_equals($this->source_hash, app(\App\Support\TranslatableContent::class)->hash($this->source));
     }
 
     /**
