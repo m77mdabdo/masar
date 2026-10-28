@@ -1,8 +1,8 @@
 @props(['locale', 'links' => null])
-{{-- Cream, one hairline, one 42px row. --}}
+{{-- Cream, one hairline, one 36px row. --}}
 <div class="border-b border-line bg-cream">
     <x-ui.container>
-        <div class="flex h-[3rem] items-center justify-between gap-4 text-xs">
+        <div class="flex h-9 items-center justify-between gap-4 text-xs">
             {{-- aria-hidden: the masthead carries the same line as real content,
                  and a second copy outside every landmark is furniture a screen
                  reader has to step over. --}}

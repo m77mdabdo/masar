@@ -14,7 +14,7 @@
     // 13px come to 750px, which does not fit beside the wordmark at 1280. The
     // tracking is tight (0.03em rather than 0.07em) because that is what buys
     // the extra half-pixel of size at every width.
-    $link = 'inline-flex h-[4.875rem] shrink-0 items-center gap-1 whitespace-nowrap border-b-2 font-display text-[0.75rem] min-[1400px]:text-[0.78125rem] font-semibold uppercase tracking-[0.03em] transition';
+    $link = 'inline-flex h-16 shrink-0 items-center gap-1 whitespace-nowrap border-b-2 font-display text-[0.75rem] min-[1400px]:text-[0.78125rem] font-semibold uppercase tracking-[0.03em] transition';
     $state = fn (bool $active): array => [
         'border-g-900 text-g-950' => $active,
         'border-transparent text-g-900 hover:text-g-600' => ! $active,

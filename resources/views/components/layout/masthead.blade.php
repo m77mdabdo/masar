@@ -2,7 +2,9 @@
 @php $home = route('web.home', $locale); @endphp
 <header class="sticky top-0 z-40 border-b border-line bg-cream/95 backdrop-blur">
     <x-ui.container>
-        <div class="flex h-[4.875rem] items-center gap-[1.375rem]">
+        {{-- 64px (owner's target, 2026-10-28): the wordmark keeps its size;
+             the bar gives up vertical padding, and the height goes to the hero. --}}
+        <div class="flex h-16 items-center gap-[1.375rem]">
             <a href="{{ $home }}" class="flex shrink-0 items-baseline gap-2.5" aria-label="{{ setting('identity.site_name') }}">
                 {{-- The Latin wordmark is the brand's large mark and leads the
                      lockup; the Arabic one sits beside it a size down. --}}

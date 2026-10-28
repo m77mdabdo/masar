@@ -28,7 +28,7 @@
                     {{-- 16px between lg and 2xl: at 1280 the 20px padding left
                          66px for a 69px print, and «11,234.56» lost its last
                          digit. --}}
-                    <div class="flex h-[3.375rem] items-center gap-2 border-s border-white/[0.07] px-4 sm:px-5 lg:px-4 2xl:px-5">
+                    <div class="flex h-11 items-center gap-2 border-s border-white/[0.07] px-4 sm:px-5 lg:px-4 2xl:px-5">
                         @if ($cell['series'] !== [])
                             {{-- The line is the row's own points. A row saved
                                  without them gets no chart, rather than a curve
@@ -83,7 +83,7 @@
                 {{-- The cell that terminates the band, one step lighter than it. --}}
                 @if ($href)
                     <a href="{{ $href }}"
-                       class="flex h-[3.375rem] items-center gap-3 border-s border-white/[0.07] bg-g-850 px-[1.625rem] font-display text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-white transition hover:bg-g-700">
+                       class="flex h-11 items-center gap-3 border-s border-white/[0.07] bg-g-850 px-[1.625rem] font-display text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-white transition hover:bg-g-700">
                         <span>نبض السوق</span>
                         <span aria-hidden="true" class="inline-block rtl:-scale-x-100">→</span>
                     </a>
