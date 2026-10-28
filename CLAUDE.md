@@ -87,52 +87,55 @@ worst line box, worst case over both lead-slide backdrops, with the dark-green s
 stage (580 / 664 / 720 / 860 at 1024 / 1280 / 1440 / 1920) under the compact
 chrome — 30px topbar carrying the demo disclosure, 54px masthead, 50px ticker; the
 1280 row re-measured again at 664. Re-measured again 2026-10-28 after the questions
-column lost its full-height band (below). This table is slide one; slides two and
-three are below:
+column lost its full-height band, and again after the headline side lost its band
+too (below). This table is slide one; slides two and three are below:
 
 | width | headline | mint word | standfirst | byline | step label | step body | numerals 01–03 |
 |---|---|---|---|---|---|---|---|
-| 375 | 10.77 | 5.78 | 6.72 | 5.43 | 14.24 | 11.90 | 6.17 |
-| 430 | 10.31 | 5.10 | 6.69 | 5.36 | 13.75 | 11.48 | 6.04 |
-| 768 | 10.31 | 4.98 | 7.16 | 5.26 | 13.37 | 11.38 | 6.56 |
-| 1024 | 11.01 | 5.82 | 7.17 | 6.08 | 12.11 | 7.84 | 5.79 |
-| 1280 | 11.09 | 5.36 | 7.16 | 6.15 | 12.53 | 8.79 | 5.84 |
-| 1440 | 10.89 | 5.43 | 7.17 | 5.97 | 12.15 | 7.38 | 5.92 |
-| 1920 | 10.78 | 5.21 | 7.07 | 5.82 | 11.71 | 7.67 | 5.58 |
+| 375 | 11.25 | 5.94 | 6.92 | 6.18 | 12.48 | 7.49 | 6.31 |
+| 430 | 10.89 | 5.26 | 6.83 | 6.19 | 12.87 | 6.53 | 5.88 |
+| 768 | 10.64 | 5.14 | 7.35 | 5.91 | 11.68 | 6.37 | 6.06 |
+| 1024 | 10.12 | 5.43 | 6.61 | 6.44 | 13.60 | 6.29 | 6.00 |
+| 1280 | 10.12 | 5.13 | 6.70 | 6.25 | 14.13 | 6.35 | 6.03 |
+| 1440 | 9.97 | 5.13 | 6.85 | 6.18 | 13.54 | 6.29 | 6.01 |
+| 1920 | 10.22 | 4.93 | 6.74 | 6.16 | 13.09 | 6.55 | 5.75 |
 
 Green is lighter than black at equal opacity, so the green scrim needs more of it:
 at black's stops the numerals fell to 3.92:1. Before the October passes the scrim
 was sized in percentages of a full-bleed section: headline 2.07 and mint word 1.0 at
 1920, numerals 1.31 at 1440. Earlier figures in this paragraph ("headline ≥ 11.11",
 then a black-scrim table) are superseded. These are not in the suite — the ground is
-a photograph — so re-measure if `.hero-scrim` or `.steps-scrim` move, or a backdrop
-is added.
+a photograph — so re-measure if any local scrim below moves, or a backdrop is
+added.
 
-**Slides two and three carry an article photograph, not a backdrop, and drop the
-bands.** The section's `data-ground="photo"` swaps them for blurred local scrims
-(`.text-scrim`, `.questions-scrim`, `.kicker-scrim`) behind each text block, so the
-middle of the picture stays clear and no gradient ends in a line. The table above
-is slide one. Photo slides, same method, both backdrops, re-measured 2026-10-28 at
-the taller stage:
+**No slide has a band any more** (owner's ruling, 2026-10-28; `.hero-scrim` and
+`.steps-scrim` are gone from the homepage, and `.hero-scrim` remains on the article
+hero only). Each text block carries its own blurred local scrim (`.text-scrim` 0.85,
+`.kicker-scrim` 0.65, `.questions-scrim`), so the photograph stays visible around
+the text and no gradient ends in a line. The short unclamped lines carry a close
+`text-shadow` halo; **clamped text never does**. `line-clamp` clips its own box,
+and a clipped halo renders as a hard dark rectangle behind the headline, the
+standfirst and every answer. That shipped once and was caught at 2× zoom. Photo
+slides, same method, both backdrops:
 
 | width | kicker | headline | mint word | standfirst | byline | button | step label | step body | numerals |
 |---|---|---|---|---|---|---|---|---|---|
-| 375 | 15.26 | 10.45 | 5.04 | 7.05 | 5.71 | 14.35 | 9.27 | 5.80 | 5.29 |
-| 430 | 15.07 | 10.16 | 5.05 | 7.02 | 5.88 | 14.09 | 9.10 | 5.94 | 4.93 |
-| 768 | 15.05 | 10.06 | 5.04 | 7.05 | 5.79 | 13.34 | 7.08 | 4.56 | 5.29 |
-| 1024 | 8.56 | 10.32 | 5.06 | 6.68 | 5.44 | 11.88 | 7.74 | 5.39 | 4.65 |
-| 1280 | 8.44 | 10.29 | 5.06 | 6.68 | 5.44 | 12.06 | 8.53 | 5.59 | 5.38 |
-| 1440 | 8.08 | 10.44 | 5.06 | 6.68 | 5.45 | 12.08 | 8.23 | 5.96 | 5.29 |
-| 1920 | 7.85 | 9.86 | 5.07 | 6.69 | 5.52 | 11.87 | 8.01 | 5.78 | 4.85 |
+| 375 | 15.08 | 10.10 | 4.90 | 6.91 | 6.00 | 14.32 | 11.03 | 6.41 | 5.57 |
+| 430 | 14.88 | 9.85 | 4.91 | 6.84 | 6.06 | 14.10 | 11.19 | 6.28 | 5.30 |
+| 768 | 15.07 | 9.76 | 4.90 | 6.92 | 5.98 | 13.13 | 8.80 | 6.00 | 5.44 |
+| 1024 | 7.69 | 10.01 | 4.91 | 6.49 | 5.81 | 11.53 | 9.71 | 6.59 | 4.93 |
+| 1280 | 7.96 | 10.00 | 4.91 | 6.49 | 5.71 | 11.71 | 10.40 | 6.68 | 5.61 |
+| 1440 | 7.23 | 10.13 | 4.91 | 6.50 | 5.87 | 11.74 | 9.98 | 6.65 | 5.52 |
+| 1920 | 5.75 | 9.56 | 4.93 | 6.51 | 5.71 | 11.52 | 9.84 | 6.86 | 5.13 |
 
-**The questions column (every slide at lg+, photo slides below lg) has no band.**
-`.questions-scrim` is a blurred field at 0.90 where the numerals sit, easing to 0.62
-under the text. The text adds a close `text-shadow` halo, and the numerals are solid
-`--gold`. Behind the column at 1440 the photograph keeps 61–64% of its brightness,
-against 32–51% under the old 0.93 band. Tightest figure: step body 4.56 at 768,
-slide two. Lighter fields fail: 0.65 flat put a numeral at 2.50, 0.55 put the step
-text at 3.62, and text-shadow alone measured 1.0–1.7 on the daylight photographs.
-Re-measure if `--q-num`, `--q-text` or the halo move. Re-measure if any local scrim's inset, blur or
+`.questions-scrim` is a blurred field at 0.90 where the numerals sit, easing to 0.70
+under the text, and the numerals are solid `--gold`. At 1440 the photograph keeps
+~71% of its brightness behind the headline column (55% under the old band on slide
+one) and ~60% behind the questions (32–51%). Tightest figure: the mint word, 4.90.
+Lighter fields fail: without a halo on the headline, 0.80 put the mint word at 4.13,
+and 0.65 flat behind the questions put a numeral at 2.50. Text-shadow alone, with no
+field, measured 1.0–1.7 on the daylight photographs. Re-measure if any opacity, the
+halo or `--q-*` move. Re-measure if any local scrim's inset, blur or
 opacity moves.
 
 ---

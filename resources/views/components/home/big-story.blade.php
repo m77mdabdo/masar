@@ -1,16 +1,12 @@
 @props(['section', 'backdrop' => null, 'sizes' => '(max-width: 1024px) 100vw, 96vw'])
-{{-- contrast-safe: every foreground sits on the scrimmed photograph, so the
-     ground is the picture and not a token. Measured 2026-10-28 off the
-     rendered pixels behind each element, text hidden, against the lightest
-     pixel under its worst line box — slide one, both lead-slide backdrops,
-     dark-green scrim — at 375 / 430 / 768 / 1024 / 1280 / 1440 / 1920:
-     headline ≥ 10.31, mint word ≥ 4.98, standfirst ≥ 6.69, byline ≥ 5.26,
-     step label ≥ 11.71, step body ≥ 7.38, numerals ≥ 5.58.
-     The per-width table is in CLAUDE.md §2. The scrim stops in app.css are
-     what hold these; re-measure if they move or a backdrop is added.
-     Slides two and three (data-ground="photo") drop the bands for blurred
-     local scrims behind each text block; their own table is beside the
-     first: mint word ≥ 5.04, step body ≥ 4.56, numerals ≥ 4.65. --}}
+{{-- contrast-safe: every foreground sits on the photograph, under its own
+     blurred local scrim, so the ground is the picture and not a token.
+     Measured 2026-10-28 off the rendered pixels behind each element, text
+     hidden, against the lightest pixel under its worst line box — all three
+     slides, both lead-slide backdrops — at 375 / 430 / 768 / 1024 / 1280 /
+     1440 / 1920: every element ≥ 4.90 (the mint word); numerals ≥ 4.93.
+     The per-width tables are in CLAUDE.md §2. The opacities in app.css are
+     what hold these; re-measure if they move or a backdrop is added. --}}
 @php
     use App\Enums\ArticleSection;
 
@@ -71,26 +67,21 @@
 @if ($count)
     {{--
         The photograph is the section's background, not a column in it: one
-        absolutely positioned layer per slide behind everything, with the scrim
-        over it and the grid on top. Full bleed to the viewport edges and flush
+        absolutely positioned layer per slide behind everything, and the grid
+        on top. There is no full-frame scrim: each text block carries its own
+        blurred one, so the photograph stays visible around them. Full bleed to the viewport edges and flush
         with the ticker above — no inset, no radius, no gap.
     --}}
     {{-- One slide: the headline names the section. Several: the group's own
          label does, because aria-labelledby keeps resolving to slide one's
          headline after the reader has moved to slide three. --}}
-    {{-- data-ground says what is behind the text: the illustrative backdrop
-         (slide one, dark and composed for it — wide scrim bands) or an
-         article's own photograph (bright daylight — local scrims behind each
-         text block only, so the photograph stays visible around them). --}}
     {{-- `overflow-clip`, not `-hidden`: the scrims reach past the stage (427px
          of content in a 375px box on a photo slide), and a hidden overflow is
          still a scroll container — a focus move or a find-in-page can scroll
          the whole slide sideways. A clipped one cannot be scrolled at all. --}}
     <section class="full-bleed relative isolate overflow-clip" @if ($count === 1) aria-labelledby="big-story-heading" @endif
-             data-ground="{{ $backdrop ? 'backdrop' : 'photo' }}"
              @if ($count > 1)
                  x-data="{ i: 0, n: {{ $count }}, go(d) { this.i = (this.i + d + this.n) % this.n } }"
-                 :data-ground="i === 0 && {{ $backdrop ? 'true' : 'false' }} ? 'backdrop' : 'photo'"
                  role="group" aria-roledescription="عرض متتابع" aria-label="{{ $section['title'] }}"
              @endif>
         @foreach ($slides as $k => $slide)
@@ -116,7 +107,6 @@
             </div>
         @endforeach
 
-        <div class="hero-scrim absolute inset-0 z-0" aria-hidden="true"></div>
         <div class="hero-seam absolute inset-x-0 top-0 z-0 h-16" aria-hidden="true"></div>
 
         {{-- Everything readable sits on the page's own grid, so the headline
@@ -231,9 +221,6 @@
                  a later media query at equal specificity and would otherwise
                  reset the bottom to 36px from 640px up. Do not tidy it away. --}}
             <div @class(['relative flex flex-col justify-center p-7 pt-5 text-cream sm:p-9', 'pb-24 sm:pb-24 xl:pb-9' => $count > 1])>
-                {{-- Local, and only as wide as this column: the frame is not
-                     tinted to rescue three lines of text. --}}
-                <span class="steps-scrim pointer-events-none absolute" aria-hidden="true"></span>
                 <div class="relative grid">
                     <span class="questions-scrim pointer-events-none absolute z-0" aria-hidden="true"></span>
                 @foreach ($slides as $k => $slide)

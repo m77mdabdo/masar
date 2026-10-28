@@ -177,13 +177,14 @@ it('keeps the photograph as the section background and the columns transparent',
         }
     }
 
-    // Three image layers, then the scrim, then the seam fade, then the grid —
-    // all siblings of the section, none of them wrapping the type.
-    expect($children)->toHaveCount(6)
+    // Three image layers, then the seam fade, then the grid — all siblings
+    // of the section, none of them wrapping the type. No full-frame scrim:
+    // the dark lives behind each text block (owner's ruling, 2026-10-28).
+    expect($children)->toHaveCount(5)
         ->and($children[0])->toContain('absolute inset-0')
-        ->and($children[3])->toContain('hero-scrim')
-        ->and($children[4])->toContain('hero-seam')
-        ->and($children[5])->toContain('grid');
+        ->and($children[3])->toContain('hero-seam')
+        ->and($children[4])->toContain('grid')
+        ->and(implode(' ', $children))->not->toContain('hero-scrim');
 
     foreach ($xpath->query('//section/div[contains(@class,"grid")]/div') as $column) {
         expect($column->getAttribute('class'))->not->toMatch('/\bbg-/');
@@ -288,32 +289,24 @@ it('keeps every slide in the layout so turning the carousel cannot change the he
         ->and($text[0][0])->not->toContain('style="visibility:hidden"');
 });
 
-it('tells the stylesheet which ground is behind the text, slide by slide', function (): void {
-    // The backdrop slide keeps the wide scrim bands; article photographs get
-    // local scrims behind each text block. `data-ground` is the switch, and
-    // Alpine moves it with the carousel.
+it('darkens only behind the text, on every slide', function (): void {
+    // No band on either side and no switch between slides: one blurred field
+    // per text block, under the text, never over it.
     $slides = collect(range(1, 3))->map(fn (): Article => Article::factory()->withHeroImage()->create());
-    $render = fn ($backdrop): string => view('components.home.big-story', [
+    $html = view('components.home.big-story', [
         'section' => ['title' => 'القصة الكبرى', 'items' => $slides],
-        'backdrop' => $backdrop,
+        'backdrop' => illustrativeMedia(),
         'attributes' => new ComponentAttributeBag,
     ])->render();
 
-    $withBackdrop = $render(illustrativeMedia());
-    $without = $render(null);
-
-    expect($withBackdrop)->toContain('data-ground="backdrop"')
-        ->toContain(":data-ground=\"i === 0 && true ? 'backdrop' : 'photo'\"")
-        ->toContain('class="text-scrim')
-        ->toContain('class="questions-scrim')
-        ->toContain('kicker-scrim')
+    expect($html)->not->toContain('hero-scrim')
+        ->not->toContain('steps-scrim')
+        ->not->toContain('data-ground')
         // The scrims reach 5rem past their block; under the text, never over it.
         ->toContain('class="text-scrim pointer-events-none absolute z-0"')
         ->toContain('class="questions-scrim pointer-events-none absolute z-0"')
         ->toContain('class="kicker-scrim relative isolate z-[1]')
-        ->toMatch('/<ol class="relative z-\[1\] [^"]*\[grid-area:1\/1\]/')
-        ->and($without)->toContain('data-ground="photo"')
-        ->toContain(":data-ground=\"i === 0 && false ? 'backdrop' : 'photo'\"");
+        ->toMatch('/<ol class="relative z-\\[1\\] [^"]*\\[grid-area:1\\/1\\]/');
 });
 
 it('clips the hero rather than hiding its overflow', function (): void {
@@ -329,4 +322,27 @@ it('clips the hero rather than hiding its overflow', function (): void {
 
     expect($html)->toMatch('/<section class="full-bleed relative isolate overflow-clip"/')
         ->not->toMatch('/<section class="[^"]*overflow-hidden/');
+});
+
+it('keeps the text halo off clamped text, where it would be cut into a box', function (): void {
+    // line-clamp clips its own box, so a text-shadow on clamped text is drawn
+    // as a hard-edged dark rectangle. The stylesheet exempts anything whose
+    // class names a clamp; this pins both halves of that contract.
+    $css = file_get_contents(resource_path('css/app.css'));
+
+    expect($css)->toMatch("/\\.text-scrim ~ div \\[class\\*='line-clamp'\\],\\s*\\.questions-scrim ~ ol \\[class\\*='line-clamp'\\]\\s*\\{\\s*text-shadow: none;/");
+
+    $slides = collect(range(1, 3))->map(fn (): Article => Article::factory()->withHeroImage()->create());
+    $html = view('components.home.big-story', [
+        'section' => ['title' => 'القصة الكبرى', 'items' => $slides],
+        'backdrop' => illustrativeMedia(),
+        'attributes' => new ComponentAttributeBag,
+    ])->render();
+
+    // Every clamp in the hero is spelled as a line-clamp utility, so the
+    // attribute selector above reaches it. A clamp written any other way
+    // (a custom class, an inline style) would get the halo back.
+    expect($html)->not->toContain('-webkit-line-clamp')
+        ->and(substr_count($html, 'line-clamp-4'))->toBe(3)
+        ->and(substr_count($html, 'line-clamp-3'))->toBeGreaterThanOrEqual(9);
 });

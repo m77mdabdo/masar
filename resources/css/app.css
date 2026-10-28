@@ -231,109 +231,77 @@
     }
 
     /*
-     * The questions column at lg and up has no band of its own any more: the
-     * full-height 0.93 band hid the photograph behind all three questions
-     * (32% of its brightness left at 1440). `.questions-scrim` below does the
-     * work on every slide there. `.steps-scrim` survives only below lg, on
-     * the backdrop slide.
-     */
-
-    /*
-     * Below lg the stage is one column and the type runs the full width, so it
-     * passes straight through the horizontal gradient's clear window. Measured
-     * at 400px before this existed: the headline sat at 1.39:1 and the step
-     * text at 1.02:1. A flat wash is the honest shape for a layout with no
-     * empty side to leave alone.
-     *
-     * The questions block, stacked under the headline, fades in from its top
-     * edge rather than starting at full strength: a horizontal gradient there
-     * drew a hard line across the photograph.
+     * Below lg the article hero is one column and the type runs the full
+     * width, so it passes straight through the horizontal gradient's clear
+     * window. Measured at 400px before this existed: the headline sat at
+     * 1.39:1. A flat wash is the honest shape for a layout with no empty side
+     * to leave alone. (The homepage hero no longer uses `.hero-scrim`; see
+     * the local scrims below.)
      */
     @media (width < 64rem) {
         .hero-scrim,
         [dir='ltr'] .hero-scrim {
             background-image: none;
             /* 84%: the mint closing word measured 3.80:1 at 78% on the two
-               daylight article photographs (slides two and three). */
+               daylight article photographs. */
             background-color: color-mix(in srgb, var(--color-g-950) 84%, transparent);
-        }
-
-        /*
-         * Light overall, dark only where the numerals are. Stacked on the flat
-         * wash above, a uniform 0.55 left the lower half of the photograph 3.3×
-         * darker than the upper; a uniform 0.28 restored it but put the
-         * numerals — gold/85, at the start edge — at 3.85:1. So: a 0.22 wash
-         * everywhere, a 0.6 strip under the numerals' column fading out by
-         * 10rem, and a mask that fades the whole layer in from the top so the
-         * block has no hard upper edge. (0.6, not 0.5, once the layer turned
-         * green: green is lighter than black for the same opacity.)
-         */
-        .steps-scrim {
-            inset: 0;
-            background-image:
-                linear-gradient(270deg, rgb(0 29 23 / 0.60) 0, rgb(0 29 23 / 0.60) 6.5rem, transparent 10rem),
-                linear-gradient(rgb(0 29 23 / 0.22), rgb(0 29 23 / 0.22));
-            -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 1.25rem);
-            mask-image: linear-gradient(180deg, transparent 0, #000 1.25rem);
-        }
-
-        [dir='ltr'] .steps-scrim {
-            inset: 0;
-            background-image:
-                linear-gradient(90deg, rgb(0 29 23 / 0.60) 0, rgb(0 29 23 / 0.60) 6.5rem, transparent 10rem),
-                linear-gradient(rgb(0 29 23 / 0.22), rgb(0 29 23 / 0.22));
         }
     }
 
     /*
-     * Article photographs: local scrims, not bands.
+     * The homepage hero: no bands, on any slide. The dark sits only behind
+     * each block of text — kicker, headline group, questions — as a box
+     * softened with a Gaussian blur, which has no edge to see. Text sits at
+     * least 2σ (5rem) inside each box. The short unclamped lines (kicker,
+     * byline, labels, numerals, button) carry a close halo (`text-shadow`).
+     * Clamped text does not: `line-clamp` clips its own box, and a clipped
+     * halo is a visible dark rectangle behind the headline, the standfirst and
+     * every answer.
      *
-     * Slides two and three show an article's own daylight photograph, and the
-     * full-height bands the backdrop slide uses left them as two heavy green
-     * curtains with a visible line where each fade ended (measured: 0.86 L*
-     * per px at the questions band's inner edge, a kink of 0.77). Here the dark
-     * sits only behind each block of text — kicker, headline group, questions —
-     * as a box softened with a Gaussian blur, which has no edge to see: its
-     * falloff has no kink anywhere. Text sits at least 2σ (5rem) inside each
-     * box, so it lands on ≥ 97.7% of the box's opacity. The opacities are the
-     * contrast gate's, measured on these photographs.
-     *
-     * The backdrop slide keeps its bands: `data-ground` on the section says
-     * which ground is showing.
+     * Owner's ruling, 2026-10-28: the full-height bands on both sides went.
+     * The right band held the headline column of slide one at 55% of the
+     * photograph's brightness at 1440; the left one held the questions at 32%.
+     * Every lighter option was measured on all three slides at 375 / 768 /
+     * 1440, and the opacities below are the lightest that keep every element
+     * at 4.5:1.
+     * - Headline group: 0.85. Without a halo on the headline, 0.80 put the
+     *   mint closing word at 4.13. With text-shadow alone the headline
+     *   measured 1.0–1.7.
+     * - Questions: 0.90 where the numerals sit, easing to 0.70 under the
+     *   text. 0.65 flat put a numeral at 2.50.
+     * Behind the headline column the photograph now keeps ~71% of its
+     * brightness at 1440, and ~60% behind the questions.
      */
     .text-scrim,
     .questions-scrim {
-        display: none;
-    }
-
-    [data-ground='photo'] .hero-scrim,
-    [data-ground='photo'] .steps-scrim {
-        background: none;
-    }
-
-    [data-ground='photo'] .text-scrim,
-    [data-ground='photo'] .questions-scrim {
         display: block;
         filter: blur(2.5rem);
     }
 
-    /*
-     * The questions: dark where the numerals are, light under the text.
-     * One flat 0.93–0.95 field was the gold numerals' requirement imposed on
-     * the white text, which needs far less. The 0.90 runs 9rem in from the
-     * box's start edge, covering the numeral column. It eases to 0.62 by
-     * 12rem, and the blur makes the step invisible. The text holds its 4.5:1
-     * with a close halo (`text-shadow`) instead of a darker field.
-     * Measured over all three slides at 375 / 768 / 1440: text ≥ 4.56,
-     * numerals ≥ 5.29. Behind the column the photograph keeps 61–64% of
-     * its brightness at 1440, against 32–51% under the flat field. Lighter
-     * fields were tried and fail: 0.65 flat put a numeral at 2.50 and 0.55
-     * put the step text at 3.62. Text-shadow alone measured 1.0–1.7 on the
-     * daylight photographs.
-     */
+    .text-scrim {
+        /* The headline group's width: the wider of the standfirst and the
+           headline's 14ch, as in --scrim-edge. Runs off the start edge, where
+           the section clips it. */
+        --text-w: max(26rem, 9.1 * clamp(2rem, 3.33vw, 3rem));
+        inset-block: -5rem;
+        inset-inline-start: -20rem;
+        inline-size: calc(var(--text-w) + 25rem);
+        background-color: rgb(0 29 23 / 0.85);
+    }
+
+    .kicker-scrim::before {
+        content: '';
+        position: absolute;
+        z-index: -1;
+        inset-block: -3rem;
+        inset-inline: -10rem -4rem;
+        background-color: rgb(0 29 23 / 0.65);
+        filter: blur(2rem);
+    }
+
     .questions-scrim {
         --q-num: rgb(0 29 23 / 0.90);
-        --q-text: rgb(0 29 23 / 0.62);
+        --q-text: rgb(0 29 23 / 0.70);
         inset-block: -5rem;
         inset-inline-start: -5rem;
         inset-inline-end: -12rem;
@@ -344,55 +312,25 @@
         background-image: linear-gradient(90deg, var(--q-num) 0, var(--q-num) 9rem, var(--q-text) 12rem);
     }
 
-    [data-ground='photo'] .questions-scrim ~ ol {
+    .kicker-scrim,
+    .text-scrim ~ div,
+    .questions-scrim ~ ol {
         text-shadow: 0 0 2px rgb(0 29 23), 0 0 4px rgb(0 29 23), 0 0 8px rgb(0 29 23 / 0.95), 0 0 16px rgb(0 29 23 / 0.85), 0 0 28px rgb(0 29 23 / 0.6);
     }
 
-    @media (width >= 64rem) {
-        .questions-scrim {
-            display: block;
-            filter: blur(2.5rem);
-        }
-
-        .questions-scrim ~ ol {
-            text-shadow: 0 0 2px rgb(0 29 23), 0 0 4px rgb(0 29 23), 0 0 8px rgb(0 29 23 / 0.95), 0 0 16px rgb(0 29 23 / 0.85), 0 0 28px rgb(0 29 23 / 0.6);
-        }
-    }
-
-    [data-ground='photo'] .text-scrim {
-        /* The headline group's width: the wider of the standfirst and the
-           headline's 14ch, as in --scrim-edge. Runs off the start edge, where
-           the section clips it. */
-        --text-w: max(26rem, 9.1 * clamp(2rem, 3.33vw, 3rem));
-        inset-block: -5rem;
-        inset-inline-start: -20rem;
-        inline-size: calc(var(--text-w) + 25rem);
-        background-color: rgb(0 29 23 / 0.86);
-    }
-
-    [data-ground='photo'] .kicker-scrim::before {
-        content: '';
-        position: absolute;
-        z-index: -1;
-        inset-block: -3rem;
-        inset-inline: -10rem -4rem;
-        background-color: rgb(0 29 23 / 0.80);
-        filter: blur(2rem);
+    .text-scrim ~ div [class*='line-clamp'],
+    .questions-scrim ~ ol [class*='line-clamp'] {
+        text-shadow: none;
     }
 
     @media (width < 64rem) {
-        /* One column: the headline group is the column's full width. On a
-           phone the text covers almost the whole stage, so there is little
-           photograph left to clear; both measured alternatives were worse.
-           A tighter blur steepened the edges (0.83 L-star per px) and put the
-           numerals at 4.25:1 at 768; a lighter headline scrim (0.80) put the
-           mint word at 4.13:1. Each bought one or two points of middle. */
-        [data-ground='photo'] .text-scrim {
+        /* One column: the headline group is the column's full width. */
+        .text-scrim {
             inline-size: auto;
             inset-inline-end: -5rem;
         }
 
-        [data-ground='photo'] .questions-scrim {
+        .questions-scrim {
             inset-inline-end: -5rem;
         }
     }
