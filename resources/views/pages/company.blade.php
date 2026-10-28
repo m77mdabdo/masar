@@ -22,7 +22,7 @@
                     @if ($company->ticker)<span class="ltr-isolate nums-tabular">{{ $company->ticker }}</span>@endif
                 </div>
                 @if ($company->translate('description'))
-                    <p class="mt-3 max-w-2xl leading-relaxed text-ink-3">{{ $company->translate('description') }}</p>
+                    <p class="mt-3 max-w-2xl leading-relaxed text-ink-3"><x-ui.bidi :text="$company->translate('description')" /></p>
                 @endif
             </div>
         </header>
@@ -46,7 +46,7 @@
                     @foreach ($facts as $label => $value)
                         <div>
                             <dt class="text-[0.7rem] uppercase tracking-[0.08em] text-ink-3">{{ $label }}</dt>
-                            <dd class="mt-1 font-display text-base text-g-950"><bdi class="nums-tabular">{{ $value }}</bdi></dd>
+                            <dd class="mt-1 font-display text-base text-g-950"><span class="nums-tabular"><x-ui.bidi :text="$value" /></span></dd>
                         </div>
                     @endforeach
                 </dl>

@@ -12,7 +12,7 @@
                          someone real. The page says so before anything else. --}}
                     <p class="mt-2"><x-ui.badge tone="gold">{{ __('pages.person.fictional') }}</x-ui.badge></p>
                 @endif
-                <p class="mt-1 text-ink-3">{{ $person->translate('title') }}</p>
+                <p class="mt-1 text-ink-3"><x-ui.bidi :text="$person->translate('title')" /></p>
                 @if ($person->company?->name)
                     <a href="{{ app(App\Support\EntityUrl::class)->for($person->company) }}" class="mt-1 inline-block text-sm text-g-700 hover:underline">
                         {{ $person->company->displayName() }}

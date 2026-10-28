@@ -10,6 +10,6 @@
     @endif
     <div class="min-w-0">
         <div class="truncate font-display text-sm font-medium text-g-950">{{ $person->displayName() }}</div>
-        <div class="truncate text-xs text-ink-3">{{ $person->translate('title') }}</div>
+        <div class="truncate text-xs text-ink-3"><x-ui.bidi :text="$person->translate('title')" /></div>
     </div>
 </a>

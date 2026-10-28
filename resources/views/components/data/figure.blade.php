@@ -5,7 +5,7 @@
     // a hard direction:ltr reverses the second kind.
     $sizes = ['sm' => 'text-sm', 'md' => 'text-lg', 'lg' => 'text-2xl'][$size];
 @endphp
-<span {{ $attributes->class(['inline-flex items-baseline gap-2']) }}>
+<span {{ $attributes->class(['inline-flex flex-wrap items-baseline gap-x-2']) }}>
     <bdi class="nums-tabular font-display font-semibold {{ $sizes }}">{{ $value }}</bdi>
 
     @if ($change !== null)
