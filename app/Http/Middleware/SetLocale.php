@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Support\Locales;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,18 +18,16 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * site would serve Arabic content under a URL that claims to be something else —
  * which search engines index and never forget.
  *
- * A locale that exists but is disabled 404s too: `en` is architected from day
- * one and has no content yet, so serving an empty English site would be worse
- * than serving none.
+ * A locale that exists but is disabled 404s too: an edition is switched on
+ * when it can be served honestly, and an empty one is worse than none.
  */
 class SetLocale
 {
     public function handle(Request $request, Closure $next): Response
     {
         $locale = (string) $request->route('locale');
-        $locales = (array) config('masar.locales');
 
-        if (! array_key_exists($locale, $locales) || ! ($locales[$locale]['enabled'] ?? false)) {
+        if (! Locales::isEnabled($locale)) {
             throw new NotFoundHttpException("Unknown locale [{$locale}].");
         }
 
@@ -38,7 +37,9 @@ class SetLocale
         // here keeps templates from re-reading config on each partial.
         view()->share([
             'locale' => $locale,
-            'direction' => $locales[$locale]['dir'] ?? 'rtl',
+            'localeTag' => Locales::tag($locale),
+            'direction' => Locales::dir($locale),
+            'script' => Locales::script($locale),
         ]);
 
         return $next($request);

@@ -28,7 +28,7 @@
     [$heading, $body, $retry] = $copy[$code][$locale] ?? $copy[$code]['ar'];
 @endphp
 <!DOCTYPE html>
-<html lang="{{ $locale }}" dir="{{ $direction }}">
+<html lang="{{ \App\Support\Locales::tag($locale) }}" dir="{{ $direction }}" data-script="{{ \App\Support\Locales::script($locale) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">

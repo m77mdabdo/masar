@@ -104,5 +104,5 @@ it('isolates latin runs inside arabic text', function (): void {
 });
 
 it('declares the document direction and language', function (): void {
-    $this->get('/ar')->assertOk()->assertSee('<html lang="ar" dir="rtl">', false);
+    $this->get('/ar')->assertOk()->assertSee('<html lang="ar" dir="rtl" data-script="arabic">', false);
 });

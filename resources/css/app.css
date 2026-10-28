@@ -91,6 +91,66 @@
         -webkit-font-smoothing: antialiased;
     }
 
+    /*
+     * Type per writing system, keyed on <html data-script> (config
+     * `masar.locales.*.script`). The brand faces cover Arabic and Latin only.
+     * The other three scripts use the reader's own system face, by the
+     * owner's ruling (2026-10-28) that nothing is fetched from outside: every
+     * platform ships one that shapes its script correctly, and a webfont for
+     * Han alone is megabytes.
+     *
+     * Latin keeps the brand faces, whose Latin glyphs are what the masthead
+     * already sets. Each stack ends in the brand face so digits and Latin
+     * names inside other scripts stay in the house style.
+     *
+     * Urdu is Nastaliq, not naskh. Its descenders fall far below the line, so
+     * it needs much looser leading; at Arabic's 1.95 the lines collide.
+     */
+    html[data-script='nastaliq'] {
+        --font-sans: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Urdu Typesetting', 'IBM Plex Sans Arabic', serif;
+        --font-display: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Urdu Typesetting', 'Readex Pro', serif;
+    }
+
+    html[data-script='devanagari'] {
+        --font-sans: 'Kohinoor Devanagari', 'Noto Sans Devanagari', 'Nirmala UI', 'Mangal', 'IBM Plex Sans Arabic', sans-serif;
+        --font-display: 'Kohinoor Devanagari', 'Noto Sans Devanagari', 'Nirmala UI', 'Mangal', 'Readex Pro', sans-serif;
+    }
+
+    html[data-script='han'] {
+        --font-sans: 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans SC', 'Source Han Sans SC', 'Microsoft YaHei', 'IBM Plex Sans Arabic', sans-serif;
+        --font-display: 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans SC', 'Source Han Sans SC', 'Microsoft YaHei', 'Readex Pro', sans-serif;
+    }
+
+    html[data-script='latin'] body {
+        line-height: 1.7;
+    }
+
+    html[data-script='devanagari'] body {
+        line-height: 1.85;
+    }
+
+    html[data-script='nastaliq'] body {
+        line-height: 2.4;
+    }
+
+    /* Han wraps between any two characters; `strict` keeps closing
+       punctuation off the start of a line. Headings set no negative
+       tracking: there is no inter-letter space in Han to tighten. */
+    html[data-script='han'] body {
+        line-height: 1.8;
+        line-break: strict;
+    }
+
+    html[data-script='han'] :is(h1, h2, h3, h4, .font-display),
+    html[data-script='devanagari'] :is(h1, h2, h3, h4, .font-display) {
+        letter-spacing: 0;
+    }
+
+    html[data-script='nastaliq'] :is(h1, h2, h3, h4, .font-display) {
+        letter-spacing: 0;
+        line-height: 1.9;
+    }
+
     h1, h2, h3, h4, .font-display {
         font-family: var(--font-display);
         line-height: 1.4;

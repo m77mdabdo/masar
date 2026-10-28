@@ -14,7 +14,7 @@
 ])
 @php
     $locale = app()->getLocale();
-    $direction = config("masar.locales.{$locale}.dir", 'rtl');
+    $direction = \App\Support\Locales::dir($locale);
     $siteName = setting('identity.site_name');
     $pageTitle = $title
         ? str_replace(':title', $title, (string) setting('seo.title_template'))
@@ -22,7 +22,7 @@
     $ogImage = $image ?? setting('identity.og_image_path');
 @endphp
 <!DOCTYPE html>
-<html lang="{{ $locale }}" dir="{{ $direction }}">
+<html lang="{{ \App\Support\Locales::tag($locale) }}" dir="{{ $direction }}" data-script="{{ \App\Support\Locales::script($locale) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -90,8 +90,13 @@
          `optional`: a face that misses its 100ms window is dropped for the whole
          visit, and the preload is what gets it inside that window. Measured —
          removing it cost ~200ms of FCP and bought nothing back on LCP or CLS. --}}
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/readex-pro-600-arabic.woff2" crossorigin>
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-sans-arabic-400-arabic.woff2" crossorigin>
+    {{-- The subset preloaded is the one this edition's text is set in. Only
+         Arabic uses the Arabic subset; every other edition sets its Latin in
+         the brand faces and its own script in a system face, so preloading the
+         Arabic file there would spend the window on glyphs no line uses. --}}
+    @php($subset = \App\Support\Locales::script($locale) === 'arabic' ? 'arabic' : 'latin')
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/readex-pro-600-{{ $subset }}.woff2" crossorigin>
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-sans-arabic-400-{{ $subset }}.woff2" crossorigin>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 

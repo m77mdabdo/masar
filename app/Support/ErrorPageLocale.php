@@ -20,9 +20,7 @@ final class ErrorPageLocale
     public static function apply(Request $request): string
     {
         $segment = (string) $request->segment(1);
-        $locale = array_key_exists($segment, (array) config('masar.locales'))
-            ? $segment
-            : (string) config('masar.default_locale', 'ar');
+        $locale = Locales::exists($segment) ? $segment : Locales::default();
 
         app()->setLocale($locale);
 
@@ -31,6 +29,6 @@ final class ErrorPageLocale
 
     public static function direction(string $locale): string
     {
-        return (string) config("masar.locales.{$locale}.dir", 'rtl');
+        return Locales::dir($locale);
     }
 }

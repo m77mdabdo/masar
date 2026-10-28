@@ -54,3 +54,52 @@ it('emits hreflang for enabled locales plus x-default', function (): void {
         ->assertSee('hreflang="ar"', false)
         ->assertSee('hreflang="x-default"', false);
 });
+
+// ---- Six editions (owner's ruling, 2026-10-28) ------------------------------
+
+it('registers all six editions with a distinct URL code and BCP 47 tag', function (): void {
+    expect(\App\Support\Locales::codes())->toBe(['ar', 'en', 'fr', 'hi', 'ur-pk', 'zh-hans'])
+        ->and(array_map(\App\Support\Locales::tag(...), \App\Support\Locales::codes()))
+        ->toBe(['ar', 'en', 'fr', 'hi', 'ur-PK', 'zh-Hans']);
+});
+
+it('runs Arabic and Urdu right to left and the other four left to right', function (): void {
+    $rtl = array_values(array_filter(\App\Support\Locales::codes(), fn (string $c): bool => \App\Support\Locales::dir($c) === 'rtl'));
+
+    expect($rtl)->toBe(['ar', 'ur-pk']);
+});
+
+it('sets Urdu in Nastaliq, not in the Arabic naskh face', function (): void {
+    // Same Unicode block, a different writing tradition. Hindi is not a
+    // substitute for Urdu either: a different script entirely.
+    expect(\App\Support\Locales::script('ur-pk'))->toBe('nastaliq')
+        ->and(\App\Support\Locales::script('ar'))->toBe('arabic')
+        ->and(\App\Support\Locales::script('hi'))->toBe('devanagari');
+});
+
+it('maps any spelling of a browser tag back to the URL code', function (string $tag, ?string $code): void {
+    expect(\App\Support\Locales::fromTag($tag))->toBe($code);
+})->with([
+    ['ur_PK', 'ur-pk'], ['UR-pk', 'ur-pk'], ['zh-Hans', 'zh-hans'], ['zh_Hans', 'zh-hans'], ['fr', 'fr'], ['de', null],
+]);
+
+it('serves an enabled multi-part edition under its lowercase segment, with the BCP 47 tag in <html lang>', function (): void {
+    config()->set('masar.locales.ur-pk.enabled', true);
+
+    $this->get('/ur-pk')
+        ->assertOk()
+        ->assertSee('<html lang="ur-PK" dir="rtl" data-script="nastaliq">', false);
+});
+
+it('negotiates the root redirect on BCP 47 tags', function (): void {
+    config()->set('masar.locales.zh-hans.enabled', true);
+
+    $this->get('/', ['Accept-Language' => 'zh-Hans,zh;q=0.9'])
+        ->assertRedirect(route('web.home', 'zh-hans'));
+});
+
+it('stores a locale longer than two characters', function (): void {
+    $article = \App\Models\Article::factory()->create(['locale' => 'zh-hans']);
+
+    expect($article->fresh()->locale)->toBe('zh-hans');
+});

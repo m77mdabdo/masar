@@ -8,14 +8,30 @@ return [
     |--------------------------------------------------------------------------
     | Locales
     |--------------------------------------------------------------------------
-    | Arabic launches. English is architected from day one but disabled until
-    | content exists — `enabled` gates the public locale switcher and routing,
-    | not the schema, which is bilingual already.
+    | Six editions (owner's ruling, 2026-10-28). The key is the URL segment and
+    | the value stored in every `locale` column, so it is lowercase and never
+    | changes: `/ur-pk/…`, `/zh-hans/…`. `tag` is the BCP 47 form that goes in
+    | `<html lang>`, hreflang and Open Graph — `ur-PK`, `zh-Hans`. The two are
+    | different strings on purpose; mixing them up is the bug where hreflang
+    | advertises a code no crawler recognises.
+    |
+    | `script` selects the type stack (`resources/css/app.css`, `[data-script]`).
+    | Urdu is Nastaliq, not Arabic naskh: same block of Unicode, a different
+    | writing tradition, and a reader in Pakistan reads naskh as foreign.
+    |
+    | `enabled` gates routing, the switcher, the sitemap and the root redirect.
+    | An edition is switched on when its interface is translated and the
+    | fallback policy can serve it honestly, not before: an empty edition is
+    | worse than none.
     */
 
     'locales' => [
-        'ar' => ['name' => 'العربية', 'dir' => 'rtl', 'enabled' => true],
-        'en' => ['name' => 'English', 'dir' => 'ltr', 'enabled' => false],
+        'ar' => ['name' => 'العربية', 'tag' => 'ar', 'dir' => 'rtl', 'script' => 'arabic', 'enabled' => true],
+        'en' => ['name' => 'English', 'tag' => 'en', 'dir' => 'ltr', 'script' => 'latin', 'enabled' => false],
+        'fr' => ['name' => 'Français', 'tag' => 'fr', 'dir' => 'ltr', 'script' => 'latin', 'enabled' => false],
+        'hi' => ['name' => 'हिन्दी', 'tag' => 'hi', 'dir' => 'ltr', 'script' => 'devanagari', 'enabled' => false],
+        'ur-pk' => ['name' => 'اردو', 'tag' => 'ur-PK', 'dir' => 'rtl', 'script' => 'nastaliq', 'enabled' => false],
+        'zh-hans' => ['name' => '简体中文', 'tag' => 'zh-Hans', 'dir' => 'ltr', 'script' => 'han', 'enabled' => false],
     ],
 
     'default_locale' => 'ar',

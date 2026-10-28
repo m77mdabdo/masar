@@ -42,7 +42,7 @@ say so explicitly and wait — do not silently implement an alternative.
 | Area | Decision |
 |---|---|
 | Geographic focus | Saudi Arabia primary; Gulf secondary; global coverage only when it affects the Saudi market |
-| Launch language | Arabic (`ar`). English (`en`) architected from day one, content added later |
+| Languages | **Six editions** (owner's ruling, 2026-10-28, superseding "Arabic at launch, English later"): `ar` · `en` · `fr` · `hi` · `ur-pk` · `zh-hans`. The code is the URL segment and the stored `locale` value; the BCP 47 tag (`ur-PK`, `zh-Hans`) goes in `<html lang>` and hreflang. `App\Support\Locales` is the only reader of `config('masar.locales')`. Arabic and Urdu run RTL; Urdu is Nastaliq, never naskh, and never Hindi. An edition's `enabled` flag goes on when its interface is translated and the fallback policy can serve it honestly. **Machine translation produces drafts, never publications:** a translated article enters the same workflow, fact-check stage and publish gate as one a person wrote. No outside translation service is used (owner's ruling): the provider seam ships with a null driver. |
 | URL strategy | Locale prefix always: `/ar/...`, `/en/...`. No unprefixed routes except a redirect at `/` |
 | Slugs | Transliterated Latin, never URL-encoded Arabic. `/ar/saudi/foreign-property-ownership`. A slug is an **editorial decision** — the system suggests a transliteration, the editor may override. No auto-slugging package. |
 | Public site | **Blade + Tailwind + Alpine.js**. Server-rendered. No SPA, no Inertia, no Node SSR |
@@ -56,7 +56,7 @@ say so explicitly and wait — do not silently implement an alternative.
 | Timezone | `Asia/Riyadh` |
 | Currency | SAR primary, USD secondary |
 | Numerals | Western Arabic numerals (0-9), never Eastern Arabic-Indic (٠-٩) |
-| Fonts | Readex Pro (display) + IBM Plex Sans Arabic (body), self-hosted, subset |
+| Fonts | Readex Pro (display) + IBM Plex Sans Arabic (body), self-hosted, subset, for Arabic and Latin. Nastaliq, Devanagari and Han use the reader's system face by script (`html[data-script]` in `app.css`); nothing is fetched from outside (owner's ruling, 2026-10-28). |
 | Reader accounts | Deferred and **not scaffolded**. There is no `reader` guard in `config/auth.php` — this row previously claimed one existed, and an audit found it did not. When reader accounts are built, the guard is the first thing to add |
 | Testing | Pest |
 

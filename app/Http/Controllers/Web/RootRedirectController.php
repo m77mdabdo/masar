@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Web;
 
+use App\Support\Locales;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -16,15 +17,13 @@ class RootRedirectController
 {
     public function __invoke(Request $request): RedirectResponse
     {
-        $enabled = collect(config('masar.locales'))
-            ->filter(fn (array $locale): bool => $locale['enabled'] ?? false)
-            ->keys()
-            ->all();
-
-        $preferred = $request->getPreferredLanguage($enabled);
+        // Negotiated on BCP 47 tags, which is what browsers send: `ur-pk` is
+        // our URL segment, `ur-PK` is what a phone in Lahore asks for.
+        $tags = array_map(Locales::tag(...), Locales::enabled());
+        $preferred = $request->getPreferredLanguage($tags);
 
         return redirect()->route('web.home', [
-            'locale' => $preferred ?: config('masar.default_locale'),
+            'locale' => ($preferred !== null ? Locales::fromTag($preferred) : null) ?? Locales::default(),
         ], 302);
     }
 }
