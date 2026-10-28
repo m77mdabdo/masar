@@ -309,3 +309,57 @@ scope and untouched.
   the 1024 numeral fix.
 - Suite 962 passed. `masar:decay`: queue ok, all seven flows ok or SKIP as before,
   6 public forms addressed — no decay found.
+
+## Slimmer chrome, taller hero (2026-10-28)
+
+Brief: a thinner navbar and header, and a clearly taller hero so the Riyadh image
+takes more of the screen. Same design, same order, no bar removed, no autoplay,
+and no change to the database, articles or images.
+
+- **Chrome** (desktop, measured box including its hairline). Topbar 49 → **37**:
+  the row is 36px (`h-9`). Masthead 79 → **65**: the bar is 64px (`h-16`), and
+  the mega-menu links match it so the active underline stays on the bottom edge.
+  The wordmark keeps its 38px size. Ticker 72 → **62**: the cells went from 54 to
+  44px (`h-11`), and the as-of line is unchanged. On mobile the same cells take
+  the ticker from 180 to 150px. The drawer opens at 375, 1024 and 1440 with all
+  7 links. The menu currently has no mega items, so there was no dropdown to check.
+- **Hero.** `clamp(32rem, min(max(36.25rem, 13.5rem + 35vw), 100svh − 11rem), 53.75rem)`.
+
+  | viewport | before | after |
+  |---|---|---|
+  | 1024×768 | 527 | **580** |
+  | 1280×800 | 560 | **624** |
+  | 1440×900 | 630 | **720** |
+  | 1920×1080 | 840 | **860** |
+
+  - **Why 1280×800 is 624, not ~650.** The fold guard holds it there. At 650 the
+    "اقرأ القصة كاملة" button would end below an 800px screen. A taller 1280
+    screen gets 660.
+  - **Phone and tablet.** The hero stays content-height, as before: 796 / 770 / 738.
+  - **The image.** Every slide stays `object-fit: cover`, with no transform and
+    no gaps. Because the stage is now taller than the backdrops' 2.28:1, `cover`
+    trims the sides rather than the sky. The existing per-image `object-position`
+    already frames the tower in full, so none was changed.
+- **What did not move.**
+  - Headline on the right, questions and gold numerals on the left, read button
+    bottom-right, slider controls bottom-left, at every width.
+  - One height per width across all three slides.
+  - No overlap and no horizontal overflow at 375, 430, 768, 1024, 1280, 1440 or
+    1920.
+  - The gradients are the same scrims as before; only the stage under them grew.
+- **The trade.** At 1440×900 the stage now fills the screen to the bottom edge, so
+  the "استكشف مسار" peek below the hero is gone at that size. The read button stays
+  on screen at every measured viewport: bottom edge 741 / 785 / 881 / 1021 against
+  folds of 768 / 800 / 900 / 1080.
+- **Contrast** (re-measured for both backdrops and all three slides, line-box
+  method). Every text element is ≥ 4.5:1. The tightest is a numeral at 1024 on a
+  photo slide: 4.58, down from 4.64. Both tables in CLAUDE.md §2 now hold the
+  2026-10-28 figures.
+- **Not touched.** `errors/standalone.blade.php` has its own copy of the 78px bar.
+  It is the static error page, which renders outside the layout, and it is out of
+  scope here.
+- Screenshots: `tasks/screenshots/hero-taller/{before,after}/`, three slides × seven
+  widths, viewport captures with the chrome, plus `chrome.json`. Backup of the
+  pre-change files: scratchpad `backup-chrome-hero` (and git, `b4a999e`).
+- Suite 962 passed. `masar:decay`: queue ok, flows ok or SKIP as before, 6 public
+  forms addressed — no decay found.
