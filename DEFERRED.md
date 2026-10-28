@@ -261,3 +261,64 @@ checks them: change a route and the footer points at a 404 with no failure at
 build, test or request time — and no `route()` grep will ever show those pages
 as linked. Not broken today. Wants either a link checker in the decay check or a
 route-name column on the menu item.
+
+## Big-story backdrops at the stage's own shape (specified 2026-10-28, Task 2.11)
+
+The owner asked for the whole image, not a crop. For article photographs that
+cannot happen: they have their own shape, and `cover` on a different stage
+cuts the overflow. The two lead-slide backdrops can, because they are
+generated page furniture rather than reportage. They have not been regenerated.
+This entry is the specification.
+
+**What they are now.** `public/images/home.jpg` is 1800×1014 (1.775:1) and
+`home-dusk.jpg` is 1893×831 (2.278:1). Each is one frame for every viewport.
+
+**Why one frame cannot do it.** The stage's shape runs from portrait to wide:
+
+| width | 375 | 430 | 768 | 1024 | 1280 | 1440 | 1920 | 2560 |
+|---|---|---|---|---|---|---|---|---|
+| stage | 375×796 | 430×770 | 768×738 | 1024×580 | 1280×664 | 1440×720 | 1920×860 | 2560×860 |
+| ratio | 0.47 | 0.56 | 1.04 | 1.77 | 1.93 | 2.00 | 2.23 | 2.98 |
+
+A single frame matches exactly one of these. A frame at the widest of the seven,
+2.233:1, shows 100% at 1920, 79% at 1024 and **21% at 375**. That is no better
+on a phone than the current dusk image, because widening the frame for desktop
+is what makes the phone crop worse. On a 1440×900 Mac with browser chrome the
+stage is 1440×676 (2.13:1).
+
+**The job.** Art-directed sources in one `<picture>`, each composed with the
+arched tower at the focal point already used:
+
+| range | frame | pixels (2× DPR) | visible at rest across the range | at drift start 1.04 |
+|---|---|---|---|---|
+| < 768 | 1:2 portrait | 1290×2580 | 89–94% | 83–87% |
+| 768–1023 | 1:1 | 2048×2048 | 96% at 768 | 89% |
+| ≥ 1024 | 2.25:1 | 3840×1707 | 79% at 1024 → 99% at 1920 | 72% → 92% |
+
+- **Desktop.** If 1024 matters more than 1920, use 2.0:1 (3840×1920) instead:
+  88% at 1024 and 90% at 1920. Past 1920 the stage keeps widening while its
+  height is capped at 860, so ultra-wide screens lose the top and bottom whatever
+  is chosen.
+- **Resolution.** The dusk source, at 1893px wide, is already under a 2× desktop
+  screen's 3840. `ImageLibrarySeeder` normalises to a 2400px master; the desktop
+  frame needs that raised, or a conversion at 3840.
+
+**What it touches.**
+- A `<picture>` with `media` sources in `big-story.blade.php`: `responsive-image`
+  offers one image at several widths, not several frames.
+- Three media records per backdrop, or three conversions of one record.
+- New `focal` custom properties.
+- The contrast table in CLAUDE.md §2, re-measured, because the ground under the
+  text changes.
+
+The rules on illustrative media stand unchanged: `is_illustrative`, credited
+«صورة تعبيرية», alt text that names no city.
+
+**Article photographs.** Out of scope for this fix by nature. The share of
+each one visible at each width is in CLAUDE.md §2. The two clipped subjects
+found in Task 2.11 are a per-image focal-point fix, not a stage fix:
+- slide 2's right-hand tower at 768;
+- slide 3's notebook on phones.
+
+That needs a focal point per article image, which the stage does not have
+today: every article slide takes `50% 40%`.

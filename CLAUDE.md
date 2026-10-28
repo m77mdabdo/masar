@@ -128,7 +128,7 @@ slides, same method, both backdrops:
 | 1440 | 7.23 | 10.13 | 4.91 | 6.50 | 5.87 | 11.74 | 9.98 | 6.65 | 5.52 |
 | 1920 | 5.75 | 9.56 | 4.93 | 6.51 | 5.71 | 11.52 | 9.84 | 6.86 | 5.13 |
 
-`.questions-scrim` is a blurred field at 0.92 where the numerals sit, easing to 0.70
+`.questions-scrim` is a blurred field at 0.90 where the numerals sit, easing to 0.70
 under the text, and the numerals are solid `--gold`. At 1440 the photograph keeps
 ~71% of its brightness behind the headline column (55% under the old band on slide
 one) and ~60% behind the questions (32–51%). Tightest figure: the mint word, 4.90.
@@ -138,52 +138,91 @@ field, measured 1.0–1.7 on the daylight photographs. Re-measure if any opacity
 halo or `--q-*` move. Re-measure if any local scrim's inset, blur or
 opacity moves.
 
-**The big story moves (owner's ruling, Task 2.10).** Each photograph drifts from
-`scale(1.06)` to `scale(1.0)`, then cross-fades to the next.
-- **Timing.** Dwell **8s**: long enough to read a headline and its standfirst,
-  where 3s would be a billboard and 9s read as stalled. The fade is **800ms**,
-  linear, and the incoming slide fades in over the outgoing one, which stays
-  opaque beneath it. The drift runs dwell + fade (8.8s) so the outgoing picture is
+**The big story moves (owner's rulings, Tasks 2.10 and 2.11).** Each photograph drifts
+from `scale(1.04)` to `scale(1.0)`, then cross-fades to the next.
+- **Timing.** Dwell **5s**. That is the owner's floor: under it the hero reads as a
+  billboard rather than a publication. Lowering it is the owner's call, and the
+  suite fails below 5000. The fade is **480ms**, linear, inside the owner's
+  450–500ms, and the incoming slide fades in over the outgoing one, which stays
+  opaque beneath it. The drift runs dwell + fade (5.48s) so the outgoing picture is
   still settling under the incoming one. It is linear, never below 1.0, and its
   origin is the slide's focal point. A test ties the CSS duration to the JS
-  timings.
+  timings. Task 2.10 ran 8s / 800ms / 1.06.
 - **Compositor only.** It animates `transform` on the image layer only. Traced:
   zero main-thread paints during the drift. The only paints come at a slide
   change, when the incoming layer is first rasterised. No `compositeFailed`, so
   no `will-change`.
 - **Contrast across the motion.** It holds at every point, not only on one
-  frame. Measured at the drift's start (1.06), middle (1.03) and end (1.0), plus
+  frame. Measured at the drift's start (1.04), middle (1.02) and end (1.0), plus
   two cross-fade frames: the incoming text over the outgoing picture (α 0), and
   over a 50/50 blend (α 0.5). All three slides, both backdrops; worst element per
-  width:
+  width (2026-10-28):
 
-  | width | start 1.06 | mid 1.03 | end 1.0 | fade α 0 | fade α 0.5 |
+  | width | start 1.04 | mid 1.02 | end 1.0 | fade α 0 | fade α 0.5 |
   |---|---|---|---|---|---|
   | 375 | 4.90 | 4.90 | 4.90 | 4.90 | 5.12 |
-  | 430 | 4.91 | 4.90 | 4.91 | 4.91 | 5.19 |
-  | 768 | 4.90 | 4.90 | 4.90 | 4.90 | 5.06 |
-  | 1024 | 4.70 | 4.98 | 4.91 | 4.89 | 5.24 |
-  | 1280 | 4.92 | 4.91 | 4.91 | 4.89 | 5.19 |
-  | 1440 | 4.98 | 4.92 | 4.91 | 4.92 | 5.19 |
-  | 1920 | 4.98 | 4.93 | 4.93 | 4.90 | 5.06 |
+  | 430 | 4.90 | 4.90 | 4.91 | 4.91 | 5.12 |
+  | 768 | 4.90 | 4.90 | 4.90 | 4.90 | 5.11 |
+  | 1024 | 4.76 | 4.91 | 4.91 | 4.89 | 4.93 |
+  | 1280 | 4.91 | 4.91 | 4.91 | 4.89 | 5.20 |
+  | 1440 | 4.93 | 4.94 | 4.91 | 4.92 | 5.13 |
+  | 1920 | 4.94 | 4.93 | 4.93 | 4.90 | 5.06 |
 
-  The floor is 4.70: a numeral at 1024 on slide two, at 1.06. It was 4.55 with the
-  numeral field at 0.90, which is why `--q-num` is 0.92.
-- **Framing.** Checked at both ends of the drift for all four images (two
-  backdrops, two article photographs). At 1.06 the tower is whole and the article
-  subjects stay in frame. The range is not to be widened without redoing that
+  The floor is 4.76: a numeral at 1024 on slide two, at 1.04. That is with
+  `--q-num` back at 0.90. Task 2.10 had raised it to 0.92 because at 1.06 the same
+  numeral measured 4.55. The smaller excursion removed the need, so it was
+  reverted.
+- **How much of the picture a reader gets.** A 2:1 stage cannot show all of a
+  1.775:1 photograph. `cover` fills the stage and cuts the overflow. The only ways
+  to show the whole frame are letterboxing, which ends the full bleed, or a stage
+  shaped like the source, which makes the hero taller. The shares below are of
+  the source frame visible at rest, at 1.0. At the drift's start, 1.04, every
+  figure is 92.5% of these (1/1.04²).
+
+  | width | stage | plain backdrop 1.775 | dusk backdrop 2.278 | article photos 1.5 |
+  |---|---|---|---|---|
+  | 375 | 375×796 | 26.5% | 20.7% | 31.4% |
+  | 430 | 430×770 | 31.5% | 24.5% | 37.2% |
+  | 768 | 768×738 | 58.6% | 45.7% | 69.4% |
+  | 1024 | 1024×580 | 99.5% | 77.5% | 85.0% |
+  | 1280 | 1280×664 | 92.1% | 84.6% | 77.8% |
+  | 1440 | 1440×720 | 88.8% | 87.8% | 75.0% |
+  | 1920 | 1920×860 | 79.5% | 98.0% | 67.2% |
+
+  Below 1024 the stage is portrait and the sides are cut. From 1280 up, the
+  article photographs lose the top and bottom, 40:60, from `50% 40%`. The
+  backdrops' fix is a specified job in `DEFERRED.md`.
+- **Framing.** Checked at 1.04 and 1.0, at all seven widths, for all four images.
+  - Both backdrops: the arched tower is whole at every width and scale. On a
+    phone at 1.04 the plain backdrop keeps ~1% of the frame to spare on the
+    tower's right.
+  - Slide 2 (`pexels-aburhman187-29859597`): the bicycles and the central towers
+    are intact everywhere. The two tall flanking towers are outside the band on
+    phones. At 768 the right-hand one is clipped at its right edge, at rest and
+    at 1.04.
+  - Slide 3 (`pexels-tima-miroshnichenko-5717315`): the table, window and plant
+    are intact everywhere. The notebook is half out of the band at 375 and 430.
+
+  Article photographs all take `50% 40%` from `big-story.blade.php`; there is no
+  per-image focal point. The range is not to be widened without redoing this
   check.
 - **LCP.** The carousel is its own Vite entry (`resources/js/big-story.js`), not
   part of `app.js`, which builds byte-identical. A loader of a few lines inside the
   component imports it only after the load event, the hero image's `decode()` and
   two animation frames. The load event alone was too early: it fired at 243ms
   and the hero painted at 262ms. Until the chunk arrives the section is
-  `x-ignore`d and shows the server frame: slide one, still, at 1.06.
+  `x-ignore`d and shows the server frame: slide one, still, at 1.04.
   - The pause control and every binding come from the chunk, so the page carries
     about 310 B gzipped more HTML than before.
-  - Lighthouse (simulate, three runs per backdrop): plain 3235 / 3158 / 3162 →
-    3241 / 3158 / 3163; dusk 3607 / 3683 / 3682 → 3607 / 3679 / 3681. No
-    difference the harness can resolve.
+  - Lighthouse (simulate), static hero (`e2faa6f`) against the moving one, eleven
+    runs per backdrop each, same harness, same day (2026-10-28). Medians: plain
+    3234 → 3233, dusk 3681 → 3681. No regression.
+  - **The figures recorded under Task 2.10 measured a carousel that never ran.**
+    `@js()` writes the chunk URL as `http:\/\/127…`, the local gzip proxy rewrote
+    only the unescaped form, and the browser refused the cross-origin module. In
+    those runs the request had status −1. Any proxy used for these measurements
+    must rewrite both forms, and the chunk's status must be confirmed as 200 in
+    the Lighthouse JSON before a figure is quoted.
 - **Reduced motion.** Nothing applies: no drift, no advance, and no pause control
   (there is nothing to stop). Measured: 0 pixels change in 10s. Prev and next
   remain.
@@ -197,8 +236,14 @@ opacity moves.
     reader navigates, so an auto-advance announces nothing.
   - The pause button's label states what it will do, and a status line states
     what it did.
-- **Data.** Only the next slide is fetched, half a dwell in. Across three slide
-  changes no media URL was requested twice.
+- **Data.** Only the next slide is fetched, half a dwell in (2.5s). Across three
+  slide changes no media URL was requested twice. On the Lighthouse mobile
+  profile (1.6 Mbps, 150ms RTT, 4× CPU), the next slide is decoded before its
+  fade at every width. The tightest case is slide 2 at 1440 and 1920, a 262 KB
+  file decoded ~990ms before its fade. At 400 kbps it misses the 5s mark, and
+  the fade waits for the decode instead: it began at 8.3s, 13ms after the image
+  decoded. A slow connection stretches the dwell. It never fades into an empty
+  frame.
 
 ---
 
