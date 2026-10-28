@@ -1,3 +1,203 @@
+# MASAR — task report: six editions and article translation
+
+Date: 2026-10-28. Commits `d2c093c` … `ece2fee` (11). Not pushed.
+
+## Read this first
+
+- **The French, Hindi, Urdu and Chinese interface text was written by Claude,
+  not by native speakers.** That is consistent with the ruling of no outside
+  translation service. It is not consistent with launching those editions
+  unread. Have a native speaker review `lang/{fr,hi,ur-pk,zh-hans}/*.php`,
+  and especially `pages.php`, before switching an edition on. That file holds
+  the editorial-standards and corrections pages, whose sentences are claims
+  about what the system enforces.
+- **Only Arabic is live.** The other five editions are built and audited but
+  switched off (`MASAR_LOCALES_ENABLED`). No story exists in them yet. An
+  edition shows only its own stories, so switching one on today gives a site
+  whose chrome is translated and whose listings show honest empty states.
+- **The admin panel switches language per user, but MASAR's own panel labels
+  are still Arabic:** 900 string literals across 54 files, plus 58 template
+  runs. This is the largest open item (see FAIL below).
+- **The development database changed.** It received 14 additive migrations,
+  two new permissions and the new label rows. A dump taken before any of this
+  is at
+  `/tmp/claude-501/-Applications-XAMPP-xamppfiles-htdocs-Masar/216eef50-3924-41f8-a70e-0d90257d66e5/scratchpad/masar-before-i18n.sql`.
+  To roll back: restore it, run `php artisan cache:clear`, then check out
+  `e331f3c`.
+
+## Rulings recorded
+
+Both are in CLAUDE.md §2 and §5:
+- **Six editions:** `ar · en · fr · hi · ur-pk · zh-hans`.
+- **Machine translation produces reviewed drafts, never publications**, and
+  no outside service is used.
+
+## What was built
+
+| Area | What exists now |
+|---|---|
+| Registry | `config('masar.locales')` is read only through `App\Support\Locales`. Each edition has a URL code (`ur-pk`), a BCP 47 tag (`ur-PK`), an `og:locale`, a direction and a script. Twelve `char(2)` locale columns are now `varchar(10)`; rolling them back refuses rather than truncating `ur-pk` to `ur`. |
+| Interface text | 461 keys in `lang/{code}/{site,home,article,pages,errors,enums,entity,mail,admin}.php`, plus Laravel's mail strings as JSON. This covers every public template, all 14 enums, error pages, reader mail (sent in the subscriber's own edition), validation messages and the editorial pages. |
+| Switcher | A disclosure of plain links in the topbar: each language named in itself, with its own `lang`/`dir` and `aria-current`. Where the page has no version in a language, the link goes to that edition's front page and says so in that language. There is also a no-JavaScript list in the footer. The chosen edition is remembered for `/`. |
+| SEO | One resolver (`Alternates`) feeds hreflang, the switcher and the sitemap. For a story, alternates are its published translations only. The sitemap carries reciprocal `xhtml:link` sets. `og:locale` and `og:locale:alternate` are correct per edition. Site name, tagline and title template are per edition. |
+| Fallback | No URL serves another edition's article text. A section, topic or company name with no row in an edition falls back to Arabic, wrapped in `<bdi lang="ar" dir="rtl">`. Editor-entered market labels are marked the same way. |
+| Typography | `html[data-script]`: brand faces for Arabic and Latin; system faces for Nastaliq, Devanagari and Han (nothing fetched from outside); Nastaliq at 2.4 leading. |
+| Translation workflow | A translation is its own article row in the source's group; `(translation_group_id, locale)` is unique. The steps: **Translate into…** (`CreateTranslationDraft`), then `TranslateArticle` runs queued by id (unique per draft, rate limited, three tries), then a person edits, then **Sign off translation**. The sign-off must come from someone other than the translator, enforced in the action as well as the policy. After that it follows the ordinary workflow, and the publish gate refuses any translation that has not been signed off. "Outdated" is computed from a hash of the source text. A reviewed translation is never overwritten. |
+| Engine | `TranslationProvider` with the null driver only. `allow_external` is a second switch that keeps text on the server whatever driver is bound. The provider never sees URLs, figures or Latin names (`SegmentGuard`), and any result that loses one, or comes back in the wrong script, is rejected. |
+| Admin | `users.locale`, chosen from the user menu. Direction follows Filament's own translation (Urdu stays RTL). Filament's packaged strings are mapped to our codes. |
+| Structured labels | `EditionLabelsSeeder` adds labels for sections, topics, menus and homepage titles in five languages. It is additive and idempotent, and never replaces a label a person wrote. |
+
+## Defects found and fixed along the way
+
+- **The article page advertised draft translations as hreflang alternates.**
+  Their URLs return 404.
+- **hreflang pointed every missing edition at its own front page.** That tells
+  a crawler an English home page is the English version of an Arabic story.
+- **The advertise page named a label the site does not render.** It said
+  sponsored pieces carry «محتوى مدعوم»; the site shows «محتوى مدفوع». The
+  sentence now takes the component's own label.
+- **The newsletter band overflowed a 320px screen in every edition**,
+  including Arabic, by 32px.
+- **The Arabic data grid clipped a figure by 9px at 320.**
+- **Found by the audit in other languages:**
+  - French menu labels ran 402px past a 1280 viewport; navigation now uses
+    short labels.
+  - Section titles were `nowrap` and pushed the "All" link off a phone.
+  - The lockup read "MASAR MASAR".
+  - The tagline stacked to four lines outside Arabic script.
+  - An older list of edition links duplicated the new switcher in the topbar.
+
+## Responsive and translation audit
+
+Each of 20 pages was loaded in 6 editions and measured at 10 widths (320,
+375, 430, 768, 820, 1024, 1280, 1440, 1920, 2560): **1,200 checks**. It ran
+on a second `php artisan serve` on :8002 with `MASAR_LOCALES_ENABLED` set for
+that process only. `.env` and the :8000 server were not touched.
+
+Each check looked for:
+- sideways scroll the reader can actually perform;
+- elements escaping the viewport;
+- raw translation keys in the text;
+- broken images in view;
+- console and page errors;
+- `<html lang/dir>`;
+- Arabic-script text not marked with its language in other-script editions.
+
+**Final run: 0 failures**, and the re-check after the last two fixes found
+0 issues. The article and opportunity pages return 404 outside Arabic
+because those records exist only in Arabic; that is the fallback policy
+working. Screenshots at 375 and 1440 for every page and edition are in
+`/tmp/claude-501/-Applications-XAMPP-xamppfiles-htdocs-Masar/216eef50-3924-41f8-a70e-0d90257d66e5/scratchpad/i18n-audit/shots/`.
+I looked at a sample: Urdu Nastaliq, Hindi, French at 1440 and English at
+1440. I did not inspect all 240.
+
+## Suite and decay
+
+`php artisan test`: **1033 passed (3940 assertions)**. 43 tests are new, plus
+datasets, covering:
+- parity of every key across six editions, and each edition in its own script;
+- no Arabic in public templates, and every template key resolving;
+- alternates, the switcher, the edition cookie and the reciprocal sitemap;
+- the translation workflow driven through the Filament buttons, including
+  protected-token loss, script checks, never overwriting a reviewed
+  translation, and the outdated hash;
+- the admin locale;
+- the labels seeder;
+- per-edition settings.
+
+Each new guard was probed before it was trusted: a planted bad key and a
+planted Arabic string both failed the template test.
+
+| check | state | detail |
+|---|---|---|
+| suite | ok | 1033 passed, recorded above |
+| queue | ok | depth 0 · failed 0 · worker running |
+| migrate:fresh --seed | ok | scratch db · 4930 rows · 83 published articles (`--with-seed` run) |
+| flow: published article is served | ok | #198 renders with its headline |
+| flow: homepage links published articles | ok | 40 of the latest 50 linked from /ar |
+| flow: navigation renders in the masthead | ok | 14 links in `<header>`, 23 menu items in db |
+| flow: homepage sections have distinct positions | ok | 18 for 18 |
+| flow: newsletter form posts to the subscribe route | ok | POSTs to web.newsletter.subscribe |
+| flow: source polling succeeds | SKIP | polling disabled |
+| flow: market ticker renders | ok | rendered |
+| flow: configured redirects answer | SKIP | none configured |
+| public forms | ok | 6 forms, all addressed |
+
+## Acceptance criteria
+
+| # | Criterion | Status |
+|---|---|---|
+| 1 | Six languages supported | **PASS.** Registry, routing, interface and rendering verified in all six. |
+| 2 | Switcher works across the site | **PASS.** Tests and the rendered audit. |
+| 3 | Arabic and Urdu RTL | **PASS.** 400 audit checks. |
+| 4 | en/fr/hi/zh LTR | **PASS.** 800 audit checks. |
+| 5 | Articles can be created in any language | **NOT TESTED.** The form's language select reads the registry and lists all six. Creating one through the form was not exercised. |
+| 6 | Automatic translation when a provider is configured | **BLOCKED** by ruling: no provider. The pipeline is proven end to end with a test provider. |
+| 7 | Translations stored persistently | **PASS** |
+| 8 | Manual translations editable and protected | **PASS** |
+| 9 | Failures recoverable | **PASS.** Stored as `failed` with a content-free message, then retried. |
+| 10 | Switching preserves article identity | **PASS** |
+| 11 | All interface strings internationalised | **FAIL.** The public site is done; MASAR's own admin labels are not (958 runs). |
+| 12 | No known hardcoded strings in scope | **FAIL**, for the same reason. Public templates are enforced by test. |
+| 13 | Localised SEO | **PASS.** Note: the Organization JSON-LD `url` still points at `/ar` in every edition. |
+| 14 | Responsive at all required widths | **PASS.** 1,200 checks, 0 failures. Automated, plus a sample looked at. |
+| 15 | No known critical layout defects | **PASS** |
+| 16 | No known critical runtime errors | **PASS** |
+| 17 | Existing functionality works | **PASS.** Suite and decay. |
+| 18 | Automated tests pass | **PASS** |
+| 19 | Migrations validated | **PASS.** Forward, back and forward again on dev; fresh seed on scratch. |
+| 20 | Deployment documented | **PASS.** Below. |
+
+Not done and not claimed:
+- Visual regression diffing against a baseline.
+- Submitting a form in a non-Arabic edition end to end.
+- Translation of article content. That is editorial work, through the
+  workflow above.
+
+## Deployment
+
+1. `php artisan migrate --force`. This adds 14 migrations, all additive; every
+   rollback refuses to lose data.
+2. `php artisan db:seed --class=RoleSeeder --force`, for the new permissions
+   `article.translate` and `article.translation.review`.
+3. `php artisan db:seed --class=EditionLabelsSeeder --force`, which adds
+   labels and changes nothing anyone wrote.
+4. `php artisan cache:clear`. The navigation and settings snapshots must be
+   rebuilt.
+5. Keep a queue worker running. Translation jobs use the default queue.
+6. Environment variables (all optional; defaults shown):
+
+```
+MASAR_LOCALES_ENABLED=ar                 # comma list; switch an edition on only after review
+MASAR_TRANSLATION_DRIVER=null            # the only driver, by ruling
+MASAR_TRANSLATION_ALLOW_EXTERNAL=false   # no article text leaves the server unless true
+MASAR_TRANSLATION_AUTO_ON_PUBLISH=false  # open drafts in every live edition on first publication
+MASAR_TRANSLATION_AUTO_RETRANSLATE=false # re-run unreviewed, outdated translations on republish
+MASAR_TRANSLATION_PER_MINUTE=10          # provider calls per minute, all workers
+```
+
+No credentials are required. None were created or committed.
+
+## Decisions I made that were not specified
+
+- **Automatic drafts open on publication, not on creation.** Creation would
+  send unfinished, unpublished drafts down the pipeline; the brief forbids
+  sending confidential content without a policy.
+- **"Outdated" is never stored.** A stored flag is a second copy that goes
+  stale. It is shown on the article page only, because computing it needs the
+  blocks, and article lists must not load blocks.
+- **Navigation labels are short; section names stay full.** The full French
+  names measured 402px past 1280.
+- **A hreflang set is listed only when an alternate exists.** The sitemap sets
+  are reciprocal.
+- **The footer's Privacy / Terms / Cookies links still point at the About
+  page.** This is pre-existing and was not fixed here.
+
+The gaps that remain are measured and written up in `DEFERRED.md`, under
+"Six editions — what is not done yet".
+
+---
+
 # MASAR — task report
 
 Date: 2026-09-15. Covers the four rulings on the `tasks/STATUS.md` audit, plus
