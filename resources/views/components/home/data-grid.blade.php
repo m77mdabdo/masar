@@ -7,7 +7,7 @@
         <div class="grid grid-cols-2 gap-px border border-line bg-line">
             @foreach ($rows as $row)
                 <div class="bg-white p-4">
-                    <div class="font-display text-[0.65rem] font-semibold uppercase tracking-[0.1em] text-ink-3">{{ $row['label'] }}</div>
+                    <div class="font-display text-[0.65rem] font-semibold uppercase tracking-[0.1em] text-ink-3"><x-ui.bidi :text="$row['label']" /></div>
                     <x-data.figure :value="$row['value']" :change="$row['change']" size="lg" class="mt-2" />
                 </div>
             @endforeach

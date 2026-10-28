@@ -52,7 +52,7 @@
 
                         <span class="min-w-0">
                             <span class="block truncate font-display text-[0.5625rem] font-bold uppercase leading-tight tracking-[0.12em] text-mint-2">
-                                {{ $cell['label'] }}
+                                <x-ui.bidi :text="$cell['label']" />
                             </span>
                             <bdi class="nums-tabular block font-display text-[0.9375rem] font-semibold leading-tight tracking-[0.01em] text-white">{{ $cell['value'] }}</bdi>
                         </span>

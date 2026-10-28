@@ -68,7 +68,7 @@
                 <div class="flex flex-wrap gap-2">
                     @foreach ($coverage as $row)
                         <span class="inline-flex items-baseline gap-2 rounded-full border border-line bg-white px-3 py-1.5 text-sm">
-                            <span class="text-ink">{{ $row['label'] }}</span>
+                            <span class="text-ink"><x-ui.bidi :text="$row['label']" /></span>
                             <span class="nums-tabular font-display font-semibold text-g-700">{{ $row['count'] }}</span>
                         </span>
                     @endforeach
@@ -114,7 +114,7 @@
                                                ? route('web.person.show', [$locale, $row['slug']])
                                                : ($type === 'company'
                                                    ? route('web.company.show', [$locale, $row['slug']])
-                                                   : route('web.topic.show', [$locale, $row['slug']])) }}">{{ $row['name'] }}</a>
+                                                   : route('web.topic.show', [$locale, $row['slug']])) }}"><x-ui.bidi :text="$row['name']" /></a>
                                         <span class="nums-tabular shrink-0 text-xs text-ink-3">{{ trans_choice('site.count.stories', $row['count']) }}</span>
                                     </li>
                                 @endforeach

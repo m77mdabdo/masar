@@ -28,7 +28,7 @@
                                         <a class="truncate text-sm text-g-900 underline-offset-2 hover:underline"
                                            href="{{ $type === 'person'
                                                ? route('web.person.show', [$locale, $row['slug']])
-                                               : route('web.company.show', [$locale, $row['slug']]) }}">{{ $row['name'] }}</a>
+                                               : route('web.company.show', [$locale, $row['slug']]) }}"><x-ui.bidi :text="$row['name']" /></a>
                                         <span class="nums-tabular shrink-0 text-xs text-ink-3">{{ trans_choice('site.count.stories', $row['count']) }}</span>
                                     </li>
                                 @endforeach

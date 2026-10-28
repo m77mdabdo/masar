@@ -41,6 +41,19 @@ class Settings
         return $this->forEdition($value);
     }
 
+    /** One edition's value of a setting, whatever edition the page is in. */
+    public function forLocale(string $key, string $locale): mixed
+    {
+        $previous = app()->getLocale();
+        app()->setLocale($locale);
+
+        try {
+            return $this->get($key);
+        } finally {
+            app()->setLocale($previous);
+        }
+    }
+
     /**
      * A value keyed by edition codes and nothing else is a per-edition value:
      * the current edition's, or the default edition's when it has none.

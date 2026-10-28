@@ -6,7 +6,11 @@
 <div @class(['flex items-center gap-4', 'mb-5 mt-13' => ! $tight, 'mb-4' => $tight])>
     <h2 @if ($id) id="{{ $id }}" @endif
         @class([
-            'shrink-0 whitespace-nowrap font-display font-bold uppercase tracking-[0.14em] text-g-950',
+            // Wraps rather than overflowing: a French or English label is far
+            // longer than the Arabic one, and nowrap pushed the action link
+            // off a 320px screen (measured, i18n audit). One line still when
+            // it fits; the rule takes whatever width is left.
+            'min-w-0 text-balance font-display font-bold uppercase tracking-[0.14em] text-g-950',
             'text-[0.8rem]' => ! $tight,
             'text-[0.75rem]' => $tight,
         ])>{{ $title }}</h2>

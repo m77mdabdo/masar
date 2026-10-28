@@ -14,7 +14,7 @@
             @if ($index)
                 <div class="mb-2 flex flex-wrap items-baseline justify-between gap-3">
                     <div class="flex flex-wrap items-baseline gap-3">
-                        <b class="font-display text-[0.95rem] font-semibold text-g-950">{{ $index['label'] }}</b>
+                        <b class="font-display text-[0.95rem] font-semibold text-g-950"><x-ui.bidi :text="$index['label']" /></b>
                         <x-data.figure :value="$index['value']" :change="$index['change']" size="sm" />
                     </div>
                     <x-data.as-of :figures="$figures" />
@@ -35,7 +35,7 @@
                 <div class="mt-5 grid grid-cols-2 gap-px border border-line bg-line">
                     @foreach ($instruments as $row)
                         <div class="bg-white p-4">
-                            <div class="font-display text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-ink-3">{{ $row['label'] }}</div>
+                            <div class="font-display text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-ink-3"><x-ui.bidi :text="$row['label']" /></div>
                             <x-data.figure :value="$row['value']" :change="$row['change']" size="lg" class="mt-2" />
                         </div>
                     @endforeach

@@ -29,7 +29,7 @@ it('never overwrites a label someone already wrote', function (): void {
 
     (new EditionLabelsSeeder)->run();
 
-    expect($item->fresh()->label)->toMatchArray(['ar' => 'قصص نجاح', 'en' => 'Stories', 'fr' => 'Histoires de réussite']);
+    expect($item->fresh()->label)->toMatchArray(['ar' => 'قصص نجاح', 'en' => 'Stories', 'fr' => 'Réussites']);
 });
 
 it('resolves a per-edition setting to the current edition and leaves other settings alone', function (): void {
@@ -56,4 +56,24 @@ it('marks a name that fell back to another edition with that edition’s lang an
 
     app()->setLocale('en');
     expect((string) $company->displayName())->toBe('<bdi lang="ar" dir="rtl">مرقاة &lt;للتعليم&gt;</bdi>');
+});
+
+it('gives navigation the short label, replacing only the long one this seeder wrote itself', function (): void {
+    $mine = MenuItem::factory()->create(['label' => ['ar' => 'عالمي بعدسة سعودية', 'fr' => 'Le monde, vu d’Arabie saoudite']]);
+    $theirs = MenuItem::factory()->create(['label' => ['ar' => 'عالمي بعدسة سعودية', 'fr' => 'International']]);
+
+    (new EditionLabelsSeeder)->run();
+
+    expect($mine->fresh()->label['fr'])->toBe('Monde')
+        ->and($theirs->fresh()->label['fr'])->toBe('International')
+        ->and($mine->fresh()->label['zh-hans'])->toBe('全球');
+});
+
+it('marks Arabic-script text with its language on a page in another script', function (): void {
+    app()->setLocale('en');
+    expect(trim(view('components.ui.bidi', ['text' => 'مؤشر أ'])->render()))->toBe('<bdi lang="ar" dir="rtl">مؤشر أ</bdi>')
+        ->and(trim(view('components.ui.bidi', ['text' => 'TASI'])->render()))->toBe('TASI');
+
+    app()->setLocale('ur-pk');
+    expect(trim(view('components.ui.bidi', ['text' => 'مؤشر أ'])->render()))->toBe('مؤشر أ');
 });

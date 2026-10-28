@@ -61,7 +61,7 @@
                                                ? route('web.person.show', [$locale, $row['slug']])
                                                : ($type === 'company'
                                                    ? route('web.company.show', [$locale, $row['slug']])
-                                                   : route('web.topic.show', [$locale, $row['slug']])) }}">{{ $row['name'] }}</a>
+                                                   : route('web.topic.show', [$locale, $row['slug']])) }}"><x-ui.bidi :text="$row['name']" /></a>
                                         <span class="nums-tabular shrink-0 text-xs text-ink-3">{{ trans_choice('site.count.stories', $row['count']) }}</span>
                                     </li>
                                 @endforeach

@@ -76,13 +76,27 @@ class EditionLabelsSeeder extends Seeder
         'ريادة الأعمال' => ['Entrepreneurship', 'Entrepreneuriat', 'उद्यमिता', 'کاروباری صلاحیت', '创业'],
     ];
 
+    /**
+     * Navigation wants the short form, as the existing English labels are
+     * ("Saudi", "Business"). The full section names in French measured 402px
+     * past a 1280px viewport in the main menu (i18n audit, 2026-10-28).
+     */
+    private const MENU = [
+        'السعودية والأسواق' => ['Saudi', 'Arabie saoudite', 'सऊदी', 'سعودی', '沙特'],
+        'الأعمال والشركات' => ['Business', 'Entreprises', 'कारोबार', 'کاروبار', '商业'],
+        'رؤى وفرص' => ['Insights', 'Analyses', 'अंतर्दृष्टि', 'بصیرت', '洞察'],
+        'الشركات الناشئة وريادة الأعمال' => ['Startups', 'Start-up', 'स्टार्टअप', 'اسٹارٹ اپس', '初创'],
+        'عالمي بعدسة سعودية' => ['Global', 'Monde', 'विश्व', 'عالمی', '全球'],
+        'قصص نجاح' => ['Stories', 'Réussites', 'सफलताएँ', 'کامیابیاں', '成功故事'],
+    ];
+
     private const CODES = ['en', 'fr', 'hi', 'ur-pk', 'zh-hans'];
 
     public function run(): void
     {
         $this->translationRows('category_translations', 'category_id');
         $this->translationRows('topic_translations', 'topic_id');
-        $this->jsonColumn('menu_items', 'label');
+        $this->jsonColumn('menu_items', 'label', self::MENU);
         $this->jsonColumn('homepage_sections', 'title');
     }
 
@@ -101,19 +115,29 @@ class EditionLabelsSeeder extends Seeder
         }
     }
 
-    /** A JSON column of locale => text; only absent locales are filled. */
-    private function jsonColumn(string $table, string $column): void
+    /**
+     * A JSON column of locale => text. Absent locales are filled; a present
+     * one is replaced only when it is exactly the long label this seeder
+     * itself wrote before the short menu forms existed — never a person's.
+     *
+     * @param  array<string, list<string>>  $preferred
+     */
+    private function jsonColumn(string $table, string $column, array $preferred = []): void
     {
         foreach (DB::table($table)->get(['id', $column]) as $row) {
             $values = json_decode((string) $row->{$column}, true) ?: [];
-            $tr = self::LABELS[$values['ar'] ?? ''] ?? null;
+            $ar = $values['ar'] ?? '';
+            $tr = $preferred[$ar] ?? self::LABELS[$ar] ?? null;
             if ($tr === null) {
                 continue;
             }
 
             $filled = $values;
             foreach (self::CODES as $i => $code) {
-                $filled[$code] ??= $tr[$i];
+                $ours = self::LABELS[$ar][$i] ?? null;
+                if (! isset($filled[$code]) || ($filled[$code] === $ours && $ours !== $tr[$i])) {
+                    $filled[$code] = $tr[$i];
+                }
             }
 
             if ($filled !== $values) {

@@ -322,3 +322,41 @@ found in Task 2.11 are a per-image focal-point fix, not a stage fix:
 
 That needs a focal point per article image, which the stage does not have
 today: every article slide takes `50% 40%`.
+
+## Six editions — what is not done yet (2026-10-28)
+
+The six-edition foundation shipped: registry, routing, interface strings in
+all six, the switcher, valid-only hreflang and sitemap, per-edition identity,
+structured labels, the translation workflow and its gate. What is left, measured:
+
+- **The admin panel's own labels.** Filament's packaged strings switch with
+  `users.locale`, and so does direction; MASAR's own labels in the panel do
+  not. 900 Arabic string literals across 54 files in `app/Filament`,
+  `app/Actions`, `app/Notifications` and `app/Exceptions`, plus 58 runs in
+  `resources/views/filament`, are still Arabic in every panel language. The
+  same pipeline as the public site applies (keys in `lang/*/admin.php`, the
+  parity test covers it the day the group grows).
+- **Per-edition settings in the admin.** Identity settings default per
+  edition, and `Settings::get()` resolves a per-edition value; the Settings
+  page still writes a plain string, which then applies to every edition.
+  Its identity fields want the TranslationsField treatment. Market labels
+  are editor-entered in Arabic and render marked `lang="ar"` elsewhere.
+- **Structured data beyond labels.** Sections, topics, menus and homepage
+  titles are in all six. Section descriptions, company and person names,
+  bios and industry/country names exist in Arabic only and fall back,
+  marked with their language. Company names are proper nouns and are not
+  to be machine-transliterated; they want an editor.
+- **Cross-edition listings.** An edition lists only its own stories; with
+  no translated stories published, the other five editions show their
+  chrome and honest empty states. A listing that shows an original-language
+  card, labelled and linking to the original, was considered and not built.
+- **Re-translation when a published original is edited.** Automatic
+  re-runs hang off (re)publication; an edit to a live article raises no
+  event, so its translations are flagged outdated on the article page and
+  re-run by a person.
+- **A translation engine.** None, by ruling. Cost tracking is the
+  provider's own `billedCharacters` in the activity log, so it reports
+  nothing today.
+- **Self-hosted faces for Nastaliq, Devanagari and Han.** System faces by
+  ruling (nothing fetched from outside). Rendering then depends on the
+  reader's platform; Windows without Urdu Typesetting falls back to naskh.
