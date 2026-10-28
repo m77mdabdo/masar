@@ -363,3 +363,49 @@ and no change to the database, articles or images.
   pre-change files: scratchpad `backup-chrome-hero` (and git, `b4a999e`).
 - Suite 962 passed. `masar:decay`: queue ok, flows ok or SKIP as before, 6 public
   forms addressed — no decay found.
+
+## Compact header, demo disclosure in the topbar (2026-10-28)
+
+Brief: remove the gold «نسخة تجريبية» band; topbar 30 / masthead 54 / ticker 50 /
+stuck header 50; use the space to bring the hero up; keep the hero heights.
+
+- **The band was the demo-mode disclosure, not decoration.** It is one of
+  `site.demo_mode`'s five surfaces, and the site is serving invented companies and
+  people. Owner's ruling: move it, don't drop it. The band and its 41px are gone.
+  The disclosure now takes the topbar's first slot, in place of the descriptor:
+  - a gold-ink «نسخة تجريبية» pill, cream on gold-ink, 4.73:1;
+  - after it, the full sentence from `sm` up, or «للعرض فقط» on a phone.
+
+  It shows on every page and every width. `DemoModeTest` now asserts the pill, its
+  `role="status"`, that no breakpoint hides it, and that it renders before
+  `<header>`. Demo mode, noindex, robots and the data are unchanged.
+- **Chrome** (measured box including its hairline):
+  - Topbar 37 → **31**. The newsletter pill is `min-h-6`, so the target stays 24px.
+  - Masthead 65 → **55** at rest. Once the page scrolls past 30px it is
+    **51**: a 50px bar plus its hairline.
+    - The 4px it loses goes into a margin, so the box in flow never changes
+      height: the hero's document top read 136 at scrollY 0, 28, 40 and 600.
+    - Menu links stretch to the bar (`h-full`) instead of carrying a fixed
+      height.
+  - Ticker 62 → **50**: 36px cells with the value at `leading-tight`, plus a 14px
+    as-of line, which stays. On mobile the ticker went from 150 to 122.
+- **Offsets that depended on the header.**
+  - Article rail `top-24` → `top-[4.25rem]`: 68px, 17px under the stuck header.
+  - Heading `scroll-margin` and `scroll-mt` 6rem → 4.5rem. A TOC jump lands the
+    heading at 92px, under a header that ends at 51.
+- **Hero.** It starts at **136px** instead of 205px on desktop, and at 208 instead
+  of 319 at 375.
+  - The fold guard went from `100svh − 11rem` to `100svh − 7rem` to match the
+    shorter stack.
+  - The owner's heights hold: 580 / 664 / 720 / 860. 1280×800 is now 664, no
+    longer cut to 624.
+  - Read-button bottom against the fold: 672/768 · 756/800 · 812/900 · 952/1080.
+    At 1440×900 the "استكشف مسار" peek is back.
+  - No overlap and no horizontal overflow at the seven widths, and one height per
+    width across the three slides.
+- **Contrast**, re-measured for both backdrops and all slides: worst 4.58, a numeral
+  at 1024 on slide three, unchanged. The 1280 rows in CLAUDE.md §2 are updated.
+- Screenshots: before = `tasks/screenshots/hero-taller/after/` (HEAD `cf4ed3e`).
+  After = `tasks/screenshots/header-compact/after/`, three slides × seven widths,
+  plus a scrolled article at 1440. Backup: git `cf4ed3e`.
+- Suite 962 passed. `masar:decay`: no decay found.
