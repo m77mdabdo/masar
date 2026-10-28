@@ -2,8 +2,11 @@
 @php $home = route('web.home', $locale); @endphp
 {{-- 54px at rest, 50px once the page scrolls. The lost 4px goes to a
      margin, so the box in flow never changes height and nothing below it
-     jumps when the bar tightens. --}}
-<header class="sticky top-0 z-40 border-b border-line bg-cream/95 backdrop-blur"
+     jumps when the bar tightens. The margin animates with the same duration
+     and curve as the bar's height, so the two sum to 54px on every frame:
+     an instant margin against a 200ms height dropped the page 4px for the
+     length of the transition. --}}
+<header class="sticky top-0 z-40 border-b border-line bg-cream/95 backdrop-blur transition-[margin] duration-200 motion-reduce:transition-none"
         x-data="{ stuck: false }" x-init="stuck = scrollY > 30"
         @scroll.window.passive="stuck = scrollY > 30" :class="stuck && 'mb-1'">
     <x-ui.container>
