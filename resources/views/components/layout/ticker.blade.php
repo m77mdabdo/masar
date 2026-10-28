@@ -28,7 +28,7 @@
                     {{-- 16px between lg and 2xl: at 1280 the 20px padding left
                          66px for a 69px print, and «11,234.56» lost its last
                          digit. --}}
-                    <div class="flex h-11 items-center gap-2 border-s border-white/[0.07] px-4 sm:px-5 lg:px-4 2xl:px-5">
+                    <div class="flex h-9 items-center gap-2 border-s border-white/[0.07] px-4 sm:px-5 lg:px-4 2xl:px-5">
                         @if ($cell['series'] !== [])
                             {{-- The line is the row's own points. A row saved
                                  without them gets no chart, rather than a curve
@@ -54,7 +54,7 @@
                             <span class="block truncate font-display text-[0.5625rem] font-bold uppercase leading-tight tracking-[0.12em] text-mint-2">
                                 {{ $cell['label'] }}
                             </span>
-                            <bdi class="nums-tabular block font-display text-[0.9375rem] font-semibold tracking-[0.01em] text-white">{{ $cell['value'] }}</bdi>
+                            <bdi class="nums-tabular block font-display text-[0.9375rem] font-semibold leading-tight tracking-[0.01em] text-white">{{ $cell['value'] }}</bdi>
                         </span>
 
                         @if ($cell['change'] !== null)
@@ -83,7 +83,7 @@
                 {{-- The cell that terminates the band, one step lighter than it. --}}
                 @if ($href)
                     <a href="{{ $href }}"
-                       class="flex h-11 items-center gap-3 border-s border-white/[0.07] bg-g-850 px-[1.625rem] font-display text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-white transition hover:bg-g-700">
+                       class="flex h-9 items-center gap-3 border-s border-white/[0.07] bg-g-850 px-[1.625rem] font-display text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-white transition hover:bg-g-700">
                         <span>نبض السوق</span>
                         <span aria-hidden="true" class="inline-block rtl:-scale-x-100">→</span>
                     </a>
@@ -101,7 +101,7 @@
              It cannot be dropped or hidden behind a hover: a figure without a
              visible date and source does not publish. --}}
         <x-ui.container>
-            <div class="flex min-h-[1.125rem] items-center pb-0.5">
+            <div class="flex min-h-[0.875rem] items-center pb-0.5">
                 <x-data.as-of :figures="$figures" tone="dark" class="!text-[0.5625rem] !leading-[1.2] !text-cream/55" />
             </div>
         </x-ui.container>

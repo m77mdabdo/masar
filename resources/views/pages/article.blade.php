@@ -79,7 +79,7 @@
             --}}
             <div class="mx-auto grid max-w-[1280px] gap-10 lg:grid-cols-[13rem_minmax(0,1fr)_19rem] lg:gap-11">
                 <aside class="order-2 hidden lg:order-none lg:block">
-                    <div class="sticky top-24 space-y-6">
+                    <div class="sticky top-[4.25rem] space-y-6">
                         <x-article.toc :article="$article" :sections="$present" :extras="$tocExtras" />
 
                         {{-- No photograph: the article's own hero is the only

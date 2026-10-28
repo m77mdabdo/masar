@@ -547,7 +547,7 @@
         font-size: 1.5rem;
         font-weight: 600;
         color: var(--color-g-900);
-        scroll-margin-top: 6rem;
+        scroll-margin-top: 4.5rem;
     }
 
     .prose-masar > h3 {
@@ -555,14 +555,14 @@
         font-size: 1.25rem;
         font-weight: 600;
         color: var(--color-g-900);
-        scroll-margin-top: 6rem;
+        scroll-margin-top: 4.5rem;
     }
 
     .prose-masar > h4 {
         margin-block: 1.3em 0.4em;
         font-size: 1.1rem;
         font-weight: 600;
-        scroll-margin-top: 6rem;
+        scroll-margin-top: 4.5rem;
     }
 
     .prose-masar a {

@@ -127,11 +127,11 @@
              36.25rem — 580 at 1024, ~660 at 1280, 720 at 1440 — and capped at
              53.75rem, 860 at 1920. `cover` crops the sides, not the sky. On a
              short screen it still gives way to the fold: never taller than
-             the viewport less 11rem — the ~205px stack above it, demo banner
-             included, less the button's 44px inset — so the button stays on
-             screen (1280×800 gets 624, not 660). 32rem is the floor, where
-             the questions column still fits. --}}
-        <div class="relative z-10 mx-auto grid min-h-[34rem] w-full max-w-[1300px] lg:min-h-[clamp(32rem,min(max(36.25rem,calc(13.5rem_+_35vw)),calc(100svh_-_11rem)),53.75rem)] lg:grid-cols-[1.36fr_0.64fr]">
+             the viewport less 7rem — the ~136px stack above it less the
+             button's 44px inset, with ~20px to spare — so the button stays on
+             screen. 32rem is the floor, where the questions column still
+             fits. --}}
+        <div class="relative z-10 mx-auto grid min-h-[34rem] w-full max-w-[1300px] lg:min-h-[clamp(32rem,min(max(36.25rem,calc(13.5rem_+_35vw)),calc(100svh_-_7rem)),53.75rem)] lg:grid-cols-[1.36fr_0.64fr]">
             {{-- The label sits at the top of the column and the story at the
                  bottom, so the space between them is the section's height doing
                  the work rather than a margin. It is the same label on every

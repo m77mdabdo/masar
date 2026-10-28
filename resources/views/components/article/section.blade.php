@@ -9,7 +9,7 @@
     $rest = $subhead !== null ? $blocks->skip(1) : $blocks;
 @endphp
 
-<section id="s-{{ $section->value }}" class="mb-10 scroll-mt-24" aria-labelledby="s-{{ $section->value }}-heading">
+<section id="s-{{ $section->value }}" class="mb-10 scroll-mt-[4.5rem]" aria-labelledby="s-{{ $section->value }}-heading">
     <div class="mb-4 flex items-start gap-4">
         <span @class([
             'mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full',

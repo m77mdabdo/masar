@@ -84,8 +84,9 @@ the contrast test tells you what broke.
 pixels behind each element (text hidden), against the *lightest* pixel under its
 worst line box, worst case over both lead-slide backdrops, with the dark-green scrim
 (owner's ruling: `--color-g-950`, not black). Re-measured 2026-10-28 at the taller
-stage (580 / 624–660 / 720 / 860 at 1024 / 1280 / 1440 / 1920) under the slimmer
-topbar, masthead and ticker. This table is slide one; slides two and three are below:
+stage (580 / 664 / 720 / 860 at 1024 / 1280 / 1440 / 1920) under the compact
+chrome — 30px topbar carrying the demo disclosure, 54px masthead, 50px ticker; the
+1280 row re-measured again at 664. This table is slide one; slides two and three are below:
 
 | width | headline | mint word | standfirst | byline | step label | step body | numerals 01–03 |
 |---|---|---|---|---|---|---|---|
@@ -93,7 +94,7 @@ topbar, masthead and ticker. This table is slide one; slides two and three are b
 | 430 | 10.31 | 5.10 | 6.60 | 5.33 | 13.66 | 11.56 | 5.06 |
 | 768 | 10.31 | 4.98 | 7.16 | 5.26 | 13.23 | 11.25 | 5.12 |
 | 1024 | 11.01 | 5.75 | 7.16 | 6.01 | 15.63 | 13.32 | 4.93 |
-| 1280 | 11.41 | 5.67 | 7.08 | 5.80 | 15.47 | 13.32 | 4.87 |
+| 1280 | 11.09 | 5.36 | 7.16 | 6.15 | 15.29 | 13.31 | 4.94 |
 | 1440 | 11.01 | 5.43 | 7.17 | 5.98 | 15.65 | 13.31 | 4.92 |
 | 1920 | 10.79 | 5.21 | 7.07 | 5.84 | 15.84 | 13.47 | 4.87 |
 
@@ -118,7 +119,7 @@ the taller stage:
 | 430 | 15.22 | 10.16 | 5.05 | 7.02 | 5.89 | 14.88 | 15.65 | 13.64 | 4.87 |
 | 768 | 15.05 | 10.13 | 5.04 | 7.05 | 5.79 | 13.70 | 15.48 | 13.63 | 4.93 |
 | 1024 | 8.56 | 10.32 | 5.06 | 6.68 | 5.44 | 11.73 | 15.10 | 13.65 | 4.58 |
-| 1280 | 7.95 | 10.18 | 5.06 | 6.70 | 5.43 | 11.76 | 15.46 | 13.65 | 4.87 |
+| 1280 | 8.44 | 10.29 | 5.06 | 6.68 | 5.44 | 12.06 | 15.46 | 13.64 | 4.94 |
 | 1440 | 8.08 | 10.29 | 5.06 | 6.68 | 5.45 | 12.08 | 15.46 | 13.65 | 4.92 |
 | 1920 | 7.85 | 10.00 | 5.07 | 6.69 | 5.52 | 11.87 | 15.67 | 13.48 | 4.75 |
 

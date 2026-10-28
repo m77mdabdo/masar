@@ -1,10 +1,16 @@
 @props(['locale', 'menu' => null])
 @php $home = route('web.home', $locale); @endphp
-<header class="sticky top-0 z-40 border-b border-line bg-cream/95 backdrop-blur">
+{{-- 54px at rest, 50px once the page scrolls. The lost 4px goes to a
+     margin, so the box in flow never changes height and nothing below it
+     jumps when the bar tightens. --}}
+<header class="sticky top-0 z-40 border-b border-line bg-cream/95 backdrop-blur"
+        x-data="{ stuck: false }" x-init="stuck = scrollY > 30"
+        @scroll.window.passive="stuck = scrollY > 30" :class="stuck && 'mb-1'">
     <x-ui.container>
-        {{-- 64px (owner's target, 2026-10-28): the wordmark keeps its size;
-             the bar gives up vertical padding, and the height goes to the hero. --}}
-        <div class="flex h-16 items-center gap-[1.375rem]">
+        {{-- Owner's target (2026-10-28): the wordmark keeps its size; the bar
+             gives up vertical padding, and the height goes to the hero. --}}
+        <div class="flex h-[3.375rem] items-center gap-[1.375rem] transition-[height] duration-200 motion-reduce:transition-none"
+             :class="stuck ? '!h-[3.125rem]' : ''">
             <a href="{{ $home }}" class="flex shrink-0 items-baseline gap-2.5" aria-label="{{ setting('identity.site_name') }}">
                 {{-- The Latin wordmark is the brand's large mark and leads the
                      lockup; the Arabic one sits beside it a size down. --}}
@@ -26,7 +32,7 @@
                  labels come to 745px, which does not fit beside a 56px wordmark at
                  1024 — it pushed the burger 242px off the start edge. Below xl the
                  drawer carries navigation, which it already did. --}}
-            <x-layout.mega-menu :menu="$menu" class="ms-auto hidden xl:flex" />
+            <x-layout.mega-menu :menu="$menu" class="ms-auto hidden self-stretch xl:flex" />
 
             {{-- Sits after a vertical hairline on the end side. Below lg the
                  nav is hidden, so it takes the free space itself. --}}
