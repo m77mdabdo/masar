@@ -82,18 +82,20 @@ the contrast test tells you what broke.
 
 **Homepage hero, text over the photograph** — measured 2026-10-27 off the rendered
 pixels behind each element (text hidden), against the *lightest* pixel under its
-worst line box, worst case over all three slides **and both lead-slide backdrops**,
-with the dark-green scrim (owner's ruling: `--color-g-950`, not black):
+worst line box, worst case over both lead-slide backdrops, with the dark-green scrim
+(owner's ruling: `--color-g-950`, not black). Re-measured 2026-10-28 at the taller
+stage (580 / 624–660 / 720 / 860 at 1024 / 1280 / 1440 / 1920) under the slimmer
+topbar, masthead and ticker. This table is slide one; slides two and three are below:
 
 | width | headline | mint word | standfirst | byline | step label | step body | numerals 01–03 |
 |---|---|---|---|---|---|---|---|
-| 375 | 9.79 | 4.74 | 6.68 | 5.34 | 12.77 | 11.27 | 4.95 |
-| 430 | 9.81 | 4.74 | 6.60 | 5.33 | 12.45 | 11.13 | 5.01 |
-| 768 | 9.79 | 4.73 | 6.69 | 5.26 | 12.26 | 10.95 | 5.01 |
-| 1024 | 11.01 | 5.32 | 6.73 | 5.71 | 14.84 | 13.31 | 4.81 |
-| 1280 | 11.40 | 5.54 | 7.02 | 5.90 | 15.06 | 13.16 | 4.87 |
-| 1440 | 10.65 | 5.58 | 6.74 | 5.91 | 14.88 | 13.31 | 4.81 |
-| 1920 | 10.46 | 5.21 | 6.68 | 5.63 | 14.89 | 13.12 | 4.81 |
+| 375 | 10.77 | 5.78 | 6.72 | 5.43 | 14.22 | 11.90 | 4.88 |
+| 430 | 10.31 | 5.10 | 6.60 | 5.33 | 13.66 | 11.56 | 5.06 |
+| 768 | 10.31 | 4.98 | 7.16 | 5.26 | 13.23 | 11.25 | 5.12 |
+| 1024 | 11.01 | 5.75 | 7.16 | 6.01 | 15.63 | 13.32 | 4.93 |
+| 1280 | 11.41 | 5.67 | 7.08 | 5.80 | 15.47 | 13.32 | 4.87 |
+| 1440 | 11.01 | 5.43 | 7.17 | 5.98 | 15.65 | 13.31 | 4.92 |
+| 1920 | 10.79 | 5.21 | 7.07 | 5.84 | 15.84 | 13.47 | 4.87 |
 
 Green is lighter than black at equal opacity, so the green scrim needs more of it:
 at black's stops the numerals fell to 3.92:1. Before the October passes the scrim
@@ -107,21 +109,21 @@ is added.
 bands.** The section's `data-ground="photo"` swaps them for blurred local scrims
 (`.text-scrim`, `.questions-scrim`, `.kicker-scrim`) behind each text block, so the
 middle of the picture stays clear and no gradient ends in a line. The table above
-still holds for slide one, which is pixel-identical. Photo slides, same method,
-2026-10-27:
+is slide one. Photo slides, same method, both backdrops, re-measured 2026-10-28 at
+the taller stage:
 
 | width | kicker | headline | mint word | standfirst | byline | button | step label | step body | numerals |
 |---|---|---|---|---|---|---|---|---|---|
 | 375 | 15.27 | 10.45 | 5.04 | 7.05 | 5.72 | 14.69 | 15.85 | 13.82 | 4.93 |
 | 430 | 15.22 | 10.16 | 5.05 | 7.02 | 5.89 | 14.88 | 15.65 | 13.64 | 4.87 |
 | 768 | 15.05 | 10.13 | 5.04 | 7.05 | 5.79 | 13.70 | 15.48 | 13.63 | 4.93 |
-| 1024 | 8.18 | 10.42 | 5.03 | 6.68 | 5.43 | 11.90 | 15.27 | 13.65 | 4.64 |
-| 1280 | 7.98 | 10.30 | 5.03 | 6.68 | 5.45 | 11.54 | 15.46 | 13.65 | 4.93 |
-| 1440 | 8.13 | 10.29 | 5.07 | 6.68 | 5.45 | 11.88 | 15.30 | 13.64 | 4.92 |
-| 1920 | 7.84 | 10.03 | 5.07 | 6.69 | 5.45 | 11.71 | 15.67 | 13.48 | 4.75 |
+| 1024 | 8.56 | 10.32 | 5.06 | 6.68 | 5.44 | 11.73 | 15.10 | 13.65 | 4.58 |
+| 1280 | 7.95 | 10.18 | 5.06 | 6.70 | 5.43 | 11.76 | 15.46 | 13.65 | 4.87 |
+| 1440 | 8.08 | 10.29 | 5.06 | 6.68 | 5.45 | 12.08 | 15.46 | 13.65 | 4.92 |
+| 1920 | 7.85 | 10.00 | 5.07 | 6.69 | 5.52 | 11.87 | 15.67 | 13.48 | 4.75 |
 
 The tightest figure is a numeral at 1024 on slide three; `.questions-scrim` went from
-0.93 to 0.95 for it (4.49 → 4.64). Re-measure if any local scrim's inset, blur or
+0.93 to 0.95 for it (4.49 → 4.64), and the taller stage took it to 4.58. Re-measure if any local scrim's inset, blur or
 opacity moves.
 
 ---

@@ -1,16 +1,16 @@
 @props(['section', 'backdrop' => null, 'sizes' => '(max-width: 1024px) 100vw, 96vw'])
 {{-- contrast-safe: every foreground sits on the scrimmed photograph, so the
-     ground is the picture and not a token. Measured 2026-10-27 off the
+     ground is the picture and not a token. Measured 2026-10-28 off the
      rendered pixels behind each element, text hidden, against the lightest
-     pixel under its worst line box — worst over all three slides and both
-     lead-slide backdrops, dark-green scrim — at 375 / 430 / 768 / 1024 /
-     1280 / 1440 / 1920: headline ≥ 9.79, mint word ≥ 4.73, standfirst ≥ 6.60,
-     byline ≥ 5.26, step label ≥ 12.26, step body ≥ 10.95, numerals ≥ 4.81.
+     pixel under its worst line box — slide one, both lead-slide backdrops,
+     dark-green scrim — at 375 / 430 / 768 / 1024 / 1280 / 1440 / 1920:
+     headline ≥ 10.31, mint word ≥ 4.98, standfirst ≥ 6.60, byline ≥ 5.26,
+     step label ≥ 13.23, step body ≥ 11.25, numerals ≥ 4.87.
      The per-width table is in CLAUDE.md §2. The scrim stops in app.css are
      what hold these; re-measure if they move or a backdrop is added.
      Slides two and three (data-ground="photo") drop the bands for blurred
      local scrims behind each text block; their own table is beside the
-     first: mint word ≥ 5.03, numerals ≥ 4.64. --}}
+     first: mint word ≥ 5.04, numerals ≥ 4.58. --}}
 @php
     use App\Enums\ArticleSection;
 
@@ -122,13 +122,16 @@
              900px viewport with the next section showing. Superseded by the
              owner's height targets below, which trade that peek for a stage at
              the backdrops' own proportion. --}}
-        {{-- Owner's targets (2026-10-27): the stage keeps the backdrops' own
-             2.28:1 — 43.75vw, so 630 at 1440 and 840 at 1920 — and never less
-             than 32.5rem (520 at 1024). On a short screen it gives way to the
-             fold: never taller than the viewport less the 15rem stack above
-             it, down to 32rem, where the questions column still fits — at
-             1024×768 a fixed stage put the button below the fold. --}}
-        <div class="relative z-10 mx-auto grid min-h-[34rem] w-full max-w-[1300px] lg:min-h-[clamp(32rem,min(max(32.5rem,43.75vw),calc(100svh_-_15rem)),52.5rem)] lg:grid-cols-[1.36fr_0.64fr]">
+        {{-- Owner's targets (2026-10-28), taller than the backdrops' 2.28:1 so
+             the picture takes more of the screen: 13.5rem + 35vw, never under
+             36.25rem — 580 at 1024, ~660 at 1280, 720 at 1440 — and capped at
+             53.75rem, 860 at 1920. `cover` crops the sides, not the sky. On a
+             short screen it still gives way to the fold: never taller than
+             the viewport less 11rem — the ~205px stack above it, demo banner
+             included, less the button's 44px inset — so the button stays on
+             screen (1280×800 gets 624, not 660). 32rem is the floor, where
+             the questions column still fits. --}}
+        <div class="relative z-10 mx-auto grid min-h-[34rem] w-full max-w-[1300px] lg:min-h-[clamp(32rem,min(max(36.25rem,calc(13.5rem_+_35vw)),calc(100svh_-_11rem)),53.75rem)] lg:grid-cols-[1.36fr_0.64fr]">
             {{-- The label sits at the top of the column and the story at the
                  bottom, so the space between them is the section's height doing
                  the work rather than a margin. It is the same label on every
