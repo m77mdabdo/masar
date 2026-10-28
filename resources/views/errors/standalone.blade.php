@@ -14,18 +14,10 @@
     $locale = \App\Support\ErrorPageLocale::apply(request());
     $direction = \App\Support\ErrorPageLocale::direction($locale);
 
-    $copy = [
-        500 => [
-            'ar' => ['حدث خطأ من جهتنا', 'تعذّر عرض هذه الصفحة بسبب خلل في الموقع، لا في جهازك ولا في اتصالك. أعد المحاولة بعد قليل.', 'أعد المحاولة'],
-            'en' => ['Something went wrong on our side', 'This page could not be shown because of a fault on the site, not your device or your connection. Try again shortly.', 'Try again'],
-        ],
-        503 => [
-            'ar' => ['مسار قيد الصيانة', 'نُجري أعمال صيانة على الموقع، وسيعود قريبًا. أعد المحاولة بعد قليل.', 'أعد المحاولة'],
-            'en' => ['MASAR is down for maintenance', 'We are carrying out maintenance on the site. Try again shortly.', 'Try again'],
-        ],
-    ];
-
-    [$heading, $body, $retry] = $copy[$code][$locale] ?? $copy[$code]['ar'];
+    // lang/ files are files: reading them needs no database, cache or setting.
+    $heading = __("errors.{$code}.heading");
+    $body = __("errors.{$code}.body");
+    $retry = __('errors.ui.retry');
 @endphp
 <!DOCTYPE html>
 <html lang="{{ \App\Support\Locales::tag($locale) }}" dir="{{ $direction }}" data-script="{{ \App\Support\Locales::script($locale) }}">

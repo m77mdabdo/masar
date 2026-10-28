@@ -1,50 +1,44 @@
 @php $locale = app()->getLocale(); @endphp
 
-<x-layout.public title="أعلن معنا" description="الإعلان والمحتوى المدعوم في مسار: ما نقبله، وكيف نُفصح عنه.">
+<x-layout.public :title="__('pages.advertise.title')" :description="__('pages.advertise.description')">
     <x-ui.container class="py-10">
         <div class="mx-auto max-w-[760px]">
             <header class="mb-10 border-b border-line pb-6">
-                <h1 class="font-display text-3xl font-semibold leading-tight text-g-950 sm:text-4xl">أعلن معنا</h1>
+                <h1 class="font-display text-3xl font-semibold leading-tight text-g-950 sm:text-4xl">{{ __('pages.advertise.title') }}</h1>
                 <p class="mt-4 text-lg leading-relaxed text-ink-3">
-                    جمهور مسار من قادة الأعمال والمستثمرين وصنّاع القرار في السوق السعودية.
+                    {{ __('pages.advertise.lede') }}
                 </p>
             </header>
 
             <div class="prose-masar">
-                <h2>ما نقدّمه</h2>
+                <h2>{{ __('pages.advertise.offer') }}</h2>
                 <p>
-                    مساحات عرض في الصفحة الرئيسية وصفحات الأقسام، ورعاية النشرة البريدية الأسبوعية،
-                    ومحتوى مدعوم يكتبه فريق الإعلان لا فريق التحرير.
+                    {{ __('pages.advertise.offer_body') }}
                 </p>
 
-                <h2>الفصل بين التحرير والإعلان</h2>
+                <h2>{{ __('pages.advertise.separation') }}</h2>
                 <p>
-                    لا نبيع تغطية تحريرية، ولا نُطلع معلنًا على مادة قبل نشرها، ولا نغيّر ترتيب
-                    الصفحة الرئيسية لحساب معلن. هذا قرارنا في كيفية العمل، وهو ما تُحاسبوننا عليه.
+                    {{ __('pages.advertise.separation_body') }}
                 </p>
                 <p>
-                    وما يسنده النظام منه شيء واحد نقوله بحجمه: صلاحية النشر معلّقة بدور تحريري،
-                    فلا ينشر أحد خارج التحرير مادةً على الموقع.
+                    {{ __('pages.advertise.enforced') }}
                 </p>
 
-                <h2>الإفصاح</h2>
+                <h2>{{ __('pages.advertise.disclosure') }}</h2>
                 <p>
-                    كل مادة مدعومة تحمل وسم «محتوى مدعوم» واسم الجهة الراعية، في أعلى المادة وفي كل
-                    مكان تظهر فيه ضمن الموقع. الوسم جزء من شروط النشر في النظام نفسه — لا يمكن نشر مادة
-                    مدعومة دون اسم راعٍ، ولا يمكن إزالة الوسم بعد النشر.
+                    {{ __('pages.advertise.disclosure_body', ['label' => __('article.sponsored')]) }}
                 </p>
 
-                <h2>ما لا نقبله</h2>
+                <h2>{{ __('pages.advertise.refuse') }}</h2>
                 <ul>
-                    <li>إعلانات تدّعي عوائد استثمارية مضمونة.</li>
-                    <li>محتوى مدعوم مكتوب ليبدو تغطية صحفية.</li>
-                    <li>أي طلب بحذف أو تعديل مادة تحريرية مقابل إعلان.</li>
+                    <li>{{ __('pages.advertise.refuse_1') }}</li>
+                    <li>{{ __('pages.advertise.refuse_2') }}</li>
+                    <li>{{ __('pages.advertise.refuse_3') }}</li>
                 </ul>
 
-                <h2>للتواصل</h2>
+                <h2>{{ __('pages.advertise.contact') }}</h2>
                 <p>
-                    راسلنا عبر <a href="{{ route('web.contact', $locale) }}" class="text-gold-ink underline">صفحة التواصل</a>
-                    وسنعود إليك بالتفاصيل والأسعار.
+                    {!! __('pages.advertise.contact_body', ['link' => '<a href="'.e(route('web.contact', $locale)).'" class="text-gold-ink underline">'.e(__('pages.advertise.contact_link')).'</a>']) !!}
                 </p>
             </div>
         </div>

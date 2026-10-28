@@ -1,100 +1,81 @@
 @php $locale = app()->getLocale(); @endphp
 
 <x-layout.public
-    title="معايير التحرير"
-    description="كيف نختار ما ننشره، وكيف نتحقق منه، وماذا نفعل حين نخطئ."
+    :title="__('site.footer.editorial_standards')"
+    :description="__('pages.standards.description')"
 >
     @push('schema')
         <x-schema.breadcrumbs :items="[
             ['name' => setting('identity.site_name'), 'url' => route('web.home', $locale, true)],
-            ['name' => 'معايير التحرير', 'url' => route('web.editorial-standards', $locale, true)],
+            ['name' => __('site.footer.editorial_standards'), 'url' => route('web.editorial-standards', $locale, true)],
         ]" />
     @endpush
 
     <x-ui.container class="py-10">
         <div class="mx-auto max-w-[760px]">
             <header class="mb-10 border-b border-line pb-6">
-                <h1 class="font-display text-3xl font-semibold leading-tight text-g-950 sm:text-4xl">معايير التحرير</h1>
+                <h1 class="font-display text-3xl font-semibold leading-tight text-g-950 sm:text-4xl">{{ __('site.footer.editorial_standards') }}</h1>
                 <p class="mt-4 text-lg leading-relaxed text-ink-3">
-                    هذه الصفحة تشرح كيف تُصنع المادة في مسار: ما الذي نختار تغطيته، وكيف نتحقق
-                    منه قبل النشر، وماذا نفعل حين نخطئ.
+                    {{ __('pages.standards.lede') }}
                 </p>
             </header>
 
             <div class="prose-masar">
-                <h2>ما الذي ننشره</h2>
+                <h2>{{ __('pages.standards.publish') }}</h2>
                 <p>
-                    مسار ليست وكالة أنباء ولا تنافس على السرعة. ننشر حين يكون لدينا ما نضيفه:
-                    تفسير لما حدث، أو أثر لم يُذكر، أو فرصة لم يلتفت إليها أحد. الخبر الذي لا
-                    نملك عليه زاوية لا ننشره.
+                    {{ __('pages.standards.publish_body') }}
                 </p>
 
-                <h2>كل مادة تجيب أربعة أسئلة</h2>
+                <h2>{{ __('pages.standards.four') }}</h2>
                 <p>
-                    قبل أن تصل أي مادة إلى القارئ، يجب أن تجيب: ماذا حدث؟ لماذا يهم؟ من المتأثر؟
-                    وأين الفرصة؟ هذه ليست توصية تحريرية بل شرط في نظامنا — المادة التي تترك
-                    «لماذا يهم هذا؟» فارغة لا يمكن نشرها تقنيًا.
+                    {{ __('pages.standards.four_body') }}
                 </p>
 
-                <h2>التحقق من المعلومات</h2>
+                <h2>{{ __('pages.standards.verify') }}</h2>
                 <p>
-                    تمر كل مادة بمرحلة تدقيق منفصلة قبل المراجعة التحريرية، ويقوم بها شخص غير
-                    كاتب المادة. لا يستطيع الكاتب تدقيق مادته بنفسه — هذا قيد مفروض في النظام،
-                    لا عرف يُتبع أحيانًا.
+                    {{ __('pages.standards.verify_body') }}
                 </p>
 
-                <h2>المصادر</h2>
+                <h2>{{ __('pages.standards.sources') }}</h2>
                 <p>
-                    لا تُنشر مادة دون مصدر واحد على الأقل مع رابط يمكن للقارئ فتحه بنفسه. هذا شرط
-                    في النظام، لا اجتهاد من المحرّر.
+                    {{ __('pages.standards.sources_body') }}
                 </p>
                 <p>
-                    وما يلي التزام تحريري نلتزم به نحن ولا يفرضه النظام، لأنه ليس مما يمكن للنظام
-                    أن يفرضه: نعتمد الوثائق الرسمية والبيانات المعلنة والمقابلات المباشرة، وننسب كل
-                    اقتباس إلى شخص حقيقي وافق على نسبته إليه، ولا ننشر رقمًا لا نعرف مصدره.
+                    {{ __('pages.standards.commitment') }}
                 </p>
 
-                <h2>المحتوى المدفوع</h2>
+                <h2>{{ __('pages.standards.paid') }}</h2>
                 <p>
-                    نُفصح عن أي محتوى مدفوع بوضوح، في أعلى المادة وفي كل بطاقة تظهر فيها وفي بيانات
-                    الصفحة التي تقرؤها محركات البحث. الإفصاح شرط في النظام: لا تُنشر مادة مدعومة
-                    دون اسم راعٍ.
+                    {{ __('pages.standards.paid_body') }}
                 </p>
                 <p>
-                    ولا نعرض المحتوى المدفوع كأنه تغطية مستقلة: يكتبه فريق الإعلان لا فريق التحرير،
-                    ولا نُدخله في الترشيحات التحريرية. هذا التزام منّا في كيفية العمل، وليس قيدًا
-                    يفرضه النظام — ما يفرضه النظام هو الوسم.
+                    {{ __('pages.standards.paid_2') }}
                 </p>
 
-                <h2>التصحيح</h2>
+                <h2>{{ __('pages.standards.corrections') }}</h2>
                 <p>
-                    حين نخطئ، نصحّح المادة ونوضّح ما تغيّر ومتى. لا نحذف مادة منشورة لإخفاء خطأ،
-                    ولا نعدّل رقمًا بصمت. كل تغيير في حالة المادة مسجّل في سجل تدقيق داخلي مع
-                    اسم من قام به.
+                    {{ __('pages.standards.corrections_body') }}
                 </p>
 
-                <h2>الاستقلال</h2>
+                <h2>{{ __('pages.standards.independence') }}</h2>
                 <p>
-                    القرار التحريري لا يخضع للمعلنين ولا للجهات التي نغطيها. تغطيتنا لشركة لا
-                    تتغيّر بسبب علاقة تجارية معها، ولا نمنح أحدًا حق مراجعة المادة قبل نشرها.
+                    {{ __('pages.standards.independence_body') }}
                 </p>
 
-                <h2>الذكاء الاصطناعي</h2>
+                <h2>{{ __('pages.standards.ai') }}</h2>
                 <p>
-                    نستخدم الذكاء الاصطناعي في البحث والتصنيف وتحسين الظهور في محركات البحث.
-                    لا ننشر نصًا مولّدًا: كل مادة يكتبها إنسان، ويراجعها إنسان، ويوافق على نشرها
-                    إنسان.
+                    {{ __('pages.standards.ai_body') }}
                 </p>
             </div>
 
             <aside class="mt-12 rounded-xl border border-line bg-white p-6">
-                <h2 class="font-display text-lg font-semibold text-g-900">وجدت خطأ؟</h2>
+                <h2 class="font-display text-lg font-semibold text-g-900">{{ __('pages.standards.found_error') }}</h2>
                 <p class="mt-2 text-ink-3">
-                    نريد أن نعرف. راسل فريق التحرير وسنراجع المادة.
+                    {{ __('pages.standards.found_error_body') }}
                 </p>
                 @if (setting('contact.editorial_email'))
                     <x-ui.button :href="'mailto:' . setting('contact.editorial_email')" class="mt-4">
-                        راسل التحرير
+                        {{ __('pages.standards.write_newsroom') }}
                     </x-ui.button>
                 @endif
             </aside>

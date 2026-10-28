@@ -5,19 +5,19 @@
      is the fabrication rule in CLAUDE.md §5 applied to people rather than to
      quotes. `people.is_expert` is never seeded true, so in demo the list below
      is empty and the page says why. --}}
-<x-layout.public title="فريق التحرير" description="من يكتب في مسار، وكيف يعمل التحرير.">
+<x-layout.public :title="__('pages.team.title')" :description="__('pages.team.description')">
     <x-ui.container class="py-10">
         <div class="mx-auto max-w-[760px]">
             <header class="mb-10 border-b border-line pb-6">
-                <h1 class="font-display text-3xl font-semibold leading-tight text-g-950 sm:text-4xl">فريق التحرير</h1>
+                <h1 class="font-display text-3xl font-semibold leading-tight text-g-950 sm:text-4xl">{{ __('pages.team.title') }}</h1>
                 <p class="mt-4 text-lg leading-relaxed text-ink-3">
-                    من يكتب، ومن يراجع، ومن يتحمّل مسؤولية ما يُنشر.
+                    {{ __('pages.team.lede') }}
                 </p>
             </header>
 
             @if ($people->isNotEmpty())
                 <section class="mb-12">
-                    <x-ui.section-rule title="الفريق" />
+                    <x-ui.section-rule :title="__('pages.team.team')" />
                     <div class="grid gap-4 sm:grid-cols-2">
                         @foreach ($people as $person)
                             <a href="{{ route('web.person.show', [$locale, $person->slug]) }}"
@@ -33,38 +33,32 @@
             @else
                 <div class="mb-12 rounded-xl border border-line bg-white p-6">
                     <p class="text-ink-3">
-                        لا نعرض أسماء بعد. هذه نسخة تجريبية، والأشخاص الظاهرون في المحتوى التجريبي غير
-                        حقيقيين — ونشر أسماء مُختلقة على أنها هيئة تحرير ادّعاءٌ لا نقبله عن أنفسنا.
-                        تظهر الأسماء هنا حين يكون خلفها أشخاص حقيقيون وافقوا على ذلك.
+                        {{ __('pages.team.no_names') }}
                     </p>
                 </div>
             @endif
 
             <div class="prose-masar">
-                <h2>كيف يعمل التحرير</h2>
+                <h2>{{ __('pages.team.how') }}</h2>
                 <p>
-                    تمرّ كل مادة بمسار واحد: بحث، ثم كتابة، ثم تدقيق للوقائع، ثم مراجعة تحريرية، ثم نشر.
-                    لا تُنشر مادة دون أن تجتاز هذه المراحل، ولا يملك أحد خارج التحرير تجاوزها.
+                    {{ __('pages.team.how_body') }}
                 </p>
 
-                <h2>ما الذي يوقف النشر</h2>
+                <h2>{{ __('pages.team.blocks') }}</h2>
                 <p>
-                    النظام نفسه يمنع النشر إذا نقص أي من هذه: ملخّص في ثلاثين ثانية، مصدر واحد على الأقل
-                    برابط، صورة رئيسية مع نصّها البديل، اجتياز مرحلة التدقيق، وإجابة عن سؤال «لماذا يهم».
-                    وإذا كانت المادة مدعومة، فاسم الجهة الراعية شرط لا يُتجاوز.
+                    {{ __('pages.team.blocks_body') }}
                 </p>
 
-                <h2>المسؤولية</h2>
+                <h2>{{ __('pages.team.accountability') }}</h2>
                 <p>
-                    كل مادة تحمل اسم كاتبها وتاريخ نشرها وتاريخ آخر تحديث. وحين نخطئ نصحّح علنًا وفق
-                    <a href="{{ route('web.corrections', $locale) }}" class="text-gold-ink underline">سياسة التصحيح</a>،
-                    ولا نحذف بصمت.
+                    {{-- The link is built here and dropped into the sentence, so each
+                         language puts it where its grammar wants it. --}}
+                    {!! __('pages.team.accountability_body', ['policy' => '<a href="'.e(route('web.corrections', $locale)).'" class="text-gold-ink underline">'.e(__('pages.team.corrections_link')).'</a>']) !!}
                 </p>
 
-                <h2>الخبراء والمصادر</h2>
+                <h2>{{ __('pages.team.experts') }}</h2>
                 <p>
-                    نُميّز بين من يكتب لنا ومن نقتبس عنه. الخبير الذي يظهر في موادنا شخص حقيقي وافق على
-                    ذلك، ولا نستخدم اسمًا أو صفة دون إذن.
+                    {{ __('pages.team.experts_body') }}
                 </p>
             </div>
         </div>

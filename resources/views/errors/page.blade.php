@@ -14,31 +14,9 @@
     // `/xx` from becoming a 500.
     view()->share('errors', $errors ?? new \Illuminate\Support\ViewErrorBag);
 
-    $copy = [
-        404 => [
-            'ar' => ['لم نجد هذه الصفحة', 'ربما نُقلت المادة أو تغيّر رابطها، أو كُتب العنوان بشكل مختلف. ابحث عمّا كنت تقصده، أو ابدأ من أحد الأقسام.'],
-            'en' => ['We could not find this page', 'The story may have moved, its link may have changed, or the address was typed differently. Search for what you meant, or start from a section.'],
-        ],
-        403 => [
-            'ar' => ['لا تملك صلاحية الوصول إلى هذه الصفحة', 'إن كنت تظن أنّ هذا خطأ، فسجّل الدخول بالحساب الصحيح أو ارجع إلى الصفحة الرئيسية.'],
-            'en' => ['You do not have access to this page', 'If you think this is a mistake, sign in with the right account or go back to the front page.'],
-        ],
-        419 => [
-            'ar' => ['انتهت صلاحية هذه الصفحة', 'مرّ وقت طويل منذ فُتحت الصفحة، فلم يعد بالإمكان إرسال النموذج. ارجع وأعد تحميلها ثم حاول مجددًا.'],
-            'en' => ['This page has expired', 'Too much time passed since the page was opened, so the form could not be sent. Go back, reload it and try again.'],
-        ],
-        429 => [
-            'ar' => ['طلبات كثيرة في وقت قصير', 'تلقّينا طلبات كثيرة من هذا الاتصال خلال فترة قصيرة. انتظر دقيقة ثم أعد المحاولة.'],
-            'en' => ['Too many requests', 'We received a lot of requests from this connection in a short time. Wait a minute and try again.'],
-        ],
-    ];
-
-    $ui = [
-        'ar' => ['kicker' => 'خطأ', 'home' => 'الصفحة الرئيسية', 'search' => 'ابحث في مسار…', 'search_label' => 'كلمة البحث', 'search_button' => 'بحث', 'sections' => 'أقسام مسار'],
-        'en' => ['kicker' => 'Error', 'home' => 'Front page', 'search' => 'Search MASAR…', 'search_label' => 'Search term', 'search_button' => 'Search', 'sections' => 'Sections'],
-    ][$locale] ?? [];
-
-    [$heading, $body] = $copy[$code][$locale] ?? $copy[$code]['ar'];
+    $heading = __("errors.{$code}.heading");
+    $body = __("errors.{$code}.body");
+    $ui = __('errors.ui');
 @endphp
 <x-layout.public :title="$heading" :noindex="true">
     <x-ui.container class="py-14 sm:py-20">
