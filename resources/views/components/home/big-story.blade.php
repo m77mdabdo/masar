@@ -4,13 +4,13 @@
      rendered pixels behind each element, text hidden, against the lightest
      pixel under its worst line box — slide one, both lead-slide backdrops,
      dark-green scrim — at 375 / 430 / 768 / 1024 / 1280 / 1440 / 1920:
-     headline ≥ 10.31, mint word ≥ 4.98, standfirst ≥ 6.60, byline ≥ 5.26,
-     step label ≥ 13.23, step body ≥ 11.25, numerals ≥ 4.87.
+     headline ≥ 10.31, mint word ≥ 4.98, standfirst ≥ 6.69, byline ≥ 5.26,
+     step label ≥ 11.71, step body ≥ 7.38, numerals ≥ 5.58.
      The per-width table is in CLAUDE.md §2. The scrim stops in app.css are
      what hold these; re-measure if they move or a backdrop is added.
      Slides two and three (data-ground="photo") drop the bands for blurred
      local scrims behind each text block; their own table is beside the
-     first: mint word ≥ 5.04, numerals ≥ 4.58. --}}
+     first: mint word ≥ 5.04, step body ≥ 4.56, numerals ≥ 4.65. --}}
 @php
     use App\Enums\ArticleSection;
 
@@ -82,7 +82,11 @@
          (slide one, dark and composed for it — wide scrim bands) or an
          article's own photograph (bright daylight — local scrims behind each
          text block only, so the photograph stays visible around them). --}}
-    <section class="full-bleed relative isolate overflow-hidden" @if ($count === 1) aria-labelledby="big-story-heading" @endif
+    {{-- `overflow-clip`, not `-hidden`: the scrims reach past the stage (427px
+         of content in a 375px box on a photo slide), and a hidden overflow is
+         still a scroll container — a focus move or a find-in-page can scroll
+         the whole slide sideways. A clipped one cannot be scrolled at all. --}}
+    <section class="full-bleed relative isolate overflow-clip" @if ($count === 1) aria-labelledby="big-story-heading" @endif
              data-ground="{{ $backdrop ? 'backdrop' : 'photo' }}"
              @if ($count > 1)
                  x-data="{ i: 0, n: {{ $count }}, go(d) { this.i = (this.i + d + this.n) % this.n } }"
@@ -240,7 +244,7 @@
                         @foreach ($slide['steps'] as $step)
                             <li class="grid grid-cols-[auto_1fr] gap-4">
                                 <span class="flex items-stretch gap-4" aria-hidden="true">
-                                    <span class="nums-tabular font-sans text-[2.625rem] font-normal leading-none tracking-[0.02em] text-gold/85">
+                                    <span class="nums-tabular font-sans text-[2.625rem] font-normal leading-none tracking-[0.02em] text-gold">
                                         {{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}
                                     </span>
                                     <span class="w-px bg-white/25"></span>

@@ -315,3 +315,18 @@ it('tells the stylesheet which ground is behind the text, slide by slide', funct
         ->and($without)->toContain('data-ground="photo"')
         ->toContain(":data-ground=\"i === 0 && false ? 'backdrop' : 'photo'\"");
 });
+
+it('clips the hero rather than hiding its overflow', function (): void {
+    // The scrims reach past the stage, and `overflow: hidden` is still a
+    // scroll container: measured at 375, a slide could be pushed 40px
+    // sideways. `clip` cannot be scrolled by anything.
+    $slides = collect(range(1, 3))->map(fn (): Article => Article::factory()->withHeroImage()->create());
+    $html = view('components.home.big-story', [
+        'section' => ['title' => 'القصة الكبرى', 'items' => $slides],
+        'backdrop' => illustrativeMedia(),
+        'attributes' => new ComponentAttributeBag,
+    ])->render();
+
+    expect($html)->toMatch('/<section class="full-bleed relative isolate overflow-clip"/')
+        ->not->toMatch('/<section class="[^"]*overflow-hidden/');
+});
