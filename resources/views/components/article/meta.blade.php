@@ -9,7 +9,7 @@
              which is under the 24x24 target WCAG 2.2 asks for. The padding is
              vertical only, so the metadata line does not visibly change. --}}
         <a href="{{ $categoryUrl }}"
-           class="inline-flex min-h-6 items-center font-medium text-g-600 transition hover:text-g-900">{{ $category->name }}</a>
+           class="inline-flex min-h-6 items-center font-medium text-g-600 transition hover:text-g-900">{{ $category->displayName() }}</a>
     @endif
 
     @if ($article->published_at)

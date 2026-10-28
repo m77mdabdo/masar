@@ -6,6 +6,9 @@ return [
     'gate' => [
         'translation_unreviewed' => 'Cette traduction n’a pas été relue. Une traduction n’est publiée qu’après validation par une personne autre que son traducteur.',
     ],
+    'language' => [
+        'menu' => 'Langue du panneau',
+    ],
     'translation' => [
         'action_retry' => 'Relancer la traduction',
         'action_review' => 'Valider la traduction',

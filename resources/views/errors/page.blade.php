@@ -46,7 +46,7 @@
                                 <li>
                                     <a href="{{ route('web.category.show', [$locale, $section->slug]) }}"
                                        class="flex min-h-6 items-center justify-between rounded-lg border border-line bg-white px-4 py-3 font-medium text-g-900 hover:border-g-600">
-                                        {{ $section->name }}
+                                        {{ $section->displayName() }}
                                         <x-ui.arrow />
                                     </a>
                                 </li>

@@ -9,7 +9,7 @@
                 <img src="{{ $company->logo_path }}" alt="" width="64" height="64" class="h-16 w-16 rounded-lg object-contain" />
             @endif
             <div class="min-w-0 flex-1">
-                <h1 class="font-display text-3xl font-semibold text-g-950">{{ $company->name }}</h1>
+                <h1 class="font-display text-3xl font-semibold text-g-950">{{ $company->displayName() }}</h1>
                 @if ($company->is_demo)
                     {{-- Demo companies are invented. A reader who arrives from a
                          shared link must not take one for a real business. --}}
@@ -17,8 +17,8 @@
                 @endif
                 <div class="mt-2 flex flex-wrap gap-2 text-sm text-ink-3">
                     <x-ui.tag>{{ $company->type?->label() }}</x-ui.tag>
-                    @if ($company->industry?->name)<x-ui.tag>{{ $company->industry->name }}</x-ui.tag>@endif
-                    @if ($company->country?->name)<x-ui.tag>{{ $company->country->name }}</x-ui.tag>@endif
+                    @if ($company->industry?->name)<x-ui.tag>{{ $company->industry->displayName() }}</x-ui.tag>@endif
+                    @if ($company->country?->name)<x-ui.tag>{{ $company->country->displayName() }}</x-ui.tag>@endif
                     @if ($company->ticker)<span class="ltr-isolate nums-tabular">{{ $company->ticker }}</span>@endif
                 </div>
                 @if ($company->translate('description'))

@@ -44,3 +44,16 @@ it('resolves a per-edition setting to the current edition and leaves other setti
     app(\App\Support\Settings::class)->set('market.ticker', [['label' => 'TASI']]);
     expect(setting('market.ticker'))->toBe([['label' => 'TASI']]);
 });
+
+it('marks a name that fell back to another edition with that edition’s lang and dir', function (): void {
+    $company = \App\Models\Company::factory()->create();
+    $company->translations()->delete();
+    $company->translations()->create(['locale' => 'ar', 'name' => 'مرقاة <للتعليم>']);
+    $company->load('translations');
+
+    app()->setLocale('ar');
+    expect((string) $company->displayName())->toBe('مرقاة &lt;للتعليم&gt;');
+
+    app()->setLocale('en');
+    expect((string) $company->displayName())->toBe('<bdi lang="ar" dir="rtl">مرقاة &lt;للتعليم&gt;</bdi>');
+});

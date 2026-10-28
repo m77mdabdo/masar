@@ -9,6 +9,9 @@ return [
     'gate' => [
         'translation_unreviewed' => 'هذه ترجمة لم يراجعها أحد بعد. لا تُنشر ترجمة قبل أن يعتمدها مراجع غير المترجم.',
     ],
+    'language' => [
+        'menu' => 'لغة اللوحة',
+    ],
     'translation' => [
         'action_retry' => 'إعادة الترجمة',
         'action_review' => 'اعتماد الترجمة',

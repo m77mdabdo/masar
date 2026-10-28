@@ -43,6 +43,14 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        // Package translations under our edition codes (ur-pk → ur, zh-hans →
+        // zh_CN). extend(), not a binding: the translation provider is
+        // deferred and would re-bind the loader after this one, silently.
+        $this->app->extend('translation.loader', fn ($loader, $app) => new \App\Support\EditionTranslationLoader(
+            $app['files'],
+            [base_path('vendor/laravel/framework/src/Illuminate/Translation/lang'), $app['path.lang']],
+        ));
+
         // No provider is selected. The null implementation ships so everything
         // downstream can be written and tested, and so the unclassified rate
         // measures exactly what an AI provider would be paid to do.

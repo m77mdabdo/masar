@@ -17,7 +17,7 @@
     <div class="min-w-0">
         @if ($article->category)
             <x-article.sponsored-flag :article="$article" />
-            <span class="inline-block rounded bg-mint/25 px-2 py-0.5 text-[0.7rem] font-medium text-g-950">{{ $article->category->name }}</span>
+            <span class="inline-block rounded bg-mint/25 px-2 py-0.5 text-[0.7rem] font-medium text-g-950">{{ $article->category->displayName() }}</span>
         @endif
         <h3 class="mt-2 font-display text-lg font-semibold text-g-950">
             <a href="{{ $url }}" class="block leading-7 transition hover:text-g-700">{{ $article->title }}</a>

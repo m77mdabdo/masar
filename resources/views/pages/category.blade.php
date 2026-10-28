@@ -23,7 +23,7 @@
 <x-layout.public :title="$category->name" :description="$category->translate('description')">
     <x-ui.container class="py-10">
         <header class="mb-10 border-b border-line pb-6">
-            <h1 class="font-display text-3xl font-semibold text-g-950 sm:text-4xl">{{ $category->name }}</h1>
+            <h1 class="font-display text-3xl font-semibold text-g-950 sm:text-4xl">{{ $category->displayName() }}</h1>
             @if ($category->translate('description'))
                 <p class="mt-3 max-w-2xl text-ink-3">{{ $category->translate('description') }}</p>
             @endif

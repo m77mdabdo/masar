@@ -11,9 +11,9 @@
     @endif
 
     <div class="min-w-0">
-        <div class="truncate font-display text-sm font-medium text-g-950">{{ $company->name }}</div>
+        <div class="truncate font-display text-sm font-medium text-g-950">{{ $company->displayName() }}</div>
         <div class="flex flex-wrap gap-x-2 text-xs text-ink-3">
-            @if ($company->industry?->name)<span>{{ $company->industry->name }}</span>@endif
+            @if ($company->industry?->name)<span>{{ $company->industry->displayName() }}</span>@endif
             @if ($company->ticker)
                 {{-- A ticker is Latin inside Arabic and must not flip the line. --}}
                 <span class="ltr-isolate nums-tabular">{{ $company->ticker }}</span>

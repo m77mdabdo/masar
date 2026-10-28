@@ -48,6 +48,32 @@ trait HasTranslations
         return $this->translation($locale)?->{$attribute};
     }
 
+    /**
+     * The name for a template, marked up when it is not in the page's
+     * language. A company with no English row renders its Arabic name on an
+     * English page; that is the fallback (CLAUDE.md §4), and it is honest
+     * only if the markup says which language the words are in — otherwise a
+     * screen reader reads «مرقاة» in an English voice and the line breaks it
+     * as Latin text. Escaped either way.
+     */
+    public function displayName(?string $locale = null): \Illuminate\Support\HtmlString
+    {
+        $locale ??= app()->getLocale();
+        $translation = $this->translation($locale);
+        $name = e((string) $translation?->name);
+
+        if ($translation === null || $translation->locale === $locale) {
+            return new \Illuminate\Support\HtmlString($name);
+        }
+
+        return new \Illuminate\Support\HtmlString(sprintf(
+            '<bdi lang="%s" dir="%s">%s</bdi>',
+            e(\App\Support\Locales::tag($translation->locale)),
+            e(\App\Support\Locales::dir($translation->locale)),
+            $name,
+        ));
+    }
+
     public function getNameAttribute(): ?string
     {
         return $this->translate('name');

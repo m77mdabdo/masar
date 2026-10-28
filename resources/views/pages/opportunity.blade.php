@@ -3,7 +3,7 @@
         <article class="mx-auto max-w-[760px]">
             <div class="mb-4 flex flex-wrap gap-2">
                 <x-ui.badge tone="accent">{{ $opportunity->potential?->label() }}</x-ui.badge>
-                @if ($opportunity->industry?->name)<x-ui.tag>{{ $opportunity->industry->name }}</x-ui.tag>@endif
+                @if ($opportunity->industry?->name)<x-ui.tag>{{ $opportunity->industry->displayName() }}</x-ui.tag>@endif
             </div>
 
             <h1 class="font-display text-3xl font-semibold leading-tight text-g-950 sm:text-4xl">{{ $opportunity->title }}</h1>
@@ -30,7 +30,7 @@
                 @if ($opportunity->country?->name)
                     <div class="rounded-xl border border-line bg-white p-4">
                         <dt class="text-xs text-ink-3">{{ __('pages.opportunities.scope') }}</dt>
-                        <dd class="mt-1 font-display text-lg">{{ $opportunity->country->name }}</dd>
+                        <dd class="mt-1 font-display text-lg">{{ $opportunity->country->displayName() }}</dd>
                     </div>
                 @endif
             </dl>

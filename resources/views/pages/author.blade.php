@@ -48,7 +48,7 @@
                     <h2 class="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-3">{{ __('pages.author.covers') }}</h2>
                     <div class="flex flex-wrap gap-2">
                         @foreach ($topics as $topic)
-                            <x-ui.tag :href="$urls->for($topic)">{{ $topic->name }}</x-ui.tag>
+                            <x-ui.tag :href="$urls->for($topic)">{{ $topic->displayName() }}</x-ui.tag>
                         @endforeach
                     </div>
                 </div>

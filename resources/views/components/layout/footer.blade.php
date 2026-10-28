@@ -72,14 +72,21 @@
                 <a href="{{ route('web.editorial-standards', $locale) }}" class="inline-flex min-h-6 items-center transition hover:text-g-700">{{ __('site.footer.editorial_standards') }}</a>
                 <a href="{{ route('web.rss.locale', $locale) }}" class="inline-flex min-h-6 items-center px-0.5 transition hover:text-g-700">RSS</a>
 
-                <span class="flex items-center gap-1">
-                    @foreach (config('masar.locales') as $code => $config)
-                        @continue (! ($config['enabled'] ?? false))
-                        @if (! $loop->first)<span aria-hidden="true">/</span>@endif
-                        <a href="{{ route('web.home', $code) }}"
-                           @class(['inline-flex min-h-6 items-center px-0.5 transition hover:text-g-700', 'font-bold text-ink' => $code === $locale])>{{ $config['name'] }}</a>
-                    @endforeach
-                </span>
+                {{-- The editions without JavaScript: each front page, named in
+                     its own language, with that language's lang and dir so a
+                     screen reader does not read «اردو» in an English voice.
+                     The topbar switcher is the in-context one; this wraps. --}}
+                @if (count(\App\Support\Locales::enabled()) > 1)
+                    <span class="flex flex-wrap items-center gap-1">
+                        @foreach (\App\Support\Locales::enabled() as $code)
+                            @if (! $loop->first)<span aria-hidden="true">/</span>@endif
+                            <a href="{{ route('web.home', $code) }}" hreflang="{{ \App\Support\Locales::tag($code) }}"
+                               lang="{{ \App\Support\Locales::tag($code) }}" dir="{{ \App\Support\Locales::dir($code) }}"
+                               @if ($code === $locale) aria-current="true" @endif
+                               @class(['inline-flex min-h-6 items-center px-0.5 transition hover:text-g-700', 'font-bold text-ink' => $code === $locale])>{{ \App\Support\Locales::name($code) }}</a>
+                        @endforeach
+                    </span>
+                @endif
 
                 {{-- A link, not a scripted button: it works with JavaScript off
                      and it is the same anchor a keyboard user already has. --}}

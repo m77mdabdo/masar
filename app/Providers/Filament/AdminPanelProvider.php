@@ -105,6 +105,28 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
                 EnforceAdminSessionLifetime::class,
+                // After Authenticate: the language is the signed-in user's.
+                \App\Http\Middleware\SetAdminLocale::class,
+            ])
+            ->userMenuItems([
+                \Filament\Actions\Action::make('language')
+                    ->label(fn (): string => __('admin.language.menu').': '.\App\Support\Locales::name(app()->getLocale()))
+                    ->icon('heroicon-o-language')
+                    ->schema([
+                        \Filament\Forms\Components\Select::make('locale')
+                            ->label(__('admin.language.menu'))
+                            ->options(fn (): array => collect(\App\Support\Locales::codes())
+                                ->mapWithKeys(fn (string $c): array => [$c => \App\Support\Locales::name($c)])->all())
+                            ->default(fn (): string => app()->getLocale())
+                            ->required(),
+                    ])
+                    ->action(function (array $data): void {
+                        $code = (string) $data['locale'];
+                        if (\App\Support\Locales::exists($code)) {
+                            auth()->user()->forceFill(['locale' => $code])->save();
+                        }
+                        redirect(request()->header('referer') ?: filament()->getUrl());
+                    }),
             ]);
     }
 }

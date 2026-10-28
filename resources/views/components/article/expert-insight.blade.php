@@ -17,7 +17,7 @@
         <div class="min-w-0">
             <blockquote class="font-display text-base italic leading-relaxed text-g-900 sm:text-lg">{{ $text }}</blockquote>
             <figcaption class="mt-3 text-sm">
-                <span class="font-medium text-ink">{{ $person->name }}</span>
+                <span class="font-medium text-ink">{{ $person->displayName() }}</span>
                 @if ($person->translate('title'))
                     <span class="block text-ink-3">{{ $person->translate('title') }}</span>
                 @endif

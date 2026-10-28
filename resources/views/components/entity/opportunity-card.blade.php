@@ -8,7 +8,7 @@
     <div class="mb-3 flex flex-wrap items-center gap-2">
         <x-ui.badge :tone="$tone">{{ $potential?->label() }}</x-ui.badge>
         @if ($opportunity->industry?->name)
-            <x-ui.tag>{{ $opportunity->industry->name }}</x-ui.tag>
+            <x-ui.tag>{{ $opportunity->industry->displayName() }}</x-ui.tag>
         @endif
     </div>
 

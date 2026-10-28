@@ -17,7 +17,7 @@
     <div class="min-w-0">
         <p class="flex flex-wrap items-center gap-x-2 text-[0.7rem] text-ink-3">
             @if ($article->category)
-                <span class="font-medium uppercase tracking-wide text-g-600">{{ $article->category->name }}</span>
+                <span class="font-medium uppercase tracking-wide text-g-600">{{ $article->category->displayName() }}</span>
             @endif
             <span class="nums-tabular">{{ __('site.article.duration_short', ['minutes' => $article->reading_time]) }}</span>
         </p>

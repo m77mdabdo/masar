@@ -48,7 +48,7 @@
                 <h2 class="mb-3 font-display text-sm font-semibold uppercase tracking-wide text-ink-3">{{ __('pages.video.series') }}</h2>
                 <div class="flex flex-wrap gap-2">
                     @foreach ($series as $topic)
-                        <x-ui.chip :href="$urls->for($topic)">{{ $topic->name }}</x-ui.chip>
+                        <x-ui.chip :href="$urls->for($topic)">{{ $topic->displayName() }}</x-ui.chip>
                     @endforeach
                 </div>
             </section>

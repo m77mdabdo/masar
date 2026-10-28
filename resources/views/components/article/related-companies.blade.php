@@ -14,11 +14,11 @@
                     {{-- Wrapped, never truncated: a company's name cut mid-word
                          is worse than a cell two lines tall. --}}
                     <span class="text-balance font-display text-[0.8rem] font-semibold leading-tight text-g-700 transition group-hover:text-g-900">
-                        {{ $company->name }}
+                        {{ $company->displayName() }}
                     </span>
                 @endif
 
-                <span class="text-[0.7rem] leading-tight text-ink-3">{{ $company->industry?->name }}</span>
+                <span class="text-[0.7rem] leading-tight text-ink-3">{{ $company->industry?->displayName() }}</span>
             </a>
         @endforeach
     </div>

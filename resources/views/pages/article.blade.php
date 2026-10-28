@@ -139,7 +139,7 @@
                         <div class="mt-8 flex flex-wrap items-center gap-2 border-t border-line pt-6">
                             <span class="text-xs text-ink-3">{{ __('article.tags') }}</span>
                             @foreach ($article->topics as $topic)
-                                <x-ui.tag :href="$urls->for($topic)">{{ $topic->name }}</x-ui.tag>
+                                <x-ui.tag :href="$urls->for($topic)">{{ $topic->displayName() }}</x-ui.tag>
                             @endforeach
                         </div>
                     @endif
@@ -180,7 +180,7 @@
                                         <a href="{{ $urls->for($topic) }}"
                                            class="flex items-center gap-2 px-4 py-2.5 text-sm text-ink transition hover:text-g-700">
                                             <span class="text-g-600" aria-hidden="true">#</span>
-                                            <span class="min-w-0 truncate">{{ $topic->name }}</span>
+                                            <span class="min-w-0 truncate">{{ $topic->displayName() }}</span>
                                         </a>
                                     </li>
                                 @endforeach

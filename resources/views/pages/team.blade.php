@@ -22,7 +22,7 @@
                         @foreach ($people as $person)
                             <a href="{{ route('web.person.show', [$locale, $person->slug]) }}"
                                class="rounded-xl border border-line bg-white p-4 transition hover:border-g-600">
-                                <div class="font-display text-base font-medium text-g-950">{{ $person->name }}</div>
+                                <div class="font-display text-base font-medium text-g-950">{{ $person->displayName() }}</div>
                                 @if ($person->translate('role'))
                                     <div class="mt-1 text-xs text-ink-3">{{ $person->translate('role') }}</div>
                                 @endif

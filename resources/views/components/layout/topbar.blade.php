@@ -35,20 +35,6 @@
                     </svg>
                 </a>
 
-                {{-- The active locale is bold, not coloured: it is the current
-                     state, and weight says so without needing a hue. --}}
-                <span class="flex items-center gap-1 text-ink-3">
-                    @foreach (config('masar.locales') as $code => $config)
-                        @continue (! ($config['enabled'] ?? false))
-                        @if (! $loop->first)<span aria-hidden="true">/</span>@endif
-                        <a href="{{ route('web.home', $code) }}"
-                           @if ($code === $locale) aria-current="true" @endif
-                           @class(['inline-flex min-h-6 items-center px-0.5 transition hover:text-g-700', 'font-bold text-ink' => $code === $locale])>
-                            {{ $config['name'] }}
-                        </a>
-                    @endforeach
-                </span>
-
                 <a href="{{ route('web.newsletter', $locale) }}"
                    class="inline-flex min-h-6 items-center rounded-full bg-g-900 px-4 text-xs font-medium text-cream transition hover:bg-g-700">
                     {{ __('site.nav.newsletter') }}

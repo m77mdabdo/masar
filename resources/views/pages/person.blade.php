@@ -6,7 +6,7 @@
                 <img src="{{ $person->photo_path }}" alt="" width="72" height="72" class="h-18 w-18 rounded-full object-cover" />
             @endif
             <div class="min-w-0">
-                <h1 class="font-display text-3xl font-semibold text-g-950">{{ $person->name }}</h1>
+                <h1 class="font-display text-3xl font-semibold text-g-950">{{ $person->displayName() }}</h1>
                 @if ($person->is_demo)
                     {{-- Demo people are invented, and a name alone can belong to
                          someone real. The page says so before anything else. --}}
@@ -15,7 +15,7 @@
                 <p class="mt-1 text-ink-3">{{ $person->translate('title') }}</p>
                 @if ($person->company?->name)
                     <a href="{{ app(App\Support\EntityUrl::class)->for($person->company) }}" class="mt-1 inline-block text-sm text-g-700 hover:underline">
-                        {{ $person->company->name }}
+                        {{ $person->company->displayName() }}
                     </a>
                 @endif
                 @if ($person->translate('bio'))

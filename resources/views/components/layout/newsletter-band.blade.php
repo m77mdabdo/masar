@@ -11,7 +11,7 @@
 @endphp
 <section class="bg-g-900 py-12 text-cream" aria-labelledby="newsletter-heading">
     <x-ui.container>
-        <div class="grid items-center gap-8 lg:grid-cols-[1fr_1.15fr_0.85fr]">
+        <div class="grid grid-cols-[minmax(0,1fr)] items-center gap-8 lg:grid-cols-[1fr_1.15fr_0.85fr]">
             <div>
                 <h2 id="newsletter-heading" class="font-display text-2xl font-semibold sm:text-3xl">
                     {{ __('site.newsletter.band_title') }}

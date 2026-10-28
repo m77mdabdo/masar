@@ -24,7 +24,7 @@
         <div class="mb-2 flex flex-wrap items-center gap-2">
             <x-article.sponsored-flag :article="$article" />
             @if ($article->category)
-                <span class="rounded bg-mint/25 px-2 py-0.5 text-[0.7rem] font-medium text-g-950">{{ $article->category->name }}</span>
+                <span class="rounded bg-mint/25 px-2 py-0.5 text-[0.7rem] font-medium text-g-950">{{ $article->category->displayName() }}</span>
             @endif
             <span class="nums-tabular text-[0.7rem] text-ink-3">{{ __('site.article.duration', ['minutes' => $article->reading_time]) }}</span>
         </div>

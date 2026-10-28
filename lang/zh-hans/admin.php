@@ -6,6 +6,9 @@ return [
     'gate' => [
         'translation_unreviewed' => '该译文尚未审核。译文须经译者以外的人员审核通过后方可发布。',
     ],
+    'language' => [
+        'menu' => '后台语言',
+    ],
     'translation' => [
         'action_retry' => '重新翻译',
         'action_review' => '审核通过译文',

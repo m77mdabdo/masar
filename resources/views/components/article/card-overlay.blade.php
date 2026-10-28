@@ -49,7 +49,7 @@
 
             @if ($article->category)
                 <span class="w-fit rounded-full border border-cream/35 px-2.5 py-0.5 text-[0.7rem] font-medium">
-                    {{ $article->category->name }}
+                    {{ $article->category->displayName() }}
                 </span>
             @endif
 

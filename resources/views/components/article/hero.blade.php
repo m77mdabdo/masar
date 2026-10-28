@@ -34,7 +34,7 @@
                 <nav aria-label="{{ __('article.breadcrumb') }}" class="mb-4 flex flex-wrap items-center gap-2 text-xs text-cream/70">
                     <a href="{{ route('web.home', $locale) }}" class="inline-flex min-h-6 items-center transition hover:text-mint">{{ __('site.nav.home') }}</a>
                     <span aria-hidden="true">›</span>
-                    <a href="{{ $urls->for($article->category) }}" class="inline-flex min-h-6 items-center transition hover:text-mint">{{ $article->category?->name }}</a>
+                    <a href="{{ $urls->for($article->category) }}" class="inline-flex min-h-6 items-center transition hover:text-mint">{{ $article->category?->displayName() }}</a>
                     <span aria-hidden="true">›</span>
                     <span class="truncate text-cream/50">{{ Str::limit($article->title, 40) }}</span>
                 </nav>
@@ -43,7 +43,7 @@
                     @if ($article->category)
                         <a href="{{ $urls->for($article->category) }}"
                            class="inline-flex items-center rounded-full bg-mint/25 px-3 py-1 text-xs font-medium text-cream transition hover:bg-mint/40">
-                            {{ $article->category->name }}
+                            {{ $article->category->displayName() }}
                         </a>
                     @endif
 

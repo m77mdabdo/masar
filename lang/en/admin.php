@@ -6,6 +6,9 @@ return [
     'gate' => [
         'translation_unreviewed' => 'This translation has not been reviewed. A translation is not published until someone other than its translator signs it off.',
     ],
+    'language' => [
+        'menu' => 'Panel language',
+    ],
     'translation' => [
         'action_retry' => 'Re-run translation',
         'action_review' => 'Sign off translation',

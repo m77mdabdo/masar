@@ -37,7 +37,7 @@
                 <div class="flex min-h-[11.875rem] flex-col justify-end gap-1 p-4.5">
                     <h3 class="font-display text-base font-semibold leading-snug">{{ $opportunity->title }}</h3>
                     <p class="text-[0.72rem] text-cream/70">
-                        @if ($opportunity->industry?->name){{ $opportunity->industry->name }}@endif
+                        @if ($opportunity->industry?->name){{ $opportunity->industry->displayName() }}@endif
                         @if ($opportunity->deadline)
                             <span aria-hidden="true"> · </span>
                             <time datetime="{{ $opportunity->deadline->toDateString() }}" class="ltr-isolate nums-tabular">{{ $opportunity->deadline->format('Y-m-d') }}</time>

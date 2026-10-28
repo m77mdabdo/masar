@@ -10,9 +10,9 @@
                     <img src="{{ $company->logo_path }}" alt="" width="28" height="28" loading="lazy" class="h-7 w-7 object-contain" />
                 @else
                     {{-- A wordmark we typeset is ours; a scraped logo is not. --}}
-                    <b class="text-balance font-display text-[0.78rem] font-semibold leading-tight text-g-700 transition group-hover:text-g-900">{{ $company->name }}</b>
+                    <b class="text-balance font-display text-[0.78rem] font-semibold leading-tight text-g-700 transition group-hover:text-g-900">{{ $company->displayName() }}</b>
                 @endif
-                <span class="text-[0.65rem] leading-tight text-ink-3">{{ $company->industry?->name }}</span>
+                <span class="text-[0.65rem] leading-tight text-ink-3">{{ $company->industry?->displayName() }}</span>
             </a>
         @endforeach
     </div>
