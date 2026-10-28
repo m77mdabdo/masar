@@ -84,6 +84,10 @@ return [
         'previous' => 'पिछला',
     ],
     'skip_to_content' => 'सामग्री पर जाएँ',
+    'switcher' => [
+        'front_page_only' => 'हिन्दी में उपलब्ध नहीं — मुखपृष्ठ',
+        'label' => 'भाषा',
+    ],
     'trend' => [
         'down' => 'गिरावट',
         'flat' => 'अपरिवर्तित',

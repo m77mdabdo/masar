@@ -25,14 +25,22 @@ return [
     | worse than none.
     */
 
-    'locales' => [
-        'ar' => ['name' => 'العربية', 'tag' => 'ar', 'dir' => 'rtl', 'script' => 'arabic', 'enabled' => true],
-        'en' => ['name' => 'English', 'tag' => 'en', 'dir' => 'ltr', 'script' => 'latin', 'enabled' => false],
-        'fr' => ['name' => 'Français', 'tag' => 'fr', 'dir' => 'ltr', 'script' => 'latin', 'enabled' => false],
-        'hi' => ['name' => 'हिन्दी', 'tag' => 'hi', 'dir' => 'ltr', 'script' => 'devanagari', 'enabled' => false],
-        'ur-pk' => ['name' => 'اردو', 'tag' => 'ur-PK', 'dir' => 'rtl', 'script' => 'nastaliq', 'enabled' => false],
-        'zh-hans' => ['name' => '简体中文', 'tag' => 'zh-Hans', 'dir' => 'ltr', 'script' => 'han', 'enabled' => false],
-    ],
+    'locales' => (function (): array {
+        // Which editions are live is an environment decision: production
+        // switches one on when it can be served, a dev machine may switch
+        // them all on to audit them. Arabic is always on.
+        $enabled = array_filter(array_map('trim', explode(',', (string) env('MASAR_LOCALES_ENABLED', 'ar'))));
+        $on = fn (string $code): bool => $code === 'ar' || in_array($code, $enabled, true);
+
+        return [
+            'ar' => ['name' => 'العربية', 'tag' => 'ar', 'og' => 'ar_SA', 'dir' => 'rtl', 'script' => 'arabic', 'enabled' => $on('ar')],
+            'en' => ['name' => 'English', 'tag' => 'en', 'og' => 'en_US', 'dir' => 'ltr', 'script' => 'latin', 'enabled' => $on('en')],
+            'fr' => ['name' => 'Français', 'tag' => 'fr', 'og' => 'fr_FR', 'dir' => 'ltr', 'script' => 'latin', 'enabled' => $on('fr')],
+            'hi' => ['name' => 'हिन्दी', 'tag' => 'hi', 'og' => 'hi_IN', 'dir' => 'ltr', 'script' => 'devanagari', 'enabled' => $on('hi')],
+            'ur-pk' => ['name' => 'اردو', 'tag' => 'ur-PK', 'og' => 'ur_PK', 'dir' => 'rtl', 'script' => 'nastaliq', 'enabled' => $on('ur-pk')],
+            'zh-hans' => ['name' => '简体中文', 'tag' => 'zh-Hans', 'og' => 'zh_CN', 'dir' => 'ltr', 'script' => 'han', 'enabled' => $on('zh-hans')],
+        ];
+    })(),
 
     'default_locale' => 'ar',
 

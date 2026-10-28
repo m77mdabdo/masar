@@ -15,6 +15,9 @@
 @php
     $locale = app()->getLocale();
     $direction = \App\Support\Locales::dir($locale);
+    // An article passes its own (published translations only); every other
+    // page is the same route in each enabled edition.
+    $pageAlternates = $alternates ?: \App\Support\Alternates::forCurrentRoute();
     $siteName = setting('identity.site_name');
     $pageTitle = $title
         ? str_replace(':title', $title, (string) setting('seo.title_template'))
@@ -40,13 +43,17 @@
 
     <link rel="canonical" href="{{ $canonical ?? url()->current() }}">
 
-    {{-- hreflang for every enabled locale, plus x-default. Emitted on every page
-         so an English version added later is discoverable the day it ships. --}}
-    @foreach (config('masar.locales') as $code => $config)
-        @continue (! ($config['enabled'] ?? false))
-        <link rel="alternate" hreflang="{{ $code }}" href="{{ $alternates[$code] ?? route('web.home', $code) }}">
+    {{-- hreflang for the editions this page really has, and only those
+         (App\Support\Alternates). It used to list every enabled edition and
+         point the missing ones at their front page, which told a crawler that
+         an English home page was the English version of an Arabic story.
+         x-default is the default edition's version, when there is one. --}}
+    @foreach ($pageAlternates as $code => $href)
+        <link rel="alternate" hreflang="{{ \App\Support\Locales::tag($code) }}" href="{{ $href }}">
     @endforeach
-    <link rel="alternate" hreflang="x-default" href="{{ route('web.home', config('masar.default_locale')) }}">
+    @isset($pageAlternates[\App\Support\Locales::default()])
+        <link rel="alternate" hreflang="x-default" href="{{ $pageAlternates[\App\Support\Locales::default()] }}">
+    @endisset
 
     <meta property="og:type" content="{{ $ogType ?? 'website' }}">
     <meta property="og:site_name" content="{{ $siteName }}">
@@ -54,7 +61,11 @@
     @if ($description)<meta property="og:description" content="{{ $description }}">@endif
     <meta property="og:url" content="{{ $canonical ?? url()->current() }}">
     @if ($ogImage)<meta property="og:image" content="{{ $ogImage }}">@endif
-    <meta property="og:locale" content="{{ $locale === 'ar' ? 'ar_SA' : 'en_US' }}">
+    <meta property="og:locale" content="{{ \App\Support\Locales::og($locale) }}">
+    @foreach ($pageAlternates as $code => $href)
+        @continue ($code === $locale)
+        <meta property="og:locale:alternate" content="{{ \App\Support\Locales::og($code) }}">
+    @endforeach
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ $title ?? $siteName }}">
@@ -110,7 +121,7 @@
         {{ __('site.skip_to_content') }}
     </a>
 
-    <x-layout.topbar :locale="$locale" :links="$topbarLinks ?? []" />
+    <x-layout.topbar :locale="$locale" :links="$topbarLinks ?? []" :alternates="$pageAlternates" />
     <x-layout.masthead :locale="$locale" :menu="$headerMenu ?? collect()" />
     {{-- Chrome, not content: the ticker sits above <main> with the masthead, so
          "skip to content" lands on the article and not on a row of figures. --}}

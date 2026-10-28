@@ -84,6 +84,10 @@ return [
         'previous' => 'Previous',
     ],
     'skip_to_content' => 'Skip to content',
+    'switcher' => [
+        'front_page_only' => 'Not available in English — front page',
+        'label' => 'Language',
+    ],
     'trend' => [
         'down' => 'Down',
         'flat' => 'Unchanged',

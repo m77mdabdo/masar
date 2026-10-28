@@ -84,6 +84,10 @@ return [
         'previous' => 'پچھلا',
     ],
     'skip_to_content' => 'مواد پر جائیں',
+    'switcher' => [
+        'front_page_only' => 'اردو میں دستیاب نہیں — سرورق',
+        'label' => 'زبان',
+    ],
     'trend' => [
         'down' => 'کمی',
         'flat' => 'کوئی تبدیلی نہیں',

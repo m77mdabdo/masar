@@ -66,39 +66,51 @@ class SitemapController
     }
 
     /**
-     * @return array<int, array{loc: string, lastmod: string|null}>
+     * Every page in every enabled edition, each with its hreflang alternates:
+     * the same section or topic in the other editions, and for a story, its
+     * published translations only (App\Support\Alternates' rule, applied in
+     * bulk — one query for the whole map instead of one per story).
+     *
+     * @return array<int, array{loc: string, lastmod: string|null, alternates: array<string, string>}>
      */
     private function entries(): array
     {
+        $locales = \App\Support\Locales::enabled();
+        $categories = Category::query()->where('is_active', true)->get();
+        $topics = Topic::query()->get();
         $entries = [];
 
-        foreach (array_keys((array) config('masar.locales')) as $locale) {
-            if (! config("masar.locales.{$locale}.enabled")) {
-                continue;
+        $structural = [fn (string $l): string => route('web.home', $l, true)];
+        foreach ($categories as $category) {
+            $structural[] = fn (string $l): string => $this->urls->for($category, $l, true);
+        }
+        foreach ($topics as $topic) {
+            $structural[] = fn (string $l): string => $this->urls->for($topic, $l, true);
+        }
+
+        foreach ($structural as $page) {
+            $alternates = collect($locales)->mapWithKeys(fn (string $l): array => [$l => $page($l)])->all();
+            foreach ($alternates as $loc) {
+                $entries[] = ['loc' => $loc, 'lastmod' => null, 'alternates' => $alternates];
             }
+        }
 
-            $entries[] = ['loc' => route('web.home', $locale, true), 'lastmod' => null];
+        $groups = [];
+        Article::query()->published()->whereIn('locale', $locales)->with('category')
+            ->chunkById(500, function ($articles) use (&$groups): void {
+                foreach ($articles as $article) {
+                    $groups[$article->translation_group_id][$article->locale] = [
+                        'loc' => $this->urls->for($article, $article->locale, true),
+                        'lastmod' => ($article->updated_content_at ?? $article->published_at)?->toAtomString(),
+                    ];
+                }
+            });
 
-            foreach (Category::query()->where('is_active', true)->get() as $category) {
-                $entries[] = ['loc' => $this->urls->for($category, $locale, true), 'lastmod' => null];
+        foreach ($groups as $versions) {
+            $alternates = array_map(fn (array $v): string => $v['loc'], $versions);
+            foreach ($versions as $version) {
+                $entries[] = [...$version, 'alternates' => count($alternates) > 1 ? $alternates : []];
             }
-
-            foreach (Topic::query()->get() as $topic) {
-                $entries[] = ['loc' => $this->urls->for($topic, $locale, true), 'lastmod' => null];
-            }
-
-            Article::query()
-                ->published()
-                ->where('locale', $locale)
-                ->with('category')
-                ->chunkById(500, function ($articles) use (&$entries, $locale): void {
-                    foreach ($articles as $article) {
-                        $entries[] = [
-                            'loc' => $this->urls->for($article, $locale, true),
-                            'lastmod' => ($article->updated_content_at ?? $article->published_at)?->toAtomString(),
-                        ];
-                    }
-                });
         }
 
         return array_values(array_filter($entries, fn (array $e): bool => $e['loc'] !== null));

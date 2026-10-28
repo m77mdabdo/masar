@@ -39,10 +39,9 @@
 
     $heroSizes = '100vw';
 
-    $alternates = $article->translations()->get()
-        ->mapWithKeys(fn ($t): array => [$t->locale => $urls->for($t, $t->locale, true)])
-        ->put($locale, $canonical)
-        ->all();
+    // Published translations only: a draft's URL 404s, and an alternate a
+    // crawler cannot open is worse than none.
+    $alternates = \App\Support\Alternates::forArticle($article);
 @endphp
 
 <x-layout.public

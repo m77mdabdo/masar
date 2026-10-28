@@ -17,8 +17,14 @@ class RootRedirectController
 {
     public function __invoke(Request $request): RedirectResponse
     {
-        // Negotiated on BCP 47 tags, which is what browsers send: `ur-pk` is
-        // our URL segment, `ur-PK` is what a phone in Lahore asks for.
+        // A reader who chose an edition before gets it back.
+        $chosen = (string) $request->cookie(\App\Http\Middleware\SetLocale::COOKIE);
+        if (Locales::isEnabled($chosen)) {
+            return redirect()->route('web.home', ['locale' => $chosen], 302);
+        }
+
+        // Otherwise negotiated on BCP 47 tags, which is what browsers send:
+        // `ur-pk` is our URL segment, `ur-PK` is what a phone in Lahore asks for.
         $tags = array_map(Locales::tag(...), Locales::enabled());
         $preferred = $request->getPreferredLanguage($tags);
 

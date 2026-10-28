@@ -23,6 +23,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class SetLocale
 {
+    public const COOKIE = 'masar_edition';
+
     public function handle(Request $request, Closure $next): Response
     {
         $locale = (string) $request->route('locale');
@@ -42,6 +44,15 @@ class SetLocale
             'script' => Locales::script($locale),
         ]);
 
-        return $next($request);
+        $response = $next($request);
+
+        // Remember the edition for the bare `/` redirect. Only when it
+        // changes: a Set-Cookie on every page would make every page
+        // uncacheable at the edge for nothing.
+        if ($request->cookie(self::COOKIE) !== $locale && method_exists($response, 'withCookie')) {
+            $response->withCookie(cookie()->forever(self::COOKIE, $locale, httpOnly: true));
+        }
+
+        return $response;
     }
 }

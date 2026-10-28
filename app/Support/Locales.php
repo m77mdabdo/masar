@@ -56,6 +56,12 @@ final class Locales
         return (string) (self::all()[$code]['tag'] ?? $code);
     }
 
+    /** Open Graph's own form (`ar_SA`, `zh_CN`). */
+    public static function og(string $code): string
+    {
+        return (string) (self::all()[$code]['og'] ?? $code);
+    }
+
     public static function dir(string $code): string
     {
         return (string) (self::all()[$code]['dir'] ?? 'rtl');

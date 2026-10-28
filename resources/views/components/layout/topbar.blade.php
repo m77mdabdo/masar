@@ -1,4 +1,4 @@
-@props(['locale', 'links' => null])
+@props(['locale', 'links' => null, 'alternates' => []])
 {{-- Cream, one hairline, one 30px row. --}}
 <div class="border-b border-line bg-cream">
     <x-ui.container>
@@ -24,6 +24,7 @@
                     <a href="{{ $link['url'] }}" class="hidden min-h-6 items-center text-ink transition hover:text-g-700 sm:inline-flex">{{ $link['label'] }}</a>
                 @endforeach
 
+                <x-layout.language-switcher :locale="$locale" :alternates="$alternates" />
                 {{-- The icon stays 16px; the target is padded to 24×24. It was exactly the
                      icon box, which is the smallest tap target on the site and one of
                      the most used. --}}

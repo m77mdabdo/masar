@@ -84,6 +84,10 @@ return [
         'previous' => '上一页',
     ],
     'skip_to_content' => '跳至正文',
+    'switcher' => [
+        'front_page_only' => '暂无中文版本——前往首页',
+        'label' => '语言',
+    ],
     'trend' => [
         'down' => '下跌',
         'flat' => '持平',
