@@ -53,7 +53,13 @@ it('shows the reader a banner while on', function (): void {
     // Visible to a person, not only to a crawler.
     app(Settings::class)->set(DemoMode::SETTING, true);
 
-    expect($this->get('/ar')->assertOk()->getContent())->toContain('نسخة تجريبية');
+    $html = $this->get('/ar')->assertOk()->getContent();
+
+    // In the topbar's first slot rather than a band above the page, and the
+    // label itself is never behind a breakpoint: a phone reader sees it too.
+    expect($html)->toContain('<span class="shrink-0 rounded-full bg-gold-ink px-2 py-0.5 text-[0.6875rem] font-semibold leading-tight text-cream">نسخة تجريبية</span>')
+        ->and($html)->toMatch('/<p role="status" class="flex min-w-0 [^"]*">\s*<span class="shrink-0 rounded-full bg-gold-ink/')
+        ->and(strpos($html, 'role="status"'))->toBeLessThan(strpos($html, '<header'));
 });
 
 it('opens all five surfaces when switched off', function (): void {

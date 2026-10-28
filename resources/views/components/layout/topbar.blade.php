@@ -1,12 +1,23 @@
 @props(['locale', 'links' => null])
-{{-- Cream, one hairline, one 36px row. --}}
+{{-- Cream, one hairline, one 30px row. --}}
 <div class="border-b border-line bg-cream">
     <x-ui.container>
-        <div class="flex h-9 items-center justify-between gap-4 text-xs">
-            {{-- aria-hidden: the masthead carries the same line as real content,
-                 and a second copy outside every landmark is furniture a screen
-                 reader has to step over. --}}
-            <p class="hidden text-ink-3 sm:block" aria-hidden="true">{{ setting('identity.descriptor') }}</p>
+        <div class="flex h-[1.875rem] items-center justify-between gap-4 text-xs">
+            @if (app(App\Support\DemoMode::class)->isOn())
+                {{-- Visible to a reader, not only to a crawler. Someone who lands
+                     on this site should know what they are reading before they
+                     quote it — so it takes the descriptor's slot and, unlike the
+                     descriptor, shows on a phone too. --}}
+                <p role="status" class="flex min-w-0 items-center gap-2 text-ink-3">
+                    <span class="shrink-0 rounded-full bg-gold-ink px-2 py-0.5 text-[0.6875rem] font-semibold leading-tight text-cream">نسخة تجريبية</span>
+                    <span class="truncate"><span class="sm:hidden">للعرض فقط</span><span class="hidden sm:inline">المحتوى المعروض لأغراض العرض فقط وليس تغطية صحفية منشورة.</span></span>
+                </p>
+            @else
+                {{-- aria-hidden: the masthead carries the same line as real content,
+                     and a second copy outside every landmark is furniture a screen
+                     reader has to step over. --}}
+                <p class="hidden text-ink-3 sm:block" aria-hidden="true">{{ setting('identity.descriptor') }}</p>
+            @endif
 
             <nav class="flex items-center gap-4" aria-label="روابط سريعة">
                 @foreach (collect($links)->take(4) as $link)
@@ -38,7 +49,7 @@
                 </span>
 
                 <a href="{{ route('web.newsletter', $locale) }}"
-                   class="inline-flex items-center rounded-full bg-g-900 px-4 py-1.5 text-xs font-medium text-cream transition hover:bg-g-700">
+                   class="inline-flex min-h-6 items-center rounded-full bg-g-900 px-4 text-xs font-medium text-cream transition hover:bg-g-700">
                     النشرة
                 </a>
             </nav>

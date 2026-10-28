@@ -98,13 +98,9 @@
     @stack('schema')
 </head>
 <body class="min-h-screen bg-cream text-ink antialiased">
-@if (app(App\Support\DemoMode::class)->isOn())
-    {{-- Visible to a reader, not only to a crawler. Someone who lands on this
-         site should know what they are reading before they quote it. --}}
-    <div role="status" class="bg-gold-ink px-4 py-2 text-center text-[0.8125rem] font-medium text-cream">
-        نسخة تجريبية — المحتوى المعروض لأغراض العرض فقط وليس تغطية صحفية منشورة.
-    </div>
-@endif
+{{-- The demo disclosure lives in the topbar's first slot, not in a band
+     of its own above the page: same words, every page, every width, no
+     height of its own. --}}
     <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-3 focus:rounded-lg focus:bg-g-900 focus:px-4 focus:py-2 focus:text-cream">
         تخطَّ إلى المحتوى
     </a>
