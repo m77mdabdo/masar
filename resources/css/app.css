@@ -267,7 +267,7 @@
      * - Headline group: 0.85. Without a halo on the headline, 0.80 put the
      *   mint closing word at 4.13. With text-shadow alone the headline
      *   measured 1.0–1.7.
-     * - Questions: 0.92 where the numerals sit, easing to 0.70 under the
+     * - Questions: 0.90 where the numerals sit, easing to 0.70 under the
      *   text. 0.65 flat put a numeral at 2.50.
      * Behind the headline column the photograph now keeps ~71% of its
      * brightness at 1440, and ~60% behind the questions.
@@ -300,9 +300,7 @@
     }
 
     .questions-scrim {
-        /* 0.92, not 0.90: at the drift's start (scale 1.06) a numeral on
-           slide two measured 4.55 at 1024. */
-        --q-num: rgb(0 29 23 / 0.92);
+        --q-num: rgb(0 29 23 / 0.90);
         --q-text: rgb(0 29 23 / 0.70);
         inset-block: -5rem;
         inset-inline-start: -5rem;
@@ -338,7 +336,7 @@
     }
 
     /*
-     * The big story's motion (Task 2.10): a zoom-out from 1.06 to 1.0 on the
+     * The big story's motion (Task 2.10): a zoom-out from 1.04 to 1.0 on the
      * image layer, then a cross-fade. Transform and opacity only, so it runs
      * on the compositor, and only in `no-preference`: under reduced motion
      * nothing here applies and the slide sits still at 1.0.
@@ -346,12 +344,12 @@
      * The origin is the slide's focal point, so the zoom settles on the
      * subject the crop was framed around rather than on the box's centre.
      * Below 1.0 would expose the stage edges; the keyframes never go there.
-     * The figures that justify 1.06 (framing at both ends, contrast at start,
+     * The figures that justify 1.04 (framing at both ends, contrast at start,
      * middle and end) are in CLAUDE.md §2.
      */
     @media (prefers-reduced-motion: no-preference) {
         [data-carousel] .hero-photo {
-            transition: opacity 800ms linear;
+            transition: opacity 480ms linear;
         }
 
         [data-carousel] .hero-photo img {
@@ -359,11 +357,11 @@
         }
 
         [data-carousel] .hero-photo.is-armed img {
-            transform: scale(1.06);
+            transform: scale(1.04);
         }
 
         [data-carousel] .hero-photo.is-drifting img {
-            animation: hero-drift 8.8s linear both;
+            animation: hero-drift 5.48s linear both;
         }
 
         [data-carousel][data-paused] .hero-photo img {
@@ -372,7 +370,7 @@
     }
 
     @keyframes hero-drift {
-        from { transform: scale(1.06); }
+        from { transform: scale(1.04); }
         to { transform: scale(1); }
     }
 

@@ -1,11 +1,14 @@
 /*
  * The big story: a slow zoom-out on each photograph, then a cross-fade to the
- * next (owner's ruling, Task 2.10).
+ * next (owner's rulings, Tasks 2.10 and 2.11).
  *
- * - Dwell 8s: long enough to read a headline and its standfirst before the
- *   slide moves, which is the point of a business hero. Three seconds is a
- *   billboard; 9s left the drift reading as stalled.
- * - The drift runs dwell + fade (8.8s), so the outgoing picture is still
+ * - Dwell 5s, the owner's floor: under it the hero stops reading as a
+ *   publication and starts reading as a billboard. Do not go lower without
+ *   asking. WCAG 2.2.2's five seconds is measured over the whole loop, not
+ *   one slide, and the loop never ends: the pause control is what makes this
+ *   conform at any dwell.
+ * - Fade 480ms, inside the owner's 450–500.
+ * - The drift runs dwell + fade (5.48s), so the outgoing picture is still
  *   settling under the incoming one rather than stopping dead.
  * - Nothing moves until the lead image has decoded: the drift must never
  *   compete with the LCP paint.
@@ -17,8 +20,8 @@
  * - Only the next slide is fetched, during the current one's dwell. A fade
  *   never starts until its picture has decoded.
  */
-const DWELL = 8000;
-const FADE = 800;
+const DWELL = 5000;
+const FADE = 480;
 const STOPPED = 'masar.hero.manual';
 
 const bigStory = (n) => ({
@@ -69,7 +72,9 @@ const bigStory = (n) => ({
             this.drift = [0];
             this.queue();
             // Half a dwell in: the page's own images are fetched by then,
-            // and the next slide still has four seconds to arrive.
+            // and the next slide still has 2.5s to arrive. On the
+            // Lighthouse mobile profile the largest (262 KB at 1440) decodes
+            // ~1s before its fade; slower than that, the fade waits for it.
             setTimeout(() => { if (this.playing) this.arm((this.i + 1) % this.n); }, DWELL / 2);
         });
     },

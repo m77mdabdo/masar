@@ -111,7 +111,7 @@ it('moves only under no-preference, only by transform, and never below 1.0', fun
 
     preg_match('/@keyframes hero-drift \{(.*?)\n    \}/s', $css, $frames);
     preg_match_all('/scale\(([\d.]+)\)/', $frames[1], $scales);
-    expect(array_map('floatval', $scales[1]))->toBe([1.06, 1.0])
+    expect(array_map('floatval', $scales[1]))->toBe([1.04, 1.0])
         ->and($frames[1])->not->toMatch('/width|height|background-position|translate/');
 });
 
@@ -126,8 +126,10 @@ it('runs the drift for exactly one dwell plus one fade', function (): void {
     preg_match('/animation: hero-drift ([\d.]+)s linear both;/', $css, $drift);
     preg_match('/\[data-carousel\] \.hero-photo \{\s*transition: opacity (\d+)ms linear;/', $css, $transition);
 
-    expect((int) $dwell[1])->toBeGreaterThanOrEqual(7000)->toBeLessThanOrEqual(9000)
-        ->and((int) $fade[1])->toBeGreaterThanOrEqual(600)->toBeLessThanOrEqual(900)
+    // 5s is the owner's floor (Task 2.11): below it the hero reads as a
+    // billboard. Lowering it is a decision for the owner, not a refactor.
+    expect((int) $dwell[1])->toBeGreaterThanOrEqual(5000)->toBeLessThanOrEqual(9000)
+        ->and((int) $fade[1])->toBeGreaterThanOrEqual(450)->toBeLessThanOrEqual(500)
         ->and((int) round((float) $drift[1] * 1000))->toBe((int) $dwell[1] + (int) $fade[1])
         ->and((int) $transition[1])->toBe((int) $fade[1]);
 });
