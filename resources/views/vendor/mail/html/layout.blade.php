@@ -2,8 +2,8 @@
 {{-- Published from Laravel's default only to carry direction. MASAR is
      Arabic-first and the packaged template is LTR, which left-aligns every
      line and strands Arabic punctuation at the wrong edge. --}}
-@php($dir = config('masar.locales.'.app()->getLocale().'.dir', 'rtl'))
-<html xmlns="http://www.w3.org/1999/xhtml" lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ $dir }}">
+@php($dir = \App\Support\Locales::dir(app()->getLocale()))
+<html xmlns="http://www.w3.org/1999/xhtml" lang="{{ \App\Support\Locales::tag(app()->getLocale()) }}" dir="{{ $dir }}">
 <head>
 <title>{{ config('app.name') }}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />

@@ -46,14 +46,20 @@ return [
     ],
     'form' => [
         'email' => '电子邮箱',
+        'email_invalid' => '该电子邮箱无效。',
+        'email_required' => '请输入您的电子邮箱。',
+        'email_too_long' => '该电子邮箱过长。',
         'honeypot' => '请勿填写此字段',
+        'not_sent' => '表单无法提交。',
     ],
     'market' => [
         'indicators' => '市场指标',
         'pulse' => '市场脉搏',
     ],
     'nav' => [
+        'about' => '关于我们',
         'close' => '关闭',
+        'contact' => '联系',
         'home' => '首页',
         'main' => '主导航',
         'menu' => '菜单',
@@ -67,6 +73,7 @@ return [
         'band_audience' => '与企业领袖、投资者和变革者一同阅读。',
         'band_body' => '每周梳理沙特市场的变化及其意义。',
         'band_title' => '从信息到机遇，每周一期',
+        'check_inbox' => '请查收邮箱：我们已发送订阅确认邮件。',
         'subscribe' => '订阅',
         'subscribe_cta' => '订阅通讯',
     ],

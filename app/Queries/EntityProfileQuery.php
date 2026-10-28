@@ -85,7 +85,7 @@ final class EntityProfileQuery
             ->values();
 
         if ($opportunities > 0) {
-            $rows->push(['label' => 'فرص', 'count' => $opportunities]);
+            $rows->push(['label' => __('pages.opportunities.title'), 'count' => $opportunities]);
         }
 
         return $rows->sortByDesc('count')->values();

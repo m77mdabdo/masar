@@ -98,3 +98,16 @@ it('renders a translated key rather than its name', function (): void {
         expect(__('site.nav.menu'))->not->toBe('site.nav.menu');
     }
 });
+
+it('gives every edition the same framework strings (lang/*.json)', function (): void {
+    // Laravel's own mail template reads these by their English text.
+    $source = array_keys(json_decode(file_get_contents(lang_path('ar.json')), true));
+
+    foreach (Locales::codes() as $code) {
+        $file = lang_path("{$code}.json");
+        expect($file)->toBeFile();
+        $target = json_decode(file_get_contents($file), true);
+        expect(array_keys($target))->toBe($source)
+            ->and(array_filter($target, fn ($v): bool => trim((string) $v) === ''))->toBe([]);
+    }
+});

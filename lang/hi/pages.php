@@ -91,8 +91,10 @@ return [
     ],
     'issue' => [
         'in_this' => 'इस अंक में',
+        'reading_minutes' => 'पढ़ने के मिनट',
         'sections' => 'खंड',
         'stories' => 'लेख',
+        'writers' => 'लेखक',
     ],
     'markets' => [
         'description' => 'सऊदी बाज़ार का विश्लेषणात्मक अध्ययन — लाइव भाव नहीं।',

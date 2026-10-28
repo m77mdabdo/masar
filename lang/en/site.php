@@ -46,14 +46,20 @@ return [
     ],
     'form' => [
         'email' => 'Email address',
+        'email_invalid' => 'This email address is not valid.',
+        'email_required' => 'Enter your email address.',
+        'email_too_long' => 'This email address is too long.',
         'honeypot' => 'Leave this field empty',
+        'not_sent' => 'The form could not be sent.',
     ],
     'market' => [
         'indicators' => 'Market indicators',
         'pulse' => 'Market pulse',
     ],
     'nav' => [
+        'about' => 'About us',
         'close' => 'Close',
+        'contact' => 'Contact',
         'home' => 'Home',
         'main' => 'Main navigation',
         'menu' => 'Menu',
@@ -67,6 +73,7 @@ return [
         'band_audience' => 'Join readers from among business leaders, investors and changemakers.',
         'band_body' => 'A weekly briefing on what changed in the Saudi market, and why it matters.',
         'band_title' => 'From information to opportunity, every week',
+        'check_inbox' => 'Check your inbox: we have sent an email to confirm your subscription.',
         'subscribe' => 'Subscribe',
         'subscribe_cta' => 'Subscribe to the newsletter',
     ],

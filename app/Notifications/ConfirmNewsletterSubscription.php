@@ -36,14 +36,14 @@ class ConfirmNewsletterSubscription extends Notification implements ShouldQueue
         $site = (string) setting('identity.site_name', 'MASAR');
 
         return (new MailMessage)
-            ->subject("أكِّد اشتراكك في نشرة {$site}")
-            ->greeting('أهلًا بك')
-            ->line("طلب أحدهم الاشتراك بهذا البريد في النشرة الأسبوعية من {$site}.")
-            ->line('إن كنت أنت، أكِّد اشتراكك من الزر أدناه. رسالة واحدة أسبوعيًا، ويمكنك إلغاء الاشتراك في أي وقت.')
-            ->action('تأكيد الاشتراك', $notifiable->confirmationUrl())
-            ->line('ينتهي هذا الرابط بعد '.Subscriber::CONFIRMATION_TTL_DAYS.' أيام.')
+            ->subject(__('mail.confirm.subject', ['site' => $site]))
+            ->greeting(__('mail.confirm.greeting'))
+            ->line(__('mail.confirm.requested', ['site' => $site]))
+            ->line(__('mail.confirm.if_you'))
+            ->action(__('mail.confirm.action'), $notifiable->confirmationUrl())
+            ->line(__('mail.confirm.expires', ['days' => Subscriber::CONFIRMATION_TTL_DAYS]))
             // The address is not on the list yet, so "ignore this" is the whole
             // remedy: no confirmation, no mail, and the row expires unused.
-            ->line('إن لم تطلب هذا الاشتراك، تجاهل هذه الرسالة ولن نرسل لك شيئًا آخر.');
+            ->line(__('mail.confirm.ignore'));
     }
 }

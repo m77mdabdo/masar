@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\SubscriberStatus;
 use App\Models\Concerns\IsDemoContent;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,11 +14,22 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\URL;
 
-class Subscriber extends Model
+class Subscriber extends Model implements HasLocalePreference
 {
     use HasFactory;
     use IsDemoContent;
     use Notifiable;
+
+    /**
+     * Mail to a subscriber is written in the edition they subscribed from.
+     * Laravel's notification sender reads this and switches locale for the
+     * duration of the message, so a queued confirmation does not fall back
+     * to whatever locale the worker happens to boot in.
+     */
+    public function preferredLocale(): string
+    {
+        return \App\Support\Locales::exists((string) $this->locale) ? (string) $this->locale : \App\Support\Locales::default();
+    }
 
     /** How long a confirmation link stays good. */
     public const CONFIRMATION_TTL_DAYS = 7;

@@ -46,14 +46,20 @@ return [
     ],
     'form' => [
         'email' => 'Adresse e-mail',
+        'email_invalid' => 'Cette adresse e-mail n’est pas valide.',
+        'email_required' => 'Saisissez votre adresse e-mail.',
+        'email_too_long' => 'Cette adresse e-mail est trop longue.',
         'honeypot' => 'Ne remplissez pas ce champ',
+        'not_sent' => 'Le formulaire n’a pas pu être envoyé.',
     ],
     'market' => [
         'indicators' => 'Indicateurs de marché',
         'pulse' => 'Pouls du marché',
     ],
     'nav' => [
+        'about' => 'Qui sommes-nous',
         'close' => 'Fermer',
+        'contact' => 'Contact',
         'home' => 'Accueil',
         'main' => 'Navigation principale',
         'menu' => 'Menu',
@@ -67,6 +73,7 @@ return [
         'band_audience' => 'Rejoignez des lecteurs parmi les dirigeants, les investisseurs et les acteurs du changement.',
         'band_body' => 'Une synthèse hebdomadaire de ce qui a changé sur le marché saoudien, et pourquoi c’est important.',
         'band_title' => 'De l’information à l’opportunité, chaque semaine',
+        'check_inbox' => 'Consultez votre boîte mail : nous vous avons envoyé un message pour confirmer l’abonnement.',
         'subscribe' => 'S’abonner',
         'subscribe_cta' => 'S’abonner à la lettre',
     ],

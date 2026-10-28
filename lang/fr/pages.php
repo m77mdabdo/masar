@@ -91,8 +91,10 @@ return [
     ],
     'issue' => [
         'in_this' => 'Dans ce numéro',
+        'reading_minutes' => 'Minutes de lecture',
         'sections' => 'Rubriques',
         'stories' => 'Articles',
+        'writers' => 'Auteurs',
     ],
     'markets' => [
         'description' => 'Une lecture analytique du marché saoudien, sans cours en temps réel.',

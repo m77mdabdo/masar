@@ -30,7 +30,7 @@ class NewsletterSubscriptionController
         return back()->with('newsletter', [
             'ok' => true,
             'source' => $request->string('source')->toString(),
-            'message' => 'تفقّد بريدك: أرسلنا رسالة لتأكيد الاشتراك.',
+            'message' => __('site.newsletter.check_inbox'),
         ])->withFragment('newsletter-heading');
     }
 

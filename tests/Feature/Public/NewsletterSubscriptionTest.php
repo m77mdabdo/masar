@@ -202,3 +202,23 @@ it('rate limits the subscribe route', function (): void {
     $this->post(route('web.newsletter.subscribe', 'ar'), ['email' => 'over@example.com'])
         ->assertStatus(429);
 });
+
+it('sends the confirmation in the edition the reader subscribed from', function (): void {
+    // The sender switches locale from preferredLocale(); a queued mail that
+    // ignored it would arrive in whatever locale the worker booted in.
+    $subscriber = Subscriber::factory()->create(['locale' => 'fr']);
+    $subscriber->notify(new ConfirmNewsletterSubscription);
+
+    Notification::assertSentTo($subscriber, ConfirmNewsletterSubscription::class,
+        fn ($notification, array $channels, object $notifiable, ?string $locale): bool => $locale === 'fr');
+
+    app()->setLocale('fr');
+    $mail = (new ConfirmNewsletterSubscription)->toMail($subscriber);
+
+    expect($mail->subject)->toStartWith('Confirmez votre abonnement')
+        ->and($mail->actionText)->toBe('Confirmer l’abonnement');
+});
+
+it('falls back to the default edition for a subscriber row with no known locale', function (): void {
+    expect(Subscriber::factory()->make(['locale' => 'xx'])->preferredLocale())->toBe('ar');
+});

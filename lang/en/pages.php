@@ -91,8 +91,10 @@ return [
     ],
     'issue' => [
         'in_this' => 'In this issue',
+        'reading_minutes' => 'Minutes of reading',
         'sections' => 'Sections',
         'stories' => 'Stories',
+        'writers' => 'Writers',
     ],
     'markets' => [
         'description' => 'An analytical reading of the Saudi market, not live prices.',

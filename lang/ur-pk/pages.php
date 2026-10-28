@@ -91,8 +91,10 @@ return [
     ],
     'issue' => [
         'in_this' => 'اس شمارے میں',
+        'reading_minutes' => 'مطالعے کے منٹ',
         'sections' => 'سیکشنز',
         'stories' => 'مضامین',
+        'writers' => 'لکھاری',
     ],
     'markets' => [
         'description' => 'سعودی مارکیٹ کا تجزیاتی مطالعہ — لائیو قیمتیں نہیں۔',

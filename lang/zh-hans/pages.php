@@ -91,8 +91,10 @@ return [
     ],
     'issue' => [
         'in_this' => '本期内容',
+        'reading_minutes' => '阅读分钟数',
         'sections' => '栏目',
         'stories' => '文章',
+        'writers' => '作者',
     ],
     'markets' => [
         'description' => '沙特市场分析解读，非实时行情。',

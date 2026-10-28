@@ -82,9 +82,9 @@ class HomeController
                     ->values(),
 
                 'topbarLinks' => [
-                    ['label' => 'من نحن', 'url' => route('web.about', $locale)],
-                    ['label' => 'معايير التحرير', 'url' => route('web.editorial-standards', $locale)],
-                    ['label' => 'تواصل', 'url' => route('web.contact', $locale)],
+                    ['label' => __('site.nav.about'), 'url' => route('web.about', $locale)],
+                    ['label' => __('site.footer.editorial_standards'), 'url' => route('web.editorial-standards', $locale)],
+                    ['label' => __('site.nav.contact'), 'url' => route('web.contact', $locale)],
                 ],
             ],
         );
@@ -117,10 +117,10 @@ class HomeController
         }
 
         return [
-            'مواد' => $items->count(),
-            'أقسام' => $items->pluck('category_id')->filter()->unique()->count(),
-            'كتّاب' => $items->pluck('author_id')->filter()->unique()->count(),
-            'دقائق قراءة' => (int) $items->sum('reading_time'),
+            __('pages.issue.stories') => $items->count(),
+            __('pages.issue.sections') => $items->pluck('category_id')->filter()->unique()->count(),
+            __('pages.issue.writers') => $items->pluck('author_id')->filter()->unique()->count(),
+            __('pages.issue.reading_minutes') => (int) $items->sum('reading_time'),
         ];
     }
 }

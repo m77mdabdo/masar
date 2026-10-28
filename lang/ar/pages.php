@@ -94,8 +94,10 @@ return [
     ],
     'issue' => [
         'in_this' => 'في هذا العدد',
+        'reading_minutes' => 'دقائق قراءة',
         'sections' => 'أقسام',
         'stories' => 'مواد',
+        'writers' => 'كتّاب',
     ],
     'markets' => [
         'description' => 'قراءة تحليلية للسوق السعودية — لا أرقام لحظية.',

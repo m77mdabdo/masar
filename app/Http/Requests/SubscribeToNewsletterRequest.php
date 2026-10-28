@@ -65,15 +65,15 @@ class SubscribeToNewsletterRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'email.required' => 'أدخل بريدك الإلكتروني.',
-            'email.email' => 'هذا البريد الإلكتروني غير صالح.',
-            'email.max' => 'هذا البريد الإلكتروني طويل أكثر من اللازم.',
-            self::HONEYPOT.'.max' => 'تعذّر إرسال النموذج.',
+            'email.required' => __('site.form.email_required'),
+            'email.email' => __('site.form.email_invalid'),
+            'email.max' => __('site.form.email_too_long'),
+            self::HONEYPOT.'.max' => __('site.form.not_sent'),
         ];
     }
 
     public function attributes(): array
     {
-        return ['email' => 'البريد الإلكتروني'];
+        return ['email' => __('site.form.email')];
     }
 }
