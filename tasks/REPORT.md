@@ -409,3 +409,52 @@ stuck header 50; use the space to bring the hero up; keep the hero heights.
   After = `tasks/screenshots/header-compact/after/`, three slides × seven widths,
   plus a scrolled article at 1440. Backup: git `cf4ed3e`.
 - Suite 962 passed. `masar:decay`: no decay found.
+
+## Hero questions column — the photograph back behind the three questions (2026-10-28)
+
+Brief: lighten or remove the dark green behind the three questions only. No boxes,
+the same white text, gold numerals and dividers, nothing moved, and the headline's
+scrim untouched. A soft text-shadow is allowed. Hold 4.5:1, and if clarity and
+contrast conflict, show the comparison.
+
+**They did conflict, so each option was measured before choosing.** Injected CSS,
+nothing edited; three slides × 375 / 768 / 1440. "Strict" = text colour against the
+lightest pixel under the line box. "Bright" = the share of the photograph's
+brightness left behind the column. Worst case over the three slides at 1440:
+
+| option | photograph kept | step text | numerals | verdict |
+|---|---|---|---|---|
+| before: 0.93 full-height band | 32–51% | ≥ 13.31 | ≥ 4.92 | passes, hides the photo |
+| text-shadow only, no field | 100% | 1.2–3.0 | 1.1–1.6 | fails badly on daylight photos |
+| strong 5-layer halo only | 100% | 1.4–4.1 | 1.1–1.7 | fails |
+| 0.45 blurred field + halo | 76–78% | 3.4–4.9 | 1.3 | fails |
+| 0.55 field + halo | 70–73% | ≥ 4.88 (3.62 at 768) | 1.8–2.5 | fails |
+| 0.65 field + halo | 64–67% | ≥ 6.48 | 2.5–2.6 | numerals fail even the 3:1 large-text bar |
+| 0.75 field + halo | 59–62% | ≥ 7 | ≥ 3.4 | passes WCAG large-text only |
+| **split: 0.90 at the numerals → 0.62 under the text, blurred, + halo** | **61–64%** | **≥ 5.96** | **≥ 5.29** | **chosen** |
+
+- **What shipped.** At lg and up, the full-height `.steps-scrim` band is gone on
+  every slide.
+  - `.questions-scrim` replaces it: a blurred field, dark only where the numerals
+    sit and light under the text, so it has no edge and is not a box.
+  - The step text carries a close `text-shadow` halo in g-950.
+  - The numerals go from `gold/85` to solid `--gold`. They are still gold, and
+    still dividered.
+  - Below lg it applies to the photo slides. The backdrop slide on a phone keeps
+    its existing scrim, which was already the clearest (85–89% kept).
+  - The headline's scrim is unchanged.
+- **Contrast**, seven widths, both backdrops, three slides: every element ≥ 4.5:1.
+  The tightest is the step body at 768 on slide two, 4.56. Both tables in CLAUDE.md
+  §2 are updated.
+- **Honest limit on phones.** On mobile the questions sit under the headline's
+  full-width wash (84%), which item 6 keeps. The photo slides gained less there:
+  23–29% → 40–48%.
+- **Found on the way and fixed.** The section was `overflow-hidden` while its
+  scrims reach past the stage (427px of content in a 375px box on a photo slide).
+  A hidden overflow is still a scroll container: at HEAD, `scrollLeft = -40` moved
+  the whole slide 40px sideways, and the first after-captures came out shifted. It
+  is now `overflow-clip`; the same forcing leaves it at 0. Test added.
+- Screenshots: `tasks/screenshots/hero-questions/{before,after}/`, three slides × 375
+  / 768 / 1440. `variants/` holds each rejected option on slide two at 1440 with the
+  raw measurements.
+- Suite 963 passed. `masar:decay`: no decay found.
