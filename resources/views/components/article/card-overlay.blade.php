@@ -64,7 +64,7 @@
 
             @if ($size !== 'sm')
                 <div class="mt-1 flex items-center justify-between gap-3">
-                    <span class="nums-tabular text-xs text-cream/70">{{ $meta ?? $article->reading_time.' دقيقة قراءة' }}</span>
+                    <span class="nums-tabular text-xs text-cream/70">{{ $meta ?? __('site.article.reading_time', ['minutes' => $article->reading_time]) }}</span>
                     <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cream text-g-900 transition group-hover:bg-mint" aria-hidden="true">
                         <svg class="h-3.5 w-3.5 rtl:-scale-x-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m0 0l-7-7m7 7l-7 7"/></svg>
                     </span>

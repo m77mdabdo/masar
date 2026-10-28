@@ -37,7 +37,7 @@
         }"
     >
         <h2 id="toc-heading" class="mb-3 font-display text-xs font-semibold uppercase tracking-[0.12em] text-ink-3">
-            في هذه المادة
+            {{ __('article.toc') }}
         </h2>
         <ul class="space-y-1 text-sm">
             @foreach ($entries as $entry)

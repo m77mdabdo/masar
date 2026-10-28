@@ -2,12 +2,12 @@
 <x-layout.public :title="$topic->name" :description="$topic->translate('description')">
     <x-ui.container class="py-10">
         <header class="mb-10 border-b border-line pb-6">
-            <p class="mb-1 text-sm text-ink-3">موضوع</p>
+            <p class="mb-1 text-sm text-ink-3">{{ __('pages.topic.kicker') }}</p>
             <h1 class="font-display text-3xl font-semibold text-g-950 sm:text-4xl">{{ $topic->name }}</h1>
             @if ($topic->translate('description'))
                 <p class="mt-3 max-w-2xl text-ink-3">{{ $topic->translate('description') }}</p>
             @endif
-            <p class="nums-tabular mt-2 text-sm text-ink-3">{{ $topic->articles_count }} مادة</p>
+            <p class="nums-tabular mt-2 text-sm text-ink-3">{{ trans_choice('site.count.stories', $topic->articles_count) }}</p>
         </header>
 
         {{-- Who appears in this topic's coverage. The graph answering a question
@@ -15,12 +15,12 @@
              stories". --}}
         @if ($entities->isNotEmpty())
             <section class="mb-10" aria-labelledby="topic-entities">
-                <x-ui.section-rule title="الأكثر ظهورًا في هذا الموضوع" id="topic-entities" />
+                <x-ui.section-rule :title="__('pages.topic.entities')" id="topic-entities" />
                 <div class="grid gap-6 sm:grid-cols-2">
                     @foreach ($entities as $type => $rows)
                         <div>
                             <h3 class="mb-2 text-[0.7rem] uppercase tracking-[0.08em] text-ink-3">
-                                {{ $type === 'person' ? 'أشخاص' : 'شركات' }}
+                                {{ $type === 'person' ? __('site.ui.people') : __('site.ui.companies') }}
                             </h3>
                             <ul class="space-y-1.5">
                                 @foreach ($rows as $row)
@@ -29,7 +29,7 @@
                                            href="{{ $type === 'person'
                                                ? route('web.person.show', [$locale, $row['slug']])
                                                : route('web.company.show', [$locale, $row['slug']]) }}">{{ $row['name'] }}</a>
-                                        <span class="nums-tabular shrink-0 text-xs text-ink-3">{{ $row['count'] }} مادة</span>
+                                        <span class="nums-tabular shrink-0 text-xs text-ink-3">{{ trans_choice('site.count.stories', $row['count']) }}</span>
                                     </li>
                                 @endforeach
                             </ul>
@@ -39,13 +39,13 @@
             </section>
         @endif
 
-        <x-ui.section-rule title="أحدث المواد" />
+        <x-ui.section-rule :title="__('site.ui.latest')" />
 
         <div class="space-y-6">
             @forelse ($articles as $article)
                 <x-article.card-row :article="$article" />
             @empty
-                <p class="py-16 text-center text-ink-3">لا توجد مواد في هذا الموضوع بعد.</p>
+                <p class="py-16 text-center text-ink-3">{{ __('pages.topic.empty') }}</p>
             @endforelse
         </div>
 

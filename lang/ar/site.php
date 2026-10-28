@@ -12,7 +12,14 @@ return [
     'article' => [
         'by' => 'بقلم :name',
         'duration' => ':minutes دقيقة',
+        'duration_short' => ':minutes د',
         'reading_time' => ':minutes دقيقة قراءة',
+        'updated' => 'آخر تحديث',
+    ],
+    'count' => [
+        'opportunities' => ':count فرصة',
+        'results' => ':count نتيجة',
+        'stories' => ':count مادة',
     ],
     'data' => [
         'as_of' => 'حتى',
@@ -50,6 +57,7 @@ return [
     ],
     'nav' => [
         'close' => 'إغلاق',
+        'home' => 'الرئيسية',
         'main' => 'التنقل الرئيسي',
         'menu' => 'القائمة',
         'mobile' => 'تنقل الجوال',
@@ -79,7 +87,12 @@ return [
     ],
     'ui' => [
         'all' => 'الكل',
+        'companies' => 'شركات',
         'image_unavailable' => 'صورة غير متوفرة',
+        'latest' => 'أحدث المواد',
+        'people' => 'أشخاص',
+        'topics' => 'موضوعات',
+        'unknown_initial' => '؟',
     ],
     'video' => [
         'download' => 'تنزيل الملف',

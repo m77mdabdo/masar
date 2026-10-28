@@ -5,7 +5,7 @@
         <img src="{{ $person->photo_path }}" alt="" width="44" height="44" loading="lazy" class="h-11 w-11 shrink-0 rounded-full object-cover" />
     @else
         <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-line font-display text-sm text-ink-3">
-            {{ mb_substr($person->name ?? '؟', 0, 1) }}
+            {{ mb_substr($person->name ?? __('site.ui.unknown_initial'), 0, 1) }}
         </span>
     @endif
     <div class="min-w-0">

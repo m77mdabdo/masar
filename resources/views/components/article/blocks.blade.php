@@ -117,7 +117,7 @@
                    class="flex items-center gap-3 rounded-xl border border-line bg-white p-4 transition hover:border-g-600">
                     <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-g-900 text-cream">▶</span>
                     <span class="min-w-0">
-                        <span class="block truncate font-medium">{{ $data['title'] ?? ($data['caption'] ?? 'مشاهدة') }}</span>
+                        <span class="block truncate font-medium">{{ $data['title'] ?? ($data['caption'] ?? __('article.watch')) }}</span>
                         <span class="ltr-isolate block truncate text-xs text-ink-3">{{ $data['url'] ?? '' }}</span>
                     </span>
                 </a>

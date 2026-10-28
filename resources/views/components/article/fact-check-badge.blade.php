@@ -13,7 +13,7 @@
             <path d="M5.75 7.9L7.2 9.4l3.05-3.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <span>
-            دُقّقت المعلومات
+            {{ __('article.fact_checked') }}
             <time datetime="{{ $article->fact_checked_at->toIso8601String() }}" class="ltr-isolate nums-tabular">
                 {{ $article->fact_checked_at->format('Y-m-d') }}
             </time>

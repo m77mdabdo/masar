@@ -21,12 +21,7 @@ enum SourceType: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::Rss => 'RSS',
-            self::Atom => 'Atom',
-            self::Api => 'واجهة برمجية',
-            self::Sitemap => 'خريطة موقع',
-        };
+        return __('enums.source_type.'.$this->value);
     }
 
     /** @return array<string, string> */

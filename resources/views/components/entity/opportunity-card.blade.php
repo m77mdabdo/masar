@@ -26,7 +26,7 @@
             'text-gold-ink' => ! $opportunity->deadline->isPast(),
             'text-ink-3' => $opportunity->deadline->isPast(),
         ])>
-            <span>آخر موعد</span>
+            <span>{{ __('entity.deadline') }}</span>
             <time datetime="{{ $opportunity->deadline->toDateString() }}" class="ltr-isolate nums-tabular">
                 {{ $opportunity->deadline->format('Y-m-d') }}
             </time>

@@ -31,8 +31,8 @@
     <x-ui.container class="relative flex min-h-[26rem] flex-col justify-end pb-8 pt-10 sm:min-h-[30rem]">
         <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_13rem]">
             <div class="max-w-[46rem]">
-                <nav aria-label="مسار التنقل" class="mb-4 flex flex-wrap items-center gap-2 text-xs text-cream/70">
-                    <a href="{{ route('web.home', $locale) }}" class="inline-flex min-h-6 items-center transition hover:text-mint">الرئيسية</a>
+                <nav aria-label="{{ __('article.breadcrumb') }}" class="mb-4 flex flex-wrap items-center gap-2 text-xs text-cream/70">
+                    <a href="{{ route('web.home', $locale) }}" class="inline-flex min-h-6 items-center transition hover:text-mint">{{ __('site.nav.home') }}</a>
                     <span aria-hidden="true">›</span>
                     <a href="{{ $urls->for($article->category) }}" class="inline-flex min-h-6 items-center transition hover:text-mint">{{ $article->category?->name }}</a>
                     <span aria-hidden="true">›</span>
@@ -49,7 +49,7 @@
 
                     @if ($article->is_sponsored)
                         <span class="inline-flex items-center rounded-full border border-gold/60 bg-gold/20 px-3 py-1 text-xs font-medium text-cream">
-                            محتوى مدفوع{{ $article->sponsor_name ? ' — '.$article->sponsor_name : '' }}
+                            {{ __('article.sponsored') }}{{ $article->sponsor_name ? ' — '.$article->sponsor_name : '' }}
                         </span>
                     @endif
                 </div>

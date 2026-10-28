@@ -19,11 +19,7 @@ enum SubscriberStatus: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::Pending => 'بانتظار التأكيد',
-            self::Confirmed => 'مؤكَّد',
-            self::Unsubscribed => 'ألغى الاشتراك',
-        };
+        return __('enums.subscriber_status.'.$this->value);
     }
 
     /** Only a confirmed address may ever be sent an issue. */

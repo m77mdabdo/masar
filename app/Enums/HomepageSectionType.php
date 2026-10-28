@@ -33,26 +33,7 @@ enum HomepageSectionType: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::BigStory => 'القصة الكبرى',
-            self::Leads => 'الأبرز',
-            self::Tiles => 'مختارات',
-            self::Saudi => 'السعودية والأسواق',
-            self::Markets => 'الأسواق',
-            self::Business => 'الأعمال والشركات',
-            self::Opportunities => 'فرص',
-            self::Intelligence => 'رصد وتحليل',
-            self::Insights => 'رؤى وفرص',
-            self::Stories => 'قصص نجاح',
-            self::MostRead => 'الأكثر قراءة',
-            self::EditorsPicks => 'اختيارات المحرر',
-            self::Video => 'مرئيات',
-            self::Reports => 'تقارير',
-            self::Data => 'بيانات',
-            self::Issue => 'ملف العدد',
-            self::Companies => 'شركات',
-            self::Newsletter => 'النشرة البريدية',
-        };
+        return __('enums.homepage_section_type.'.$this->value);
     }
 
     /**

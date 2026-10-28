@@ -17,7 +17,7 @@
 
     @if ($href)
         <a href="{{ $href }}" class="inline-flex min-h-6 shrink-0 items-center text-xs text-ink-3 transition hover:text-g-700">
-            {{ $more ?? 'الكل' }} <span aria-hidden="true" class="rtl:inline-block rtl:-scale-x-100">→</span>
+            {{ $more ?? __('site.ui.all') }} <span aria-hidden="true" class="rtl:inline-block rtl:-scale-x-100">→</span>
         </a>
     @elseif ($nav)
         {{-- The prototype's prev/next pair. Rendered as real buttons with real
@@ -25,11 +25,11 @@
              to a screen reader. --}}
         <div class="flex shrink-0 gap-1.5">
             <button type="button" class="flex h-7 w-7 items-center justify-center rounded-full border border-line text-ink-3 transition hover:border-g-600 hover:text-g-700">
-                <span class="sr-only">السابق</span>
+                <span class="sr-only">{{ __('site.pagination.previous') }}</span>
                 <svg class="h-3 w-3 rtl:-scale-x-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5m0 0l7 7m-7-7l7-7"/></svg>
             </button>
             <button type="button" class="flex h-7 w-7 items-center justify-center rounded-full border border-line text-ink-3 transition hover:border-g-600 hover:text-g-700">
-                <span class="sr-only">التالي</span>
+                <span class="sr-only">{{ __('site.pagination.next') }}</span>
                 <svg class="h-3 w-3 rtl:-scale-x-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m0 0l-7-7m7 7l-7 7"/></svg>
             </button>
         </div>

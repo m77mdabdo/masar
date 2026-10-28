@@ -9,7 +9,14 @@ return [
     'article' => [
         'by' => '作者：:name',
         'duration' => ':minutes 分钟',
+        'duration_short' => ':minutes 分',
         'reading_time' => '阅读约 :minutes 分钟',
+        'updated' => '最后更新',
+    ],
+    'count' => [
+        'opportunities' => ':count 个机遇',
+        'results' => ':count 条结果',
+        'stories' => ':count 篇',
     ],
     'data' => [
         'as_of' => '截至',
@@ -47,6 +54,7 @@ return [
     ],
     'nav' => [
         'close' => '关闭',
+        'home' => '首页',
         'main' => '主导航',
         'menu' => '菜单',
         'mobile' => '移动端导航',
@@ -76,7 +84,12 @@ return [
     ],
     'ui' => [
         'all' => '全部',
+        'companies' => '企业',
         'image_unavailable' => '图片不可用',
+        'latest' => '最新文章',
+        'people' => '人物',
+        'topics' => '话题',
+        'unknown_initial' => '？',
     ],
     'video' => [
         'download' => '下载文件',

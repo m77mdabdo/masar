@@ -18,11 +18,7 @@ enum OpportunityPotential: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::High => 'عالية',
-            self::Medium => 'متوسطة',
-            self::Low => 'منخفضة',
-        };
+        return __('enums.opportunity_potential.'.$this->value);
     }
 
     /**

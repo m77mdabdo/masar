@@ -7,7 +7,7 @@
         '@type' => 'Person',
         'name' => $author->name,
         'url' => $canonical,
-        'jobTitle' => 'صحفي',
+        'jobTitle' => __('entity.journalist'),
         'worksFor' => [
             '@type' => 'NewsMediaOrganization',
             'name' => setting('identity.site_name'),

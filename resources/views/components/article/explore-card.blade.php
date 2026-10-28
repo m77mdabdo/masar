@@ -5,7 +5,7 @@
      allows the token by component, not by page. --}}
 <a href="{{ app(App\Support\EntityUrl::class)->for($category) }}"
    class="block overflow-hidden rounded-xl bg-g-900 p-5 text-cream transition hover:bg-g-950">
-    <span class="font-display text-xs font-semibold uppercase tracking-wide text-mint">استكشف</span>
+    <span class="font-display text-xs font-semibold uppercase tracking-wide text-mint">{{ __('article.explore') }}</span>
     <h2 class="mt-1 font-display text-lg font-semibold">{{ $category->name }}</h2>
     @if (filled($category->description))
         <p class="mt-2 text-sm leading-relaxed text-cream/75">{{ Str::limit($category->description, 90) }}</p>

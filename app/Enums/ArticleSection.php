@@ -23,12 +23,7 @@ enum ArticleSection: string
     /** The small uppercase kicker above the section's headline. */
     public function label(): string
     {
-        return match ($this) {
-            self::WhatHappened => 'ما الذي حدث؟',
-            self::WhyItMatters => 'لماذا يهم هذا؟',
-            self::WhoIsAffected => 'من المتأثر؟',
-            self::Opportunity => 'أين الفرصة؟',
-        };
+        return __('enums.article_section.'.$this->value);
     }
 
     /**

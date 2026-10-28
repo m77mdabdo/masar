@@ -10,7 +10,7 @@
                 @if ($person->is_demo)
                     {{-- Demo people are invented, and a name alone can belong to
                          someone real. The page says so before anything else. --}}
-                    <p class="mt-2"><x-ui.badge tone="gold">شخصية تخيّلية لأغراض العرض — لا تمثّل شخصًا حقيقيًا</x-ui.badge></p>
+                    <p class="mt-2"><x-ui.badge tone="gold">{{ __('pages.person.fictional') }}</x-ui.badge></p>
                 @endif
                 <p class="mt-1 text-ink-3">{{ $person->translate('title') }}</p>
                 @if ($person->company?->name)
@@ -28,7 +28,7 @@
              the sections they turn up in say what they are a source about. --}}
         @if ($sections->isNotEmpty())
             <section class="mb-10" aria-labelledby="person-sections">
-                <x-ui.section-rule title="يتحدث في" id="person-sections" />
+                <x-ui.section-rule :title="__('pages.person.speaks_on')" id="person-sections" />
                 <div class="flex flex-wrap gap-2">
                     @foreach ($sections as $section)
                         <a href="{{ route('web.category.show', [$locale, $section['slug']]) }}"
@@ -46,12 +46,12 @@
              about that expert a reader should be able to see. --}}
         @if ($coMentions->isNotEmpty())
             <section class="mb-10" aria-labelledby="person-co-mentions">
-                <x-ui.section-rule title="يظهر مع" id="person-co-mentions" />
+                <x-ui.section-rule :title="__('pages.person.appears_with')" id="person-co-mentions" />
                 <div class="grid gap-6 sm:grid-cols-2">
                     @foreach ($coMentions as $type => $rows)
                         <div>
                             <h3 class="mb-2 text-[0.7rem] uppercase tracking-[0.08em] text-ink-3">
-                                {{ $type === 'person' ? 'أشخاص' : ($type === 'company' ? 'شركات' : 'موضوعات') }}
+                                {{ $type === 'person' ? __('site.ui.people') : ($type === 'company' ? __('site.ui.companies') : __('site.ui.topics')) }}
                             </h3>
                             <ul class="space-y-1.5">
                                 @foreach ($rows as $row)
@@ -62,7 +62,7 @@
                                                : ($type === 'company'
                                                    ? route('web.company.show', [$locale, $row['slug']])
                                                    : route('web.topic.show', [$locale, $row['slug']])) }}">{{ $row['name'] }}</a>
-                                        <span class="nums-tabular shrink-0 text-xs text-ink-3">{{ $row['count'] }} مادة</span>
+                                        <span class="nums-tabular shrink-0 text-xs text-ink-3">{{ trans_choice('site.count.stories', $row['count']) }}</span>
                                     </li>
                                 @endforeach
                             </ul>
@@ -72,7 +72,7 @@
             </section>
         @endif
 
-        <x-ui.section-rule title="ورد في" />
+        <x-ui.section-rule :title="__('pages.person.featured_in')" />
 
         <div class="space-y-6">
             @forelse ($mentions as $mention)
@@ -80,7 +80,7 @@
                 @continue (! $item instanceof App\Models\Article)
                 <x-article.card-row :article="$item" />
             @empty
-                <p class="py-16 text-center text-ink-3">لا توجد مواد بعد.</p>
+                <p class="py-16 text-center text-ink-3">{{ __('pages.person.empty') }}</p>
             @endforelse
         </div>
 

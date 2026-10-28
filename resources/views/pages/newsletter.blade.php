@@ -3,15 +3,15 @@
     $urls = app(App\Support\EntityUrl::class);
 @endphp
 
-<x-layout.public title="النشرة البريدية" description="ملخص أسبوعي لما تغيّر في السوق السعودية، ولماذا يهم.">
+<x-layout.public :title="__('pages.newsletter.title')" :description="__('site.newsletter.band_body')">
     <x-ui.container class="py-10">
         <div class="mx-auto max-w-[760px]">
             <header class="mb-10 border-b border-line pb-6">
                 <h1 class="font-display text-3xl font-semibold leading-tight text-g-950 sm:text-4xl">
-                    من المعلومة إلى الفرصة، كل أسبوع
+                    {{ __('site.newsletter.band_title') }}
                 </h1>
                 <p class="mt-4 text-lg leading-relaxed text-ink-3">
-                    ملخص أسبوعي لما تغيّر فعليًا في السوق السعودية، ولماذا يهم لمن يتخذ قرارًا.
+                    {{ __('pages.newsletter.lede') }}
                 </p>
             </header>
 
@@ -32,11 +32,11 @@
 
                     {{-- The honeypot. See the band component. --}}
                     <div class="hidden" aria-hidden="true">
-                        <label for="page-company-website">لا تملأ هذا الحقل</label>
+                        <label for="page-company-website">{{ __('site.form.honeypot') }}</label>
                         <input id="page-company-website" type="text" name="company_website" tabindex="-1" autocomplete="off" />
                     </div>
 
-                    <label for="subscribe-email" class="mb-2 block text-sm font-medium">البريد الإلكتروني</label>
+                    <label for="subscribe-email" class="mb-2 block text-sm font-medium">{{ __('site.form.email') }}</label>
                     <div class="flex flex-col gap-2 sm:flex-row">
                         <input
                             id="subscribe-email" name="email" type="email" required dir="ltr"
@@ -46,7 +46,7 @@
                             @error('email') aria-invalid="true" aria-describedby="subscribe-email-error" @enderror
                             class="ltr-isolate min-w-0 flex-1 rounded-lg border border-line px-4 py-3 focus:border-g-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-g-600"
                         />
-                        <x-ui.button type="submit" size="lg">اشترك</x-ui.button>
+                        <x-ui.button type="submit" size="lg">{{ __('site.newsletter.subscribe') }}</x-ui.button>
                     </div>
 
                     @error('email')
@@ -54,20 +54,20 @@
                     @enderror
 
                     <p class="mt-3 text-xs text-ink-3">
-                        رسالة واحدة أسبوعيًا. يمكنك إلغاء الاشتراك في أي وقت.
+                        {{ __('pages.newsletter.frequency') }}
                     </p>
                 </form>
             @endif
 
             @if ($issues->isNotEmpty())
                 <section class="mt-12">
-                    <x-ui.section-rule title="ملفات سابقة" />
+                    <x-ui.section-rule :title="__('pages.newsletter.past')" />
                     <div class="grid gap-3 sm:grid-cols-2">
                         @foreach ($issues as $issue)
                             <a href="{{ route('web.issue.show', [$locale, $issue->slug]) }}"
                                class="rounded-xl border border-line bg-white p-4 transition hover:border-g-600">
                                 <div class="font-display text-base font-medium text-g-950">{{ $issue->name }}</div>
-                                <div class="nums-tabular mt-1 text-xs text-ink-3">{{ $issue->articles_count }} مادة</div>
+                                <div class="nums-tabular mt-1 text-xs text-ink-3">{{ trans_choice('site.count.stories', $issue->articles_count) }}</div>
                             </a>
                         @endforeach
                     </div>
@@ -76,7 +76,7 @@
 
             @if ($recent->isNotEmpty())
                 <section class="mt-12">
-                    <x-ui.section-rule title="ما نشرناه مؤخرًا" />
+                    <x-ui.section-rule :title="__('pages.newsletter.recent')" />
                     <div class="space-y-5">
                         @foreach ($recent as $article)
                             <x-article.card-row :article="$article" />

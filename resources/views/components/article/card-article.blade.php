@@ -26,7 +26,7 @@
             @if ($article->category)
                 <span class="rounded bg-mint/25 px-2 py-0.5 text-[0.7rem] font-medium text-g-950">{{ $article->category->name }}</span>
             @endif
-            <span class="nums-tabular text-[0.7rem] text-ink-3">{{ $article->reading_time }} دقيقة</span>
+            <span class="nums-tabular text-[0.7rem] text-ink-3">{{ __('site.article.duration', ['minutes' => $article->reading_time]) }}</span>
         </div>
 
         <h3 @class(['font-display font-semibold text-g-950', 'text-lg leading-snug' => ! $compact, 'text-base leading-snug' => $compact])>

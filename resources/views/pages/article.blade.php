@@ -31,10 +31,10 @@
         ->values();
 
     $tocExtras = collect([
-        filled($article->key_numbers) ? ['href' => '#key-numbers', 'label' => 'أرقام مفتاحية'] : null,
-        $expert ? ['href' => '#expert-insight', 'label' => 'رأي خبير'] : null,
-        $companies->isNotEmpty() ? ['href' => '#related-companies', 'label' => 'شركات ذات صلة'] : null,
-        $article->sources->isNotEmpty() ? ['href' => '#sources', 'label' => 'المصادر والتدقيق'] : null,
+        filled($article->key_numbers) ? ['href' => '#key-numbers', 'label' => __('article.toc_key_numbers')] : null,
+        $expert ? ['href' => '#expert-insight', 'label' => __('article.expert')] : null,
+        $companies->isNotEmpty() ? ['href' => '#related-companies', 'label' => __('article.related_companies')] : null,
+        $article->sources->isNotEmpty() ? ['href' => '#sources', 'label' => __('article.sources')] : null,
     ])->filter()->values()->all();
 
     $heroSizes = '100vw';
@@ -86,11 +86,11 @@
                              one to hand, and the same picture twice on one page
                              reads as a mistake. --}}
                         <x-article.dark-card
-                            eyebrow="نشرة مسار"
-                            title="اقرأ ما تغيّر فعليًا"
-                            body="قراءة أسبوعية للاقتصاد السعودي، في بريدك."
+                            :eyebrow="__('article.promo.eyebrow')"
+                            :title="__('article.promo.title')"
+                            :body="__('article.promo.body')"
                             :href="route('web.newsletter', $locale)"
-                            cta="اشترك"
+                            :cta="__('site.newsletter.subscribe')"
                         />
                     </div>
                 </aside>
@@ -100,7 +100,7 @@
 
                     @if (filled($article->key_numbers))
                         <x-article.band-heading
-                            title="أرقام مفتاحية"
+                            :title="__('article.toc_key_numbers')"
                             id="key-numbers"
                             icon="M4 4h16v16H4zM4 10h16M10 4v16"
                         />
@@ -108,7 +108,7 @@
                     @endif
 
                     @if ($expert)
-                        <x-article.band-heading title="رأي خبير" id="expert-insight" :nav="true"
+                        <x-article.band-heading :title="__('article.expert')" id="expert-insight" :nav="true"
                             icon="M5 13l4 4L19 7" />
                         <x-article.expert-insight
                             :person="App\Models\Person::find($expert->data['person_id'] ?? null)"
@@ -118,18 +118,18 @@
 
                     @if ($companies->isNotEmpty())
                         <x-article.band-heading
-                            title="شركات ذات صلة"
+                            :title="__('article.related_companies')"
                             id="related-companies"
                             icon="M7 17L17 7m0 0H9m8 0v8"
                             :href="route('web.home', $locale)"
-                            more="الدليل"
+                            :more="__('home.companies.more')"
                         />
                         <x-article.related-companies :companies="$companies" />
                     @endif
 
                     @if ($article->sources->isNotEmpty())
                         <x-article.band-heading
-                            title="المصادر والتدقيق"
+                            :title="__('article.sources')"
                             id="sources"
                             icon="M12 3v18M5 7h14M7 7l-3 7h6zM17 7l-3 7h6z"
                         />
@@ -138,7 +138,7 @@
 
                     @if ($article->topics->isNotEmpty())
                         <div class="mt-8 flex flex-wrap items-center gap-2 border-t border-line pt-6">
-                            <span class="text-xs text-ink-3">الوسوم:</span>
+                            <span class="text-xs text-ink-3">{{ __('article.tags') }}</span>
                             @foreach ($article->topics as $topic)
                                 <x-ui.tag :href="$urls->for($topic)">{{ $topic->name }}</x-ui.tag>
                             @endforeach
@@ -148,14 +148,14 @@
                     {{-- End-aligned, as the prototype has it: the share bar is a
                          closing action, not a second heading. --}}
                     <div class="mt-6 flex items-center justify-end gap-3">
-                        <span class="text-xs text-ink-3">شارك هذه المادة</span>
+                        <span class="text-xs text-ink-3">{{ __('article.share_this') }}</span>
                         <x-article.share :article="$article" :url="$canonical" variant="icons" />
                     </div>
                 </div>
 
                 <aside class="order-3 space-y-5 lg:order-none">
                     @if ($related->isNotEmpty())
-                        <x-article.rail-panel title="قصص ذات صلة" id="rail-related-heading">
+                        <x-article.rail-panel :title="__('article.related_stories')" id="rail-related-heading">
                             @foreach ($related->take(4) as $item)
                                 <x-article.rail-story :article="$item" />
                             @endforeach
@@ -165,16 +165,16 @@
                     @if ($exploreCategory)
                         <x-article.dark-card
                             :media="$exploreMedia"
-                            eyebrow="استكشف"
+                            :eyebrow="__('article.explore')"
                             :title="$exploreCategory->name"
                             :body="Str::limit($exploreCategory->translate('description'), 90)"
                             :href="$urls->for($exploreCategory)"
-                            cta="افتح القسم"
+                            :cta="__('article.open_section')"
                         />
                     @endif
 
                     @if ($trendingTopics->isNotEmpty())
-                        <x-article.rail-panel title="موضوعات رائجة" id="rail-topics-heading">
+                        <x-article.rail-panel :title="__('article.trending_topics')" id="rail-topics-heading">
                             <ul class="divide-y divide-line">
                                 @foreach ($trendingTopics as $topic)
                                     <li>
@@ -195,7 +195,7 @@
                              disclosed. --}}
                         <div>
                             <p class="mb-2 font-display text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-gold-ink">
-                                محتوى مدفوع{{ $sponsored->sponsor_name ? ' — '.$sponsored->sponsor_name : '' }}
+                                {{ __('article.sponsored') }}{{ $sponsored->sponsor_name ? ' — '.$sponsored->sponsor_name : '' }}
                             </p>
                             <x-article.dark-card
                                 :media="$sponsored->heroMedia"
@@ -211,7 +211,7 @@
 
         @if ($related->isNotEmpty())
             <x-ui.container class="mt-16 border-t border-line pt-8">
-                <x-article.band-heading title="اقرأ أيضًا" :nav="true" />
+                <x-article.band-heading :title="__('article.read_also')" :nav="true" />
                 <x-ui.grid :cols="4">
                     @foreach ($related->take(4) as $item)
                         <x-article.card-overlay :article="$item" />

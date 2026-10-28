@@ -31,22 +31,7 @@ enum ArticleStatus: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::Idea => 'فكرة',
-            self::Assigned => 'مُسندة',
-            self::Research => 'بحث',
-            self::Writing => 'كتابة',
-            self::FactCheck => 'تدقيق المعلومات',
-            self::EditorReview => 'مراجعة التحرير',
-            self::Seo => 'تحسين محركات البحث',
-            self::Ready => 'جاهزة للنشر',
-            self::Scheduled => 'مجدولة',
-            self::Published => 'منشورة',
-            self::NeedsRevision => 'تحتاج مراجعة',
-            self::OnHold => 'معلّقة',
-            self::Rejected => 'مرفوضة',
-            self::Archived => 'مؤرشفة',
-        };
+        return __('enums.article_status.'.$this->value);
     }
 
     /**

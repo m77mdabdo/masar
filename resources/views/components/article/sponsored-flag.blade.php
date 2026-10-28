@@ -15,6 +15,6 @@
         'bg-gold/25 text-gold-ink' => $tone === 'light',
         'bg-gold/30 text-cream' => $tone === 'dark',
     ])>
-        محتوى مدفوع
+        {{ __('article.sponsored') }}
     </span>
 @endif

@@ -9,7 +9,14 @@ return [
     'article' => [
         'by' => 'تحریر: :name',
         'duration' => ':minutes منٹ',
+        'duration_short' => ':minutes منٹ',
         'reading_time' => ':minutes منٹ کا مطالعہ',
+        'updated' => 'آخری تازہ کاری',
+    ],
+    'count' => [
+        'opportunities' => ':count مواقع',
+        'results' => ':count نتائج',
+        'stories' => '[0,1] :count مضمون|[2,*] :count مضامین',
     ],
     'data' => [
         'as_of' => 'بتاریخ',
@@ -47,6 +54,7 @@ return [
     ],
     'nav' => [
         'close' => 'بند کریں',
+        'home' => 'ہوم',
         'main' => 'مرکزی نیویگیشن',
         'menu' => 'مینو',
         'mobile' => 'موبائل نیویگیشن',
@@ -76,7 +84,12 @@ return [
     ],
     'ui' => [
         'all' => 'سب',
+        'companies' => 'کمپنیاں',
         'image_unavailable' => 'تصویر دستیاب نہیں',
+        'latest' => 'تازہ ترین مضامین',
+        'people' => 'افراد',
+        'topics' => 'موضوعات',
+        'unknown_initial' => '؟',
     ],
     'video' => [
         'download' => 'فائل ڈاؤن لوڈ کریں',

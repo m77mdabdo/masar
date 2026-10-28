@@ -17,16 +17,7 @@ enum ContentType: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::News => 'خبر',
-            self::Analysis => 'تحليل',
-            self::Explainer => 'شرح',
-            self::Interview => 'مقابلة',
-            self::Opinion => 'رأي',
-            self::Story => 'قصة',
-            self::Report => 'تقرير',
-            self::Sponsored => 'محتوى مدفوع',
-        };
+        return __('enums.content_type.'.$this->value);
     }
 
     /**

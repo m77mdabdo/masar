@@ -20,12 +20,7 @@ enum ClassificationPath: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::Rules => 'قواعد',
-            self::Ai => 'ذكاء اصطناعي',
-            self::Manual => 'يدوي',
-            self::Unclassified => 'غير مصنّف',
-        };
+        return __('enums.classification_path.'.$this->value);
     }
 
     /** @return array<string, string> */

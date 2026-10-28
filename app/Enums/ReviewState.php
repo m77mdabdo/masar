@@ -23,14 +23,7 @@ enum ReviewState: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::New => 'جديد',
-            self::Saved => 'محفوظ لاحقًا',
-            self::Approved => 'معتمد',
-            self::Drafted => 'أُنشئت مسودة',
-            self::Rejected => 'مرفوض',
-            self::Ignored => 'متجاهَل',
-        };
+        return __('enums.review_state.'.$this->value);
     }
 
     /** States that leave the queue. */

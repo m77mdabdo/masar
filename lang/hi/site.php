@@ -9,7 +9,14 @@ return [
     'article' => [
         'by' => ':name द्वारा',
         'duration' => ':minutes मिनट',
+        'duration_short' => ':minutes मि.',
         'reading_time' => 'पढ़ने में :minutes मिनट',
+        'updated' => 'अंतिम अद्यतन',
+    ],
+    'count' => [
+        'opportunities' => ':count अवसर',
+        'results' => ':count परिणाम',
+        'stories' => ':count लेख',
     ],
     'data' => [
         'as_of' => 'अद्यतन:',
@@ -47,6 +54,7 @@ return [
     ],
     'nav' => [
         'close' => 'बंद करें',
+        'home' => 'होम',
         'main' => 'मुख्य नेविगेशन',
         'menu' => 'मेनू',
         'mobile' => 'मोबाइल नेविगेशन',
@@ -76,7 +84,12 @@ return [
     ],
     'ui' => [
         'all' => 'सभी',
+        'companies' => 'कंपनियाँ',
         'image_unavailable' => 'छवि उपलब्ध नहीं',
+        'latest' => 'ताज़ा लेख',
+        'people' => 'लोग',
+        'topics' => 'विषय',
+        'unknown_initial' => '?',
     ],
     'video' => [
         'download' => 'फ़ाइल डाउनलोड करें',

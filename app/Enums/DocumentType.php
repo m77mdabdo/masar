@@ -42,22 +42,7 @@ enum DocumentType: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::Decision => 'قرار',
-            self::Regulation => 'تنظيم',
-            self::Tender => 'مناقصة',
-            self::Licence => 'ترخيص',
-            self::Funding => 'تمويل',
-            self::Appointment => 'تعيين',
-            self::Earnings => 'نتائج مالية',
-            self::Statistic => 'إحصاء',
-            self::Announcement => 'إعلان',
-            self::Report => 'تقرير',
-            self::MarketMove => 'حركة سوق',
-            self::Forecast => 'توقّع',
-            self::Statement => 'تصريح',
-            self::Other => 'غير مصنّف',
-        };
+        return __('enums.document_type.'.$this->value);
     }
 
     /**

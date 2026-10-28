@@ -7,11 +7,11 @@
     $featuredClip = $featured?->getFirstMedia('video');
 @endphp
 
-<x-layout.public title="مرئيات" description="تقارير ومقابلات مصوّرة من مسار.">
+<x-layout.public :title="__('pages.video.title')" :description="__('pages.video.description')">
     <x-ui.container class="py-10">
         <header class="mb-8 border-b border-line pb-6">
-            <h1 class="font-display text-3xl font-semibold text-g-950 sm:text-4xl">مرئيات</h1>
-            <p class="mt-2 text-ink-3">تقارير ومقابلات مصوّرة.</p>
+            <h1 class="font-display text-3xl font-semibold text-g-950 sm:text-4xl">{{ __('pages.video.title') }}</h1>
+            <p class="mt-2 text-ink-3">{{ __('pages.video.lede') }}</p>
         </header>
 
         @if ($featured && $featuredVideo)
@@ -45,7 +45,7 @@
 
         @if ($series->isNotEmpty())
             <section class="mb-10">
-                <h2 class="mb-3 font-display text-sm font-semibold uppercase tracking-wide text-ink-3">سلاسل</h2>
+                <h2 class="mb-3 font-display text-sm font-semibold uppercase tracking-wide text-ink-3">{{ __('pages.video.series') }}</h2>
                 <div class="flex flex-wrap gap-2">
                     @foreach ($series as $topic)
                         <x-ui.chip :href="$urls->for($topic)">{{ $topic->name }}</x-ui.chip>
@@ -55,13 +55,13 @@
         @endif
 
         <section>
-            <x-ui.section-rule title="كل المرئيات" />
+            <x-ui.section-rule :title="__('home.video.all')" />
 
             <x-ui.grid :cols="3">
                 @forelse ($videos as $video)
                     <x-article.card-article :article="$video" />
                 @empty
-                    <p class="col-span-full py-16 text-center text-ink-3">لا توجد مرئيات بعد.</p>
+                    <p class="col-span-full py-16 text-center text-ink-3">{{ __('pages.video.empty') }}</p>
                 @endforelse
             </x-ui.grid>
 

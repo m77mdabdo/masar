@@ -21,7 +21,7 @@
                 'flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-display text-sm',
                 'bg-cream/15 text-cream' => $dark,
                 'bg-g-900 text-cream' => ! $dark,
-            ]) aria-hidden="true">{{ mb_substr($article->author?->name ?? '؟', 0, 1) }}</span>
+            ]) aria-hidden="true">{{ mb_substr($article->author?->name ?? __('site.ui.unknown_initial'), 0, 1) }}</span>
         @endif
 
         <div class="min-w-0 text-sm">
@@ -56,13 +56,13 @@
                      not present itself as a revision. --}}
                 @if ($article->published_at && $article->updated_content_at?->gt($article->published_at->copy()->addMinutes(5)))
                     <span>·</span>
-                    <span>آخر تحديث
+                    <span>{{ __('site.article.updated') }}
                         <time datetime="{{ $article->updated_content_at->toIso8601String() }}" class="ltr-isolate nums-tabular">
                             {{ $article->updated_content_at->format('Y-m-d') }}
                         </time>
                     </span>
                 @endif
-                <span class="nums-tabular">{{ $article->reading_time }} دقيقة قراءة</span>
+                <span class="nums-tabular">{{ __('site.article.reading_time', ['minutes' => $article->reading_time]) }}</span>
             </div>
         </div>
     </div>

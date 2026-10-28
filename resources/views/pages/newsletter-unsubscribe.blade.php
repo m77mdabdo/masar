@@ -2,24 +2,25 @@
 
 {{-- The GET that does nothing. Mail clients and scanners fetch every link in a
      message before a human sees it, so the act of leaving is the POST below. --}}
-<x-layout.public title="إلغاء الاشتراك" :noindex="true">
+<x-layout.public :title="__('pages.newsletter.unsubscribe')" :noindex="true">
     <x-ui.container class="py-10">
         <div class="mx-auto max-w-[760px]">
             <header class="mb-8 border-b border-line pb-6">
                 <h1 class="font-display text-3xl font-semibold leading-tight text-g-950 sm:text-4xl">
-                    إلغاء الاشتراك في النشرة
+                    {{ __('pages.newsletter.unsubscribe_heading') }}
                 </h1>
                 <p class="mt-4 text-lg leading-relaxed text-ink-3">
-                    تأكيد أخير قبل أن نوقف الرسائل عن
-                    <bdi class="font-medium text-g-950">{{ $subscriber->email }}</bdi>.
+                    {{-- The address is escaped before it enters the sentence; the
+                         sentence itself is ours (lang/), so nothing else is raw. --}}
+                    {!! __('pages.newsletter.last_check', ['email' => '<bdi class="font-medium text-g-950">'.e($subscriber->email).'</bdi>']) !!}
                 </p>
             </header>
 
             <form method="POST" action="{{ url()->full() }}">
                 @csrf
-                <x-ui.button type="submit" size="lg">نعم، ألغِ اشتراكي</x-ui.button>
+                <x-ui.button type="submit" size="lg">{{ __('pages.newsletter.yes_unsubscribe') }}</x-ui.button>
                 <a href="{{ route('web.home', $locale) }}" class="ms-3 text-sm text-ink-3 underline hover:text-g-900">
-                    تراجع
+                    {{ __('pages.newsletter.cancel') }}
                 </a>
             </form>
         </div>

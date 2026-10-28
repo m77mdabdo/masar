@@ -16,11 +16,7 @@ enum EntityRole: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::Primary => 'رئيسي',
-            self::Secondary => 'ثانوي',
-            self::Mentioned => 'مذكور',
-        };
+        return __('enums.entity_role.'.$this->value);
     }
 
     /**

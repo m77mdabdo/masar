@@ -17,8 +17,8 @@
                     </svg>
                 </span>
                 <div>
-                    <h2 id="summary-heading" class="font-display text-sm font-semibold text-g-950">في 30 ثانية</h2>
-                    <p class="mt-0.5 text-xs leading-relaxed text-ink-3">أهم ما في هذه المادة</p>
+                    <h2 id="summary-heading" class="font-display text-sm font-semibold text-g-950">{{ __('article.summary.heading') }}</h2>
+                    <p class="mt-0.5 text-xs leading-relaxed text-ink-3">{{ __('article.summary.sub') }}</p>
                 </div>
             </div>
 

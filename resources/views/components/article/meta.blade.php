@@ -21,11 +21,11 @@
 
     @unless ($compact)
         @if ($article->reading_time)
-            <span class="nums-tabular">{{ $article->reading_time }} دقيقة قراءة</span>
+            <span class="nums-tabular">{{ __('site.article.reading_time', ['minutes' => $article->reading_time]) }}</span>
         @endif
 
         @if ($article->is_sponsored)
-            <x-ui.badge tone="gold">محتوى مدفوع</x-ui.badge>
+            <x-ui.badge tone="gold">{{ __('article.sponsored') }}</x-ui.badge>
         @endif
     @endunless
 </div>

@@ -19,7 +19,7 @@
             @if ($article->category)
                 <span class="font-medium uppercase tracking-wide text-g-600">{{ $article->category->name }}</span>
             @endif
-            <span class="nums-tabular">{{ $article->reading_time }} د</span>
+            <span class="nums-tabular">{{ __('site.article.duration_short', ['minutes' => $article->reading_time]) }}</span>
         </p>
         <h3 class="mt-1 font-display text-[0.82rem] font-medium text-g-950">
             <a href="{{ $url }}" class="block leading-6 transition hover:text-g-700">{{ $article->title }}</a>

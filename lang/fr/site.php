@@ -9,7 +9,14 @@ return [
     'article' => [
         'by' => 'Par :name',
         'duration' => ':minutes min',
+        'duration_short' => ':minutes min',
         'reading_time' => ':minutes min de lecture',
+        'updated' => 'Mis à jour le',
+    ],
+    'count' => [
+        'opportunities' => '[0,1] :count opportunité|[2,*] :count opportunités',
+        'results' => '[0,1] :count résultat|[2,*] :count résultats',
+        'stories' => '[0,1] :count article|[2,*] :count articles',
     ],
     'data' => [
         'as_of' => 'Au',
@@ -47,6 +54,7 @@ return [
     ],
     'nav' => [
         'close' => 'Fermer',
+        'home' => 'Accueil',
         'main' => 'Navigation principale',
         'menu' => 'Menu',
         'mobile' => 'Navigation mobile',
@@ -76,7 +84,12 @@ return [
     ],
     'ui' => [
         'all' => 'Tout voir',
+        'companies' => 'Entreprises',
         'image_unavailable' => 'Image indisponible',
+        'latest' => 'Derniers articles',
+        'people' => 'Personnes',
+        'topics' => 'Thèmes',
+        'unknown_initial' => '?',
     ],
     'video' => [
         'download' => 'Télécharger le fichier',

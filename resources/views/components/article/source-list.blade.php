@@ -44,7 +44,7 @@
                     </svg>
                 </span>
                 <div class="text-xs leading-relaxed">
-                    <p class="font-display text-sm font-semibold text-g-950">دُقّقت المعلومات</p>
+                    <p class="font-display text-sm font-semibold text-g-950">{{ __('article.fact_checked') }}</p>
                     @if ($article->factChecker)
                         <p class="text-ink-3">{{ $article->factChecker->name }}</p>
                     @endif

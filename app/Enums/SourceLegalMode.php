@@ -21,10 +21,7 @@ enum SourceLegalMode: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::Metadata => 'بيانات وصفية فقط',
-            self::FullText => 'نص كامل (يُحذف بعد مدة الاحتفاظ)',
-        };
+        return __('enums.source_legal_mode.'.$this->value);
     }
 
     /** Whether the publisher's own body text may be stored at all. */

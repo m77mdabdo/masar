@@ -18,13 +18,7 @@ enum CompanyType: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::Company => 'شركة',
-            self::Startup => 'شركة ناشئة',
-            self::Government => 'جهة حكومية',
-            self::Fund => 'صندوق',
-            self::Project => 'مشروع',
-        };
+        return __('enums.company_type.'.$this->value);
     }
 
     /**

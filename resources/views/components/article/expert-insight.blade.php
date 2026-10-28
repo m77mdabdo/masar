@@ -10,7 +10,7 @@
                  class="h-14 w-14 rounded-full object-cover" />
         @else
             <span class="flex h-14 w-14 items-center justify-center rounded-full bg-line font-display text-lg text-g-700" aria-hidden="true">
-                {{ mb_substr($person->name ?? '؟', 0, 1) }}
+                {{ mb_substr($person->name ?? __('site.ui.unknown_initial'), 0, 1) }}
             </span>
         @endif
 

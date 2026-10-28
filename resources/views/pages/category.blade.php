@@ -30,7 +30,7 @@
         </header>
 
         @if ($shape !== 'none')
-            <x-ui.section-rule title="مختارات" />
+            <x-ui.section-rule :title="__('enums.homepage_section_type.tiles')" />
 
             @if ($shape === 'single')
                 {{-- One feature, given the room a single thing deserves rather
@@ -54,14 +54,14 @@
             @endif
         @endif
 
-        <x-ui.section-rule title="أحدث المواد" />
+        <x-ui.section-rule :title="__('site.ui.latest')" />
 
         <div class="space-y-6">
             @forelse ($articles as $article)
                 {{-- With no feature above it, the first row carries the LCP. --}}
                 <x-article.card-row :article="$article" />
             @empty
-                <p class="py-16 text-center text-ink-3">لا توجد مواد في هذا القسم بعد.</p>
+                <p class="py-16 text-center text-ink-3">{{ __('pages.category.empty') }}</p>
             @endforelse
         </div>
 

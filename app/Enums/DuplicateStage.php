@@ -21,12 +21,7 @@ enum DuplicateStage: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::Url => 'رابط مطابق',
-            self::CanonicalUrl => 'رابط أساسي مطابق',
-            self::ExternalId => 'معرّف الناشر مطابق',
-            self::Title => 'عنوان متقارب',
-        };
+        return __('enums.duplicate_stage.'.$this->value);
     }
 
     /** Whether the match is an identity, not a resemblance. */

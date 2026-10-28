@@ -6,7 +6,7 @@
              class="h-10 w-10 shrink-0 rounded object-contain" />
     @else
         <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-line font-display text-sm text-ink-3">
-            {{ mb_substr($company->name ?? '؟', 0, 1) }}
+            {{ mb_substr($company->name ?? __('site.ui.unknown_initial'), 0, 1) }}
         </span>
     @endif
 

@@ -12,7 +12,7 @@
         <h3 class="mt-1.5 font-display text-base font-semibold text-g-950">
             <a href="{{ $url }}" class="block leading-6 transition hover:text-g-700">{{ $article->title }}</a>
         </h3>
-        <p class="nums-tabular mt-2 text-[0.7rem] text-ink-3">{{ $article->reading_time }} دقيقة قراءة</p>
+        <p class="nums-tabular mt-2 text-[0.7rem] text-ink-3">{{ __('site.article.reading_time', ['minutes' => $article->reading_time]) }}</p>
     </div>
 
     <a href="{{ $url }}" class="block overflow-hidden rounded bg-line" tabindex="-1" aria-hidden="true">

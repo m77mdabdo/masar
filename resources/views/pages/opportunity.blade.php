@@ -11,7 +11,7 @@
 
             @if (filled($opportunity->requirements))
                 <section class="mt-8 rounded-xl border border-line bg-white p-5">
-                    <h2 class="mb-3 font-display text-lg font-semibold text-g-900">المتطلبات</h2>
+                    <h2 class="mb-3 font-display text-lg font-semibold text-g-900">{{ __('pages.opportunity.requirements') }}</h2>
                     <ul class="space-y-2">
                         @foreach ((array) $opportunity->requirements as $requirement)
                             <li class="flex gap-3 text-base"><span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-g-600"></span>{{ $requirement }}</li>
@@ -23,13 +23,13 @@
             <dl class="mt-8 grid gap-4 sm:grid-cols-2">
                 @if ($opportunity->deadline)
                     <div class="rounded-xl border border-line bg-white p-4">
-                        <dt class="text-xs text-ink-3">آخر موعد</dt>
+                        <dt class="text-xs text-ink-3">{{ __('entity.deadline') }}</dt>
                         <dd class="ltr-isolate nums-tabular mt-1 font-display text-lg">{{ $opportunity->deadline->format('Y-m-d') }}</dd>
                     </div>
                 @endif
                 @if ($opportunity->country?->name)
                     <div class="rounded-xl border border-line bg-white p-4">
-                        <dt class="text-xs text-ink-3">النطاق</dt>
+                        <dt class="text-xs text-ink-3">{{ __('pages.opportunities.scope') }}</dt>
                         <dd class="mt-1 font-display text-lg">{{ $opportunity->country->name }}</dd>
                     </div>
                 @endif
@@ -38,7 +38,7 @@
             @if ($opportunity->official_source_url)
                 {{-- An opportunity without a verifiable official source is a
                      rumour; the link is the whole claim. --}}
-                <x-ui.button :href="$opportunity->official_source_url" class="mt-8">المصدر الرسمي</x-ui.button>
+                <x-ui.button :href="$opportunity->official_source_url" class="mt-8">{{ __('pages.opportunity.official_source') }}</x-ui.button>
             @endif
         </article>
     </x-ui.container>

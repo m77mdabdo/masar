@@ -54,12 +54,16 @@ it('defines every Arabic key in every edition, non-empty, with the same placehol
                     continue;
                 }
 
+                // A set, not a list: each plural form of `{1} :count story|
+                // [0,*] :count stories` repeats the placeholder.
                 preg_match_all('/:([a-z_]+)/', $text, $want);
                 preg_match_all('/:([a-z_]+)/', $value, $have);
-                sort($want[1]);
-                sort($have[1]);
+                $want = array_values(array_unique($want[1]));
+                $have = array_values(array_unique($have[1]));
+                sort($want);
+                sort($have);
 
-                if ($want[1] !== $have[1]) {
+                if ($want !== $have) {
                     $problems[] = "{$code}: {$group}.{$key} placeholders differ";
                 }
             }
@@ -78,14 +82,14 @@ it('does not leave an edition in another edition’s script', function (): void 
     // Latin-script editions must not contain Arabic letters; Hindi must
     // contain Devanagari, Chinese must contain Han, Urdu must contain the
     // letters Urdu adds to the Arabic alphabet (ے ہ ں ٹ ڈ ڑ ۓ).
-    foreach (langGroups() as $group) {
-        $join = fn (string $code): string => implode(' ', flatLang($code, $group));
+    // Whole editions, not group by group: a two-string group can be
+    // legitimately free of any one script's distinguishing letters.
+    $join = fn (string $code): string => implode(' ', array_merge(...array_map(fn (string $g): array => flatLang($code, $g), langGroups())));
 
-        expect(preg_match('/\p{Arabic}/u', $join('en').$join('fr').$join('zh-hans').$join('hi')))->toBe(0)
-            ->and(preg_match('/\p{Devanagari}/u', $join('hi')))->toBe(1)
-            ->and(preg_match('/\p{Han}/u', $join('zh-hans')))->toBe(1)
-            ->and(preg_match('/[ےہںٹڈڑۓ]/u', $join('ur-pk')))->toBe(1);
-    }
+    expect(preg_match('/\p{Arabic}/u', $join('en').$join('fr').$join('zh-hans').$join('hi')))->toBe(0)
+        ->and(preg_match('/\p{Devanagari}/u', $join('hi')))->toBe(1)
+        ->and(preg_match('/\p{Han}/u', $join('zh-hans')))->toBe(1)
+        ->and(preg_match('/[ےہںٹڈڑۓ]/u', $join('ur-pk')))->toBe(1);
 });
 
 it('renders a translated key rather than its name', function (): void {
