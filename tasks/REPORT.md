@@ -458,3 +458,58 @@ brightness left behind the column. Worst case over the three slides at 1440:
   / 768 / 1440. `variants/` holds each rejected option on slide two at 1440 with the
   raw measurements.
 - Suite 963 passed. `masar:decay`: no decay found.
+
+## Hero — the right-side band goes too; two defects found on the way (2026-10-28)
+
+Owner: «شيل الطبقه اللي ع اليمين كمان» — remove the headline-side layer as well.
+
+- **What changed.** The homepage hero has no band on any slide:
+  - `.hero-scrim` and `.steps-scrim` are removed from it, along with the
+    `data-ground` switch they needed.
+  - Every text block keeps a blurred local field: headline group 0.85, kicker
+    0.65, and the questions at 0.90 where the numerals sit, easing to 0.70 under
+    the text.
+  - `.hero-scrim` still exists for the article hero (`article/hero.blade.php`),
+    and its CSS, including the 84% mobile wash, is untouched.
+- **Measured before choosing** (headline column; 375 / 768 / 1440; all slides):
+
+  | option | headline column kept at 1440 | weakest element |
+  |---|---|---|
+  | before: right band (slide one) / 0.86 field (photo slides) | 55% / 70–72% | ≥ 4.98 |
+  | text-shadow only, no field | 100% | headline 1.0–1.7 ✗ |
+  | 0.65 field + halo | 78% | mint 2.8–3.3 ✗ |
+  | 0.75 field + halo | 74–76% | mint 3.8–4.4 ✗ |
+  | **shipped: 0.85 field, halo on unclamped lines only** | **71–72%** | **mint 4.90** |
+
+  On a phone, slide one used to sit under an 84% wash over the whole stage. It
+  now keeps 30% behind the headline group and 42% behind the questions, and the
+  city shows.
+- **Defect 1 — I shipped it in `41df162`: the text halo was cut into rectangles.**
+  - The headline (`line-clamp-4`), the standfirst and every answer (`line-clamp-3`)
+    clip their own box, so their `text-shadow` rendered as hard-edged dark boxes
+    behind the text. That is exactly the "no boxes" the brief ruled out.
+  - The contrast sweep could not see it, because a clipped halo still darkens the
+    ground. The gradient-smoothness measure read 2.1–2.75 because it counts the
+    halos; it was seen at 2× zoom.
+  - Fix: clamped text carries no halo, and the fields are set for that (0.85,
+    0.70). A checker now walks every shadowed text node in the hero for a
+    clipping ancestor: 40 at 375 and 40 at 1440, none clipped. A test pins the
+    CSS exemption and the clamp spelling it relies on.
+- **Defect 2 — I shipped it in `7e32a66`: the page jumped 4px when the header
+  tightened.**
+  - The stuck header's 4px margin applied instantly, while its height animated
+    over 200ms. For the whole transition the page sat 4px low, then crept back.
+  - Sampled every frame: the hero's document top went 212 → 208, and 204 → 208
+    on the way back, for 0.0040 layout shift per toggle. My earlier check read
+    positions 350ms later, after it had settled.
+  - Fix: the margin animates with the same duration and curve. Now 208 / 207.98
+    over 44 frames, layout shift 0.0000.
+- **Contrast**, seven widths, both backdrops, three slides: every element ≥ 4.90.
+  Both tables in CLAUDE.md §2 are replaced.
+- **Smoothness**, shadows excluded: kink 0.15–0.18 at every width.
+  - At 375 a 2.0 reading turned out to be the header jump in defect 2, caught by
+    the first capture.
+  - Heights, positions, overlap and overflow are unchanged at all seven widths.
+- Screenshots: `tasks/screenshots/hero-no-bands/{before,after}/`, three slides ×
+  375 / 768 / 1440, plus a 2× crop showing the clamp-halo fix.
+- Suite 964 passed. `masar:decay`: no decay found.
