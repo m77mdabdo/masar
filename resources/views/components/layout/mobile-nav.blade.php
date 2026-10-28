@@ -11,7 +11,7 @@
          is no other route to the menu. --}}
     <button type="button" @click="open = true"
             class="flex items-center justify-center px-1 py-3 text-ink transition hover:opacity-70"
-            aria-label="فتح القائمة" :aria-expanded="open.toString()">
+            aria-label="{{ __('site.nav.open_menu') }}" :aria-expanded="open.toString()">
         <span class="grid w-[1.375rem] gap-[5px]" aria-hidden="true">
             <span class="block h-[1.5px] w-full bg-current"></span>
             <span class="block h-[1.5px] w-full bg-current"></span>
@@ -25,17 +25,17 @@
         {{-- Anchored to the inline-end edge, which is the left in RTL. --}}
         <div class="absolute inset-y-0 end-0 flex w-[85%] max-w-sm flex-col bg-cream p-5 shadow-xl"
              x-trap.noscroll="open"
-             x-transition:enter="transition duration-200" role="dialog" aria-modal="true" aria-label="القائمة">
+             x-transition:enter="transition duration-200" role="dialog" aria-modal="true" aria-label="{{ __('site.nav.menu') }}">
             <div class="mb-6 flex items-center justify-between">
                 <span class="font-display text-xl font-semibold text-g-900">{{ setting('identity.site_name') }}</span>
-                <button type="button" @click="open = false" class="rounded-lg p-2 text-g-700" aria-label="إغلاق">
+                <button type="button" @click="open = false" class="rounded-lg p-2 text-g-700" aria-label="{{ __('site.nav.close') }}">
                     <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                         <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
                     </svg>
                 </button>
             </div>
 
-            <nav class="flex-1 overflow-y-auto" aria-label="تنقل الجوال">
+            <nav class="flex-1 overflow-y-auto" aria-label="{{ __('site.nav.mobile') }}">
                 <ul class="space-y-1">
                     @foreach ($items as $item)
                         <li>
@@ -58,7 +58,7 @@
                 </ul>
             </nav>
 
-            <x-ui.button :href="route('web.newsletter', $locale)" class="mt-4 w-full">اشترك في النشرة</x-ui.button>
+            <x-ui.button :href="route('web.newsletter', $locale)" class="mt-4 w-full">{{ __('site.newsletter.subscribe_cta') }}</x-ui.button>
         </div>
     </div>
 </div>

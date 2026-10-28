@@ -74,8 +74,8 @@
             >
                 <source src="{{ $media->getUrl() }}" type="{{ $media->mime_type ?? 'video/mp4' }}" />
                 <p class="p-4 text-sm text-cream">
-                    متصفحك لا يدعم تشغيل هذا المقطع.
-                    <a href="{{ $media->getUrl() }}" class="underline">تنزيل الملف</a>
+                    {{ __('site.video.unsupported') }}
+                    <a href="{{ $media->getUrl() }}" class="underline">{{ __('site.video.download') }}</a>
                 </p>
             </video>
         </div>
@@ -86,7 +86,7 @@
                  description of the footage is a caption in the ordinary sense. --}}
             <figcaption id="{{ $describedBy }}" class="mt-2 text-xs leading-6 text-ink-3">
                 @if ($hasAudio === false)
-                    <span class="font-medium">مقطع بلا صوت.</span>
+                    <span class="font-medium">{{ __('site.video.silent') }}</span>
                 @endif
                 {{ $describe }}
             </figcaption>

@@ -11,12 +11,12 @@
 {{-- Renders nothing at all when nothing is running. An empty bordered box
      labelled "advertisement" is a worse page than no box. --}}
 @if ($creative !== null)
-    <aside class="my-8" aria-label="إعلان">
+    <aside class="my-8" aria-label="{{ __('site.ad.label') }}">
         {{-- The label is outside the link and not a prop: an advertisement is
              marked as one whatever the creative says, and a caller cannot turn
              it off (CLAUDE.md §5). --}}
         <div class="mb-1.5 flex items-baseline justify-between gap-3">
-            <span class="text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-ink-3">إعلان</span>
+            <span class="text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-ink-3">{{ __('site.ad.label') }}</span>
             <span class="truncate text-[0.65rem] text-ink-3">{{ $creative->campaign->advertiser }}</span>
         </div>
 

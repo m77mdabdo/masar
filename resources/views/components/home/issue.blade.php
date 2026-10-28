@@ -7,13 +7,13 @@
 @endphp
 
 <section class="mb-0" aria-labelledby="issue-heading">
-    <x-ui.section-rule :title="$section['title']" id="issue-heading" more="كل الأعداد" :href="route('web.home', app()->getLocale())" />
+    <x-ui.section-rule :title="$section['title']" id="issue-heading" :more="__('home.issue.all')" :href="route('web.home', app()->getLocale())" />
 
     {{-- White and bordered. The issue is a product, not a dark band — it sits
          on the page the way a magazine sits on a table. --}}
     <div class="grid items-center gap-8 rounded-xl border border-line bg-white p-6 sm:p-8 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
-            <span class="font-display text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-ink-3">عدد رقمي خاص</span>
+            <span class="font-display text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-ink-3">{{ __('home.issue.special') }}</span>
 
             @if ($cover)
                 <h3 class="mt-3 font-display text-[2rem] font-semibold leading-[1.06] text-g-950 sm:text-[2.6rem]">
@@ -42,13 +42,13 @@
                 @if ($cover)
                     <a href="{{ app(App\Support\EntityUrl::class)->for($cover) }}"
                        class="inline-flex items-center gap-2 rounded-full bg-g-900 px-5 py-2.5 text-xs font-medium text-cream transition hover:bg-g-700">
-                        اقرأ العدد
+                        {{ __('home.issue.read') }}
                         <span aria-hidden="true" class="inline-block rtl:-scale-x-100">→</span>
                     </a>
                 @endif
                 <a href="{{ route('web.video.index', app()->getLocale()) }}"
                    class="inline-flex items-center gap-2 rounded-full border border-line px-5 py-2.5 text-xs font-medium text-g-900 transition hover:border-g-600">
-                    شاهد المقدمة
+                    {{ __('home.issue.watch_intro') }}
                 </a>
             </div>
         </div>

@@ -110,8 +110,14 @@ const bigStory = (n) => ({
         return {
             '@click': () => c.toggle(),
             'x-show': () => !c.reduced,
-            ':aria-label': () => (c.playing || c.starting ? 'إيقاف العرض التلقائي' : 'تشغيل العرض التلقائي'),
+            ':aria-label': () => (c.playing || c.starting ? c.label('pause') : c.label('play')),
         };
+    },
+
+    // The words come from the section's data-label-* attributes, rendered in
+    // the page's language; this file holds no copy of any translation.
+    label(name) {
+        return this.$root.dataset['label' + name[0].toUpperCase() + name.slice(1)] ?? '';
     },
 
     get paused() {
@@ -227,7 +233,7 @@ const bigStory = (n) => ({
     toggle() {
         if (this.playing || this.starting) {
             this.stop(true);
-            this.status = 'أُوقف العرض التلقائي';
+            this.status = this.label('paused');
             return;
         }
         try { sessionStorage.removeItem(STOPPED); } catch { /* nothing to clear */ }
@@ -236,7 +242,7 @@ const bigStory = (n) => ({
         this.held.hover = false;
         this.held.focus = false;
         this.playing = true;
-        this.status = 'استؤنف العرض التلقائي';
+        this.status = this.label('resumed');
         this.queue();
         this.arm((this.i + 1) % this.n);
     },
@@ -260,7 +266,7 @@ function addToggle(section) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = next.className;
-    button.setAttribute('aria-label', 'إيقاف العرض التلقائي');
+    button.setAttribute('aria-label', section.dataset.labelPause ?? '');
     button.setAttribute('x-bind', 'toggler');
     button.innerHTML = `<svg x-show="playing || starting" class="h-3 w-3" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">${PAUSE}</svg>`
         + `<svg x-show="!(playing || starting)" style="display:none" class="h-3 w-3 rtl:-scale-x-100" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">${PLAY}</svg>`;

@@ -87,7 +87,9 @@
                       the section until it arrives. Hover and keyboard focus hold it; leaving
                       releases it. --}}
                  x-data="bigStory({{ $count }})" data-carousel x-ignore x-bind="root"
-                 role="group" aria-roledescription="عرض متتابع" aria-label="{{ $section['title'] }}"
+                 role="group" aria-roledescription="{{ __('home.big_story.carousel') }}" aria-label="{{ $section['title'] }}"
+                 data-label-pause="{{ __('home.big_story.pause') }}" data-label-play="{{ __('home.big_story.play') }}"
+                 data-label-paused="{{ __('home.big_story.paused') }}" data-label-resumed="{{ __('home.big_story.resumed') }}"
              @endif>
         @foreach ($slides as $k => $slide)
             {{-- Stacked, and cross-faded rather than swapped: the incoming slide
@@ -198,7 +200,7 @@
                         @endif
 
                         <p class="mt-5 flex flex-wrap items-center gap-x-3 text-xs text-cream/65">
-                            @if ($slide['article']->author)<span>بقلم {{ $slide['article']->author->name }}</span>@endif
+                            @if ($slide['article']->author)<span>{{ __('site.article.by', ['name' => $slide['article']->author->name]) }}</span>@endif
                             @if ($slide['article']->published_at)
                                 <span aria-hidden="true">·</span>
                                 <time datetime="{{ $slide['article']->published_at->toIso8601String() }}" class="ltr-isolate nums-tabular">
@@ -206,12 +208,12 @@
                                 </time>
                             @endif
                             <span aria-hidden="true">·</span>
-                            <span class="nums-tabular">{{ $slide['article']->reading_time }} دقيقة قراءة</span>
+                            <span class="nums-tabular">{{ __('site.article.reading_time', ['minutes' => $slide['article']->reading_time]) }}</span>
                         </p>
 
                         <a href="{{ $slide['url'] }}"
                            class="mt-7 inline-flex w-fit items-center gap-2 rounded-full border border-white/70 px-6 py-3 text-sm font-medium text-white transition hover:border-white hover:bg-white/10">
-                            اقرأ القصة كاملة
+                            {{ __('home.big_story.read_full') }}
                             <span aria-hidden="true" class="inline-block rtl:-scale-x-100">→</span>
                         </a>
                     </div>
@@ -281,7 +283,7 @@
                      slide the next button goes to, so the affordance is not
                      decoration. --}}
                 <div class="absolute bottom-7 end-7 z-10 flex items-center gap-3 sm:bottom-8 sm:end-8">
-                    <button type="button" @click="go(-1)" aria-label="الشريحة السابقة"
+                    <button type="button" @click="go(-1)" aria-label="{{ __('home.big_story.previous') }}"
                             class="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/70 text-white transition before:absolute before:-inset-[5px] before:content-[''] hover:bg-white/10">
                         <span aria-hidden="true" class="inline-block rtl:-scale-x-100">←</span>
                     </button>
@@ -299,7 +301,7 @@
                         </span>
                     @endforeach
 
-                    <button type="button" @click="go(1)" aria-label="الشريحة التالية" data-next
+                    <button type="button" @click="go(1)" aria-label="{{ __('home.big_story.next') }}" data-next
                             class="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/70 text-white transition before:absolute before:-inset-[5px] before:content-[''] hover:bg-white/10">
                         <span aria-hidden="true" class="inline-block rtl:-scale-x-100">→</span>
                     </button>

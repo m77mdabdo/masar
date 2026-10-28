@@ -78,14 +78,19 @@ it('does not move a single slide', function (): void {
         ->not->toContain('const load = () => import(');
 });
 
-it('gives the reader a pause control with a state-true Arabic label and a status line', function (): void {
+it('gives the reader a pause control with a state-true label and a status line', function (): void {
     $js = bigStoryJs();
+    $html = bigStory();
 
     // The same circle as its neighbours by construction: it copies the next
     // button's class string rather than restating it.
-    expect(bigStory())->toContain('aria-label="الشريحة التالية" data-next');
+    expect($html)->toContain('aria-label="الشريحة التالية" data-next')
+        // The words are the page's, in its language; the chunk holds none.
+        ->toContain('data-label-pause="إيقاف العرض التلقائي" data-label-play="تشغيل العرض التلقائي"')
+        ->toContain('data-label-paused="أُوقف العرض التلقائي" data-label-resumed="استؤنف العرض التلقائي"');
+    expect(preg_match('/\p{Arabic}/u', preg_replace('#/\*.*?\*/|//[^\n]*#s', '', $js)))->toBe(0);
     expect($js)->toContain('button.className = next.className;')
-        ->toContain("':aria-label': () => (c.playing || c.starting ? 'إيقاف العرض التلقائي' : 'تشغيل العرض التلقائي')")
+        ->toContain("':aria-label': () => (c.playing || c.starting ? c.label('pause') : c.label('play'))")
         ->toContain("'x-show': () => !c.reduced")
         ->toContain("status.setAttribute('role', 'status');");
 });

@@ -20,7 +20,7 @@
 
                 <span class="min-w-0">
                     <b class="block font-display text-[0.85rem] font-semibold leading-6 text-g-950 transition group-hover:text-g-700">{{ $article->title }}</b>
-                    <span class="nums-tabular text-[0.7rem] text-ink-3">{{ $article->reading_time }} دقيقة قراءة</span>
+                    <span class="nums-tabular text-[0.7rem] text-ink-3">{{ __('site.article.reading_time', ['minutes' => $article->reading_time]) }}</span>
                 </span>
 
                 <span class="text-ink-3 transition group-hover:text-g-700" aria-hidden="true">↓</span>

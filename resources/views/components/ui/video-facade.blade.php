@@ -26,7 +26,7 @@
                 type="button"
                 @click="loaded = true"
                 class="group absolute inset-0 flex h-full w-full items-center justify-center"
-                aria-label="تشغيل: {{ $title }}"
+                aria-label="{{ __('site.video.play', ['title' => $title]) }}"
             >
                 @if ($posterUrl)
                     <img

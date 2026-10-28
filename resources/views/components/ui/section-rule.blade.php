@@ -19,7 +19,7 @@
              line, so nothing moves. This link is not inline in a sentence, so
              the inline exception does not cover it. --}}
         <a href="{{ $href }}" class="inline-flex min-h-6 shrink-0 items-center whitespace-nowrap text-xs text-ink-3 transition hover:text-g-700">
-            {{ $more ?? 'الكل' }}
+            {{ $more ?? __('site.ui.all') }}
             <span aria-hidden="true" class="inline-block rtl:-scale-x-100">→</span>
         </a>
     @endif

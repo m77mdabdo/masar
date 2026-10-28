@@ -61,6 +61,6 @@
     <div
         {{ $attributes->class(['flex items-center justify-center bg-line text-xs text-ink-3', $boxClass]) }}
         role="img"
-        aria-label="{{ $alt ?: 'صورة غير متوفرة' }}"
+        aria-label="{{ $alt ?: __('site.ui.image_unavailable') }}"
     ></div>
 @endif

@@ -8,7 +8,7 @@
         'text-cream/60' => $tone === 'dark',
         'text-ink-3' => $tone !== 'dark',
     ]) }}>
-        <span>حتى</span>
+        <span>{{ __('site.data.as_of') }}</span>
         <time datetime="{{ $asOf->toIso8601String() }}" class="ltr-isolate nums-tabular">{{ $asOf->format('Y-m-d H:i') }}</time>
         @if ($figures->source())
             <span aria-hidden="true">·</span>

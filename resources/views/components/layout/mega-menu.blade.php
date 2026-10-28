@@ -20,7 +20,7 @@
         'border-transparent text-g-900 hover:text-g-600' => ! $active,
     ];
 @endphp
-<nav {{ $attributes->class(['items-stretch gap-[1rem] min-[1400px]:gap-[1.125rem]']) }} aria-label="التنقل الرئيسي">
+<nav {{ $attributes->class(['items-stretch gap-[1rem] min-[1400px]:gap-[1.125rem]']) }} aria-label="{{ __('site.nav.main') }}">
     @foreach ($items as $item)
         @if ($item['is_mega'] && count($item['children']))
             {{-- Mega panels open on hover and focus, and close on Escape — a

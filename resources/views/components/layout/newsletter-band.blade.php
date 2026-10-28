@@ -14,10 +14,10 @@
         <div class="grid items-center gap-8 lg:grid-cols-[1fr_1.15fr_0.85fr]">
             <div>
                 <h2 id="newsletter-heading" class="font-display text-2xl font-semibold sm:text-3xl">
-                    من المعلومة إلى الفرصة، كل أسبوع
+                    {{ __('site.newsletter.band_title') }}
                 </h2>
                 <p class="mt-2 text-cream/70">
-                    ملخص أسبوعي لما تغيّر في السوق السعودية، ولماذا يهم.
+                    {{ __('site.newsletter.band_body') }}
                 </p>
             </div>
 
@@ -34,12 +34,12 @@
                     {{-- The honeypot. Hidden from sight and from assistive tech,
                          never autofilled, and left empty by any real browser. --}}
                     <div class="hidden" aria-hidden="true">
-                        <label for="band-company-website">لا تملأ هذا الحقل</label>
+                        <label for="band-company-website">{{ __('site.form.honeypot') }}</label>
                         <input id="band-company-website" type="text" name="company_website" tabindex="-1" autocomplete="off" />
                     </div>
 
                     <div class="flex gap-2">
-                        <label for="newsletter-email" class="sr-only">البريد الإلكتروني</label>
+                        <label for="newsletter-email" class="sr-only">{{ __('site.form.email') }}</label>
                         <input
                             id="newsletter-email" name="email" type="email" required
                             value="{{ old('email') }}"
@@ -49,7 +49,7 @@
                             class="ltr-isolate min-w-0 flex-1 rounded-full border border-cream/25 bg-cream/10 px-4 py-2.5 text-cream placeholder:text-cream/40 focus:border-mint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint"
                         />
                         <button type="submit" class="shrink-0 rounded-full bg-cream px-6 py-2.5 font-medium text-g-900 transition hover:bg-mint">
-                            اشترك
+                            {{ __('site.newsletter.subscribe') }}
                         </button>
                     </div>
 
@@ -57,7 +57,7 @@
                         <p id="newsletter-email-error" class="text-xs text-coral">{{ $message }}</p>
                     @enderror
 
-                    <p class="text-xs text-cream/65">انضم إلى قرّاء من قادة الأعمال والمستثمرين وصنّاع التغيير.</p>
+                    <p class="text-xs text-cream/65">{{ __('site.newsletter.band_audience') }}</p>
                 </form>
             @endif
 

@@ -2,7 +2,7 @@
 {{-- contrast-safe: each card renders on the card scrim, which guarantees a
      g-950 ground. Mint is 2.07:1 on cream and 7.63:1 on g-950. --}}
 <section class="mb-0" aria-labelledby="opportunities-heading">
-    <x-ui.section-rule :title="$section['title']" :href="$href" more="رادار الفرص" id="opportunities-heading" />
+    <x-ui.section-rule :title="$section['title']" :href="$href" :more="__('home.intelligence.radar')" id="opportunities-heading" />
 
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         @foreach ($section['items']->take(6) as $opportunity)

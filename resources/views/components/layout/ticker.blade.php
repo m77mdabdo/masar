@@ -14,7 +14,7 @@
     --}}
     {{-- The band is the darkest surface on the page — near-black green,
          a step below the masthead's own ground. --}}
-    <nav aria-label="مؤشرات السوق" class="bg-band text-cream">
+    <nav aria-label="{{ __('site.market.indicators') }}" class="bg-band text-cream">
         <x-ui.container class="!pe-0">
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-[repeat(5,minmax(0,1fr))_auto]">
                 @foreach ($cells as $cell)
@@ -74,7 +74,7 @@
                                     <span aria-hidden="true">{{ $rising ? '▲' : '▼' }}</span>
                                 @endif
                                 <bdi>{{ number_format(abs($cell['change']), 2) }}%</bdi>
-                                <span class="sr-only">{{ $rising ? 'ارتفاع' : ($falling ? 'انخفاض' : 'بلا تغير') }}</span>
+                                <span class="sr-only">{{ $rising ? __('site.trend.up') : ($falling ? __('site.trend.down') : __('site.trend.flat')) }}</span>
                             </span>
                         @endif
                     </div>
@@ -84,7 +84,7 @@
                 @if ($href)
                     <a href="{{ $href }}"
                        class="flex h-9 items-center gap-3 border-s border-white/[0.07] bg-g-850 px-[1.625rem] font-display text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-white transition hover:bg-g-700">
-                        <span>نبض السوق</span>
+                        <span>{{ __('site.market.pulse') }}</span>
                         <span aria-hidden="true" class="inline-block rtl:-scale-x-100">→</span>
                     </a>
                 @endif

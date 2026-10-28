@@ -1,6 +1,6 @@
 @props(['section', 'href' => null])
 <section class="mb-0" aria-labelledby="companies-heading">
-    <x-ui.section-rule :title="$section['title']" :href="$href" more="الدليل" id="companies-heading" />
+    <x-ui.section-rule :title="$section['title']" :href="$href" :more="__('home.companies.more')" id="companies-heading" />
 
     <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:grid-cols-8">
         @foreach ($section['items']->take(8) as $company)

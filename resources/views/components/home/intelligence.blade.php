@@ -12,21 +12,21 @@
     $urls = app(EntityUrl::class);
     $pulse = $figures->pulse();
     $keyNumbers = $figures->data();
-    $sectors = $section['items']->groupBy(fn ($a) => $a->category?->name ?? 'تحليل');
+    $sectors = $section['items']->groupBy(fn ($a) => $a->category?->name ?? __('home.intelligence.analysis'));
     $radar = $section['items']->filter(fn ($a) => filled($a->opportunity))->values();
 
     $panels = [
-        'pulse' => 'نبض السوق',
-        'sectors' => 'قطاعات صاعدة',
-        'radar' => 'رادار الفرص',
-        'numbers' => 'أرقام رئيسية',
+        'pulse' => __('site.market.pulse'),
+        'sectors' => __('home.intelligence.sectors'),
+        'radar' => __('home.intelligence.radar'),
+        'numbers' => __('home.intelligence.numbers'),
     ];
 @endphp
 
 <section class="mb-0" aria-labelledby="intelligence-heading">
     <x-ui.section-rule :title="$section['title']" :href="$href" id="intelligence-heading" />
 
-    <p class="-mt-3 mb-5 text-[0.9rem] leading-relaxed text-ink-3">رؤى حقيقية. فرص حقيقية.</p>
+    <p class="-mt-3 mb-5 text-[0.9rem] leading-relaxed text-ink-3">{{ __('home.intelligence.strap') }}</p>
 
     {{-- Light, with only the opportunity card dark. --}}
     <div class="grid gap-5 lg:grid-cols-[1.5fr_1fr]">
@@ -69,7 +69,7 @@
                                 </ul>
                                 <x-data.as-of :figures="$figures" class="mt-3" />
                             @else
-                                <x-data.empty label="لم تُدخل قراءات المناطق بعد. لا نعرض نسبة بلا مصدر وتاريخ." />
+                                <x-data.empty :label="__('home.intelligence.regions_empty').' '.__('site.data.no_unsourced_share')" />
                             @endif
                         </div>
 
@@ -91,7 +91,7 @@
                             <img src="/svg/world-outline.svg" alt="" aria-hidden="true" loading="lazy" decoding="async"
                                  width="1000" height="480"
                                  class="pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover opacity-[0.28]" />
-                            <h3 class="mb-2.5 font-display text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-ink-3">مناطق التغطية</h3>
+                            <h3 class="mb-2.5 font-display text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-ink-3">{{ __('home.intelligence.regions') }}</h3>
                             <ul class="space-y-2">
                                 @foreach ($section['items']->take(4) as $article)
                                     <li>
@@ -117,7 +117,7 @@
                             @endforeach
                         </ul>
                     @else
-                        <x-data.empty label="لا توجد قطاعات مرصودة في هذه الفترة." />
+                        <x-data.empty :label="__('home.intelligence.sectors_empty')" />
                     @endif
                 </div>
 
@@ -139,7 +139,7 @@
                             @endforeach
                         </ul>
                     @else
-                        <x-data.empty label="لم تُرصد فرص في هذه الفترة." />
+                        <x-data.empty :label="__('home.intelligence.radar_empty')" />
                     @endif
                 </div>
 
@@ -156,7 +156,7 @@
                         </div>
                         <x-data.as-of :figures="$figures" class="mt-3" />
                     @else
-                        <x-data.empty label="لم تُدخل أرقام بعد. لا نعرض رقمًا بلا مصدر وتاريخ." />
+                        <x-data.empty :label="__('home.intelligence.numbers_empty').' '.__('site.data.no_unsourced')" />
                     @endif
                 </div>
             </div>
@@ -182,13 +182,13 @@
                 <span class="diagonal-fade absolute inset-0 -z-10" aria-hidden="true"></span>
 
                 <span class="max-w-[22ch]">
-                    <span class="block font-display text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-mint">فرصة الأسبوع</span>
+                    <span class="block font-display text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-mint">{{ __('home.intelligence.week_opportunity') }}</span>
                     <h3 class="mt-3 font-display text-[1.75rem] font-semibold leading-[1.22]">{{ $opportunity->title }}</h3>
                     <p class="mt-3 text-[0.9rem] leading-[1.7] text-cream/75">{{ Str::limit($opportunity->summary, 120) }}</p>
                 </span>
 
                 <span class="mt-2 inline-flex w-fit items-center gap-2 rounded-full border border-cream/45 px-5 py-2.5 text-xs font-medium transition group-hover:border-mint group-hover:text-mint">
-                    استكشف الفرص
+                    {{ __('home.intelligence.explore') }}
                     <span aria-hidden="true" class="inline-block rtl:-scale-x-100">→</span>
                 </span>
             </a>

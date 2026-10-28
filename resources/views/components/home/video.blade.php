@@ -8,7 +8,7 @@
      also what keeps the front page free of video bytes. The clip itself only
      loads on the article page, behind a deliberate press. --}}
 <section class="mb-0" aria-labelledby="video-heading">
-    <x-ui.section-rule :title="$section['title']" :href="$href" more="كل المرئيات" id="video-heading" />
+    <x-ui.section-rule :title="$section['title']" :href="$href" :more="__('home.video.all')" id="video-heading" />
 
     <div class="grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:gap-9">
         @if ($featured)
@@ -37,7 +37,7 @@
                         <h3 class="font-display text-[0.82rem] font-medium text-g-950">
                             <a href="{{ $url }}" class="block leading-6 transition hover:text-g-700">{{ $article->title }}</a>
                         </h3>
-                        <span class="nums-tabular text-[0.7rem] text-ink-3">{{ $article->reading_time }} دقيقة</span>
+                        <span class="nums-tabular text-[0.7rem] text-ink-3">{{ __('site.article.duration', ['minutes' => $article->reading_time]) }}</span>
                     </div>
                 </article>
             @endforeach

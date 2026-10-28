@@ -7,7 +7,7 @@
 @endphp
 
 <section class="mb-0" aria-labelledby="markets-heading">
-    <x-ui.section-rule :title="$section['title']" :href="$href" more="نبض السوق" id="markets-heading" />
+    <x-ui.section-rule :title="$section['title']" :href="$href" :more="__('site.market.pulse')" id="markets-heading" />
 
     <div class="grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:gap-9">
         <div class="rounded-xl border border-line bg-white p-5">
@@ -23,12 +23,12 @@
                 @if ($index['series'] !== [])
                     {{-- No value axis: the points are an editor-entered shape,
                          not a series we can stand behind to the pixel. --}}
-                    <div class="h-40 text-g-600" role="img" aria-label="اتجاه {{ $index['label'] }}">
+                    <div class="h-40 text-g-600" role="img" aria-label="{{ __('home.markets.trend', ['label' => $index['label']]) }}">
                         <x-data.sparkline :points="$index['series']" :area="true" :height="170" :width="600" />
                     </div>
                 @endif
             @else
-                <x-data.empty label="لم يُدخل محرّر قيمة المؤشر بعد. لا نعرض رقمًا بلا مصدر وتاريخ." />
+                <x-data.empty :label="__('home.markets.index_empty').' '.__('site.data.no_unsourced')" />
             @endif
 
             @if ($instruments->isNotEmpty())
@@ -44,7 +44,7 @@
         </div>
 
         <div>
-            <h3 class="mb-3 font-display text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-g-950">قراءات في السوق</h3>
+            <h3 class="mb-3 font-display text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-g-950">{{ __('home.markets.readings') }}</h3>
 
             <ol>
                 @foreach ($insights as $article)
@@ -58,7 +58,7 @@
 
             @if ($href)
                 <a href="{{ $href }}" class="mt-4 inline-flex items-center gap-2 rounded-full border border-line px-5 py-2.5 text-xs font-medium text-g-900 transition hover:border-g-600">
-                    افتح صفحة الأسواق
+                    {{ __('home.markets.open') }}
                     <span aria-hidden="true" class="inline-block rtl:-scale-x-100">→</span>
                 </a>
             @endif

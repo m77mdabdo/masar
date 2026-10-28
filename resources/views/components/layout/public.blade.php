@@ -107,7 +107,7 @@
      of its own above the page: same words, every page, every width, no
      height of its own. --}}
     <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-3 focus:rounded-lg focus:bg-g-900 focus:px-4 focus:py-2 focus:text-cream">
-        تخطَّ إلى المحتوى
+        {{ __('site.skip_to_content') }}
     </a>
 
     <x-layout.topbar :locale="$locale" :links="$topbarLinks ?? []" />

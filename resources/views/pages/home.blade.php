@@ -90,7 +90,7 @@
                         <x-home.rail-row :cols="3">
                             @if ($has('reports'))<x-home.reports :section="$byType['reports']" />@endif
                             <x-home.data-grid
-                                :section="$byType['data'] ?? ['type' => 'data', 'title' => 'بيانات', 'items' => collect()]"
+                                :section="$byType['data'] ?? ['type' => 'data', 'title' => __('home.data.fallback_title'), 'items' => collect()]"
                                 :figures="$figures"
                                 :href="route('web.markets', $locale)"
                             />
@@ -157,7 +157,7 @@
             @endif
             </div>
         @empty
-            <p class="py-20 text-center text-ink-3">لا يوجد محتوى منشور بعد.</p>
+            <p class="py-20 text-center text-ink-3">{{ __('home.empty') }}</p>
         @endforelse
     </x-ui.container>
 </x-layout.public>

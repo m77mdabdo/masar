@@ -19,7 +19,7 @@
         ])>
             <span aria-hidden="true">{{ $change >= 0 ? '▲' : '▼' }}</span>
             <bdi>{{ number_format(abs($change), 2) }}%</bdi>
-            <span class="sr-only">{{ $change >= 0 ? 'ارتفاع' : 'انخفاض' }}</span>
+            <span class="sr-only">{{ $change >= 0 ? __('site.trend.up') : __('site.trend.down') }}</span>
         </span>
     @endif
 </span>

@@ -14,12 +14,12 @@
         </div>
         <x-data.as-of :figures="$figures" class="mt-3" />
     @else
-        <x-data.empty label="لم تُدخل مؤشرات لوحة البيانات بعد. لا نعرض رقمًا بلا مصدر وتاريخ." />
+        <x-data.empty :label="__('home.data.empty').' '.__('site.data.no_unsourced')" />
     @endif
 
     @if ($href)
         <a href="{{ $href }}" class="mt-4 flex items-center justify-center gap-2 rounded-full border border-line px-5 py-2.5 text-xs font-medium text-g-900 transition hover:border-g-600">
-            افتح مركز البيانات
+            {{ __('home.data.open') }}
             <span aria-hidden="true" class="inline-block rtl:-scale-x-100">→</span>
         </a>
     @endif
