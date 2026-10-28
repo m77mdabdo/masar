@@ -34,11 +34,26 @@ class Settings
     {
         $all = $this->all();
 
-        if (array_key_exists($key, $all)) {
-            return $all[$key];
+        $value = array_key_exists($key, $all)
+            ? $all[$key]
+            : ($default ?? config("masar.settings.defaults.{$key}"));
+
+        return $this->forEdition($value);
+    }
+
+    /**
+     * A value keyed by edition codes and nothing else is a per-edition value:
+     * the current edition's, or the default edition's when it has none.
+     * Anything else — a string, a list of instruments — is returned as is, so
+     * no existing setting changes meaning.
+     */
+    private function forEdition(mixed $value): mixed
+    {
+        if (! is_array($value) || $value === [] || array_diff(array_keys($value), Locales::codes()) !== []) {
+            return $value;
         }
 
-        return $default ?? config("masar.settings.defaults.{$key}");
+        return $value[app()->getLocale()] ?? $value[Locales::default()] ?? reset($value);
     }
 
     /**

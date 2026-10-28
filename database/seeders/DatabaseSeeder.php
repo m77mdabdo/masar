@@ -19,6 +19,10 @@ class DatabaseSeeder extends Seeder
 
             // Demo content, every row of it flagged and purgeable.
             DemoSeeder::class,
+
+            // Labels in every edition, for whatever structure exists by now.
+            // Last, so topics and homepage sections are there to label.
+            EditionLabelsSeeder::class,
         ]);
 
         /*

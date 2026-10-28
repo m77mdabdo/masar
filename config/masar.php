@@ -207,12 +207,15 @@ return [
         'defaults' => [
             'site.demo_mode' => true,
 
-            'identity.site_name' => 'مسار',
-            'identity.tagline' => 'من المعلومة إلى الفرصة',
+            // Per edition: a value keyed by every edition code is resolved to
+            // the current one by Settings::get(). The brand is «مسار» in the
+            // editions written in Arabic script and MASAR in the others.
+            'identity.site_name' => ['ar' => 'مسار', 'en' => 'MASAR', 'fr' => 'MASAR', 'hi' => 'MASAR', 'ur-pk' => 'مسار', 'zh-hans' => 'MASAR'],
+            'identity.tagline' => ['ar' => 'من المعلومة إلى الفرصة', 'en' => 'From information to opportunity', 'fr' => 'De l’information à l’opportunité', 'hi' => 'सूचना से अवसर तक', 'ur-pk' => 'معلومات سے موقع تک', 'zh-hans' => '从信息到机遇'],
             // The strip above the masthead says what MASAR covers; the tagline
             // beside the wordmark says what it is for. They were the same
             // string, printed twice, eighty pixels apart.
-            'identity.descriptor' => 'أعمال · اقتصاد · أسواق · فرص',
+            'identity.descriptor' => ['ar' => 'أعمال · اقتصاد · أسواق · فرص', 'en' => 'Business · Economy · Markets · Opportunities', 'fr' => 'Affaires · Économie · Marchés · Opportunités', 'hi' => 'कारोबार · अर्थव्यवस्था · बाज़ार · अवसर', 'ur-pk' => 'کاروبار · معیشت · مارکیٹس · مواقع', 'zh-hans' => '商业 · 经济 · 市场 · 机遇'],
             'identity.logo_path' => null,
             'identity.favicon_path' => null,
             'identity.og_image_path' => null,
@@ -227,7 +230,7 @@ return [
             'editorial.articles_per_page' => 12,
             'editorial.reading_speed_wpm' => 180,
 
-            'seo.title_template' => ':title | مسار',
+            'seo.title_template' => ['ar' => ':title | مسار', 'en' => ':title | MASAR', 'fr' => ':title | MASAR', 'hi' => ':title | MASAR', 'ur-pk' => ':title | مسار', 'zh-hans' => ':title | MASAR'],
             'seo.robots' => "User-agent: *\nAllow: /\n",
             'seo.verification_tags' => null,
 
