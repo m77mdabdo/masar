@@ -31,11 +31,11 @@
             <nav aria-labelledby="footer-legal">
                 <h2 id="footer-legal" class="mb-3 font-display text-sm font-semibold text-g-900">{{ __('site.footer.legal') }}</h2>
                 <ul class="space-y-2 text-sm">
-                    {{-- Privacy, terms and cookie links used to sit here, all three
-                         pointing at the About page: a link named "Privacy policy"
-                         to a page with no privacy policy is a false claim. They
-                         return with the pages (DEFERRED.md). --}}
                     <li><a href="{{ route('web.editorial-standards', $locale) }}" class="inline-flex min-h-6 items-center text-ink-3 transition hover:text-g-700">{{ __('site.footer.editorial_standards') }}</a></li>
+                    {{-- Each to its own page. These once all pointed at About. --}}
+                    <li><a href="{{ route('web.privacy', $locale) }}" class="inline-flex min-h-6 items-center text-ink-3 transition hover:text-g-700">{{ __('site.footer.privacy') }}</a></li>
+                    <li><a href="{{ route('web.terms', $locale) }}" class="inline-flex min-h-6 items-center text-ink-3 transition hover:text-g-700">{{ __('site.footer.terms') }}</a></li>
+                    <li><a href="{{ route('web.cookies', $locale) }}" class="inline-flex min-h-6 items-center text-ink-3 transition hover:text-g-700">{{ __('site.footer.cookies') }}</a></li>
                 </ul>
             </nav>
 

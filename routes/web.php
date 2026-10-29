@@ -81,6 +81,9 @@ Route::middleware('locale')
         // project and every one of them 404'd.
         Route::get('/corrections', [Web\PageController::class, 'corrections'])->name('corrections');
         Route::get('/advertise', [Web\PageController::class, 'advertise'])->name('advertise');
+        Route::get('/privacy', [Web\PageController::class, 'privacy'])->name('privacy');
+        Route::get('/terms', [Web\PageController::class, 'terms'])->name('terms');
+        Route::get('/cookies', [Web\PageController::class, 'cookies'])->name('cookies');
         Route::get('/team', [Web\PageController::class, 'team'])->name('team');
 
         // Click-through for an advertisement. A redirect rather than a direct

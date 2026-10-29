@@ -66,12 +66,13 @@ it('credits the hero photograph on the story page', function (): void {
     $this->get(app(EntityUrl::class)->for($article->fresh(), 'ar'))->assertOk()->assertSee('Pam Santos / Pexels');
 });
 
-it('links to no legal page that does not exist', function (): void {
+it('links each legal page to the page itself, never to About', function (): void {
     $html = $this->get('/en')->getContent();
 
-    expect($html)->not->toContain('>'.__('site.footer.privacy', [], 'en').'<')
-        ->not->toContain('>'.__('site.footer.terms', [], 'en').'<')
-        ->not->toContain('>'.__('site.footer.cookies', [], 'en').'<');
+    foreach (['privacy', 'terms', 'cookies'] as $page) {
+        expect($html)->toContain('href="'.route("web.{$page}", 'en').'"');
+    }
+    expect(substr_count($html, 'href="'.route('web.about', 'en').'"'))->toBeLessThanOrEqual(2);
 });
 
 it('says the people in demo content are fictional only while the demo is on', function (): void {

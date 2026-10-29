@@ -38,6 +38,22 @@ class PageController
         return view('pages.advertise');
     }
 
+    /** Legal pages: they describe only processing the code actually does. */
+    public function privacy(): View
+    {
+        return view('pages.legal', ['page' => 'privacy']);
+    }
+
+    public function terms(): View
+    {
+        return view('pages.legal', ['page' => 'terms']);
+    }
+
+    public function cookies(): View
+    {
+        return view('pages.legal', ['page' => 'cookies', 'cookies' => \App\Support\SiteCookies::all()]);
+    }
+
     /**
      * The newsroom page names no one until there is someone real to name.
      *

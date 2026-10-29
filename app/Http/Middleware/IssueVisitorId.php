@@ -30,7 +30,7 @@ use Symfony\Component\HttpFoundation\Response;
 class IssueVisitorId
 {
     /** Chrome caps cookie lifetime at 400 days; anything longer is silently trimmed. */
-    private const LIFETIME_MINUTES = 400 * 24 * 60;
+    public const LIFETIME_MINUTES = 400 * 24 * 60;
 
     public const COOKIE = 'masar_vid';
 

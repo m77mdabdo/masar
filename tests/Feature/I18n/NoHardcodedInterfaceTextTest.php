@@ -54,6 +54,12 @@ it('defines every translation key a public template asks for', function (): void
         preg_match_all("/(?:__|trans_choice)\\('([a-z_]+\\.[a-z0-9_.]+)'/", $file->getContents(), $keys);
 
         foreach (array_unique($keys[1]) as $key) {
+            // A prefix a template completes at runtime ('x.y.'.$kind) is not a
+            // key; the pages that build those keys are rendered by tests.
+            if (str_ends_with($key, '.')) {
+                continue;
+            }
+
             if (! \Illuminate\Support\Facades\Lang::has($key, 'ar', false)) {
                 $missing[] = $file->getRelativePathname().': '.$key;
             }
