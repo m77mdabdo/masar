@@ -23,6 +23,8 @@ class DatabaseSeeder extends Seeder
             // Labels in every edition, for whatever structure exists by now.
             // Last, so topics and homepage sections are there to label.
             EditionLabelsSeeder::class,
+            // The demo content itself in every edition (owner's directive).
+            ContentTranslationsSeeder::class,
         ]);
 
         /*
