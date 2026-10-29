@@ -23,6 +23,10 @@ enum TranslationStatus: string
     case AwaitingTranslator = 'awaiting_translator';
     case NeedsReview = 'needs_review';
     case Reviewed = 'reviewed';
+    // Machine-assisted, published on the owner's authorisation (2026-10-29),
+    // native review still pending. Not Reviewed: nobody claims to have read it
+    // against the source, and the site says so.
+    case OwnerAuthorized = 'owner_authorized';
     case Failed = 'failed';
 
     public function label(): string
@@ -34,6 +38,13 @@ enum TranslationStatus: string
     public function isProtected(): bool
     {
         return $this === self::Reviewed;
+    }
+
+    /** May the publish gate let this translation through? */
+    public function isPublishable(): bool
+    {
+        return $this === self::Reviewed
+            || ($this === self::OwnerAuthorized && (bool) config('masar.translation.owner_authorized_publication', false));
     }
 
     public function canRetry(): bool

@@ -38,6 +38,23 @@ final class CreateTranslationDraft
     {
         Gate::forUser($actor)->authorize('translate', $source);
 
+        $draft = $this->draft($source, $locale, $actor);
+
+        // Scalars only: the job must not carry a model it may outlive.
+        TranslateArticle::dispatch($draft->id);
+
+        return $draft;
+    }
+
+    /**
+     * The domain half: rules, structure, the row. No permission check and no
+     * job — the content importer uses this too, so a translation row is made
+     * one way only. Whoever calls it has already decided they may.
+     */
+    public function draft(Article $source, string $locale, User $author): Article
+    {
+        $actor = $author;
+
         if (! Locales::exists($locale)) {
             throw TranslationNotAllowed::unknownLocale($locale);
         }
@@ -67,6 +84,10 @@ final class CreateTranslationDraft
                 'translation_status', 'translation_origin', 'source_hash', 'translation_error', 'translation_attempts',
                 'translated_at', 'translation_reviewed_by_id', 'translation_reviewed_at', 'is_featured',
             ]);
+            // replicate() carries the source's loaded relations across; a draft
+            // holding the original's blocks and sources would write its
+            // translation into the original. It starts with none.
+            $draft->setRelations([]);
             $draft->fill([
                 'locale' => $locale,
                 'author_id' => $actor->id,
@@ -89,12 +110,14 @@ final class CreateTranslationDraft
                 $draft->sources()->create($row->only(['title', 'url', 'publisher', 'source_type', 'accessed_at', 'sort_order']));
             }
             $draft->topics()->sync($source->topics->modelKeys());
+            // The same companies, people and markets: entity pages in the new
+            // edition aggregate the story like the original.
+            foreach ($source->mentions()->get() as $mention) {
+                $draft->mentions()->create($mention->only(['entity_type', 'entity_id', 'role', 'prominence']));
+            }
 
             return $draft;
         });
-
-        // Scalars only: the job must not carry a model it may outlive.
-        TranslateArticle::dispatch($draft->id);
 
         return $draft;
     }

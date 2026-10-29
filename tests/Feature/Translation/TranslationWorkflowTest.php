@@ -252,5 +252,9 @@ it('keeps the editorial-standards promise of human-written text true', function 
         expect(app(TranslationProvider::class))->toBeInstanceOf(\App\Services\Translation\NullTranslationProvider::class);
     }
 
-    expect(__('pages.standards.ai_body', [], 'ar'))->toContain('لا ننشر نصًا مولّدًا');
+    // Since 2026-10-29 the page says what happens: originals are written by a
+    // person; the other editions carry machine-assisted translations,
+    // published on the owner's authorisation and not yet natively reviewed.
+    expect(__('pages.standards.ai_body', [], 'en'))->toContain('machine-assisted')
+        ->toContain('not yet reviewed by native speakers');
 });

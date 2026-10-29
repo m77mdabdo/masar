@@ -26,8 +26,9 @@ use Normalizer;
  */
 final class TranslatableContent
 {
-    /** Article columns that hold reader-facing language. */
-    private const FIELDS = ['title', 'subtitle', 'what_happened', 'why_it_matters', 'business_impact', 'opportunity', 'hero_alt', 'meta_title', 'meta_description'];
+    /** Article columns that hold reader-facing language. A sponsor's name is
+     *  disclosed to the reader in the story's language, so it is one of them. */
+    private const FIELDS = ['title', 'subtitle', 'what_happened', 'why_it_matters', 'business_impact', 'opportunity', 'hero_alt', 'meta_title', 'meta_description', 'sponsor_name'];
 
     /** Keys inside a block's JSON that hold language; anything else is structure. */
     private const BLOCK_KEYS = ['text', 'caption', 'title', 'attribution', 'role'];
@@ -70,6 +71,16 @@ final class TranslatableContent
             foreach (self::BLOCK_KEYS as $key) {
                 if (is_string($block->data[$key] ?? null) && filled($block->data[$key])) {
                     $out["blocks.{$i}.{$key}"] = $block->data[$key];
+                }
+            }
+        }
+
+        // A citation's title and publisher are shown to the reader in the
+        // story's language; its URL is structure and never sent.
+        foreach ($article->sources as $i => $source) {
+            foreach (['title', 'publisher'] as $key) {
+                if (filled($source->{$key})) {
+                    $out["sources.{$i}.{$key}"] = (string) $source->{$key};
                 }
             }
         }
@@ -121,6 +132,19 @@ final class TranslatableContent
             }
         }
         $draft->key_numbers = $numbers ?: $draft->key_numbers;
+
+        foreach ($draft->sources as $i => $source) {
+            $changed = false;
+            foreach (['title', 'publisher'] as $key) {
+                if (isset($segments["sources.{$i}.{$key}"])) {
+                    $source->{$key} = $segments["sources.{$i}.{$key}"];
+                    $changed = true;
+                }
+            }
+            if ($changed) {
+                $source->save();
+            }
+        }
 
         foreach ($draft->blocks as $i => $block) {
             $data = $block->data;

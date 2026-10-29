@@ -197,7 +197,7 @@ class EvaluatePublishGate
             return;
         }
 
-        if ($article->translation_status !== \App\Enums\TranslationStatus::Reviewed) {
+        if (! ($article->translation_status?->isPublishable() ?? false)) {
             $failures[] = ['rule' => 'translation_review', 'message' => __('admin.gate.translation_unreviewed')];
         }
     }

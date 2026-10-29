@@ -82,6 +82,12 @@ return [
         // a person has reviewed: that one is flagged as outdated instead.
         'auto_retranslate' => (bool) env('MASAR_TRANSLATION_AUTO_RETRANSLATE', false),
 
+        // Owner's ruling (2026-10-29): machine-assisted translations of the
+        // demo stories may be published on the owner's authorisation, marked
+        // owner_authorized — never "reviewed" — while native review is pending.
+        // Off, the gate admits only translations a person has reviewed.
+        'owner_authorized_publication' => (bool) env('MASAR_TRANSLATION_OWNER_AUTHORIZED', true),
+
         // Provider calls per minute, across all workers.
         'per_minute' => (int) env('MASAR_TRANSLATION_PER_MINUTE', 10),
 
