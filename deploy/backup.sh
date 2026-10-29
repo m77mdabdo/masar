@@ -39,7 +39,7 @@ MYSQL_PWD="$DB_PASS" mysqldump \
 gzip -t "$SQL" || die "dump failed its integrity check: $SQL"
 
 MEDIA=""
-if [[ -d storage/app/public ]]; then
+if [[ -d storage/app/public && "${MASAR_BACKUP_SKIP_MEDIA:-0}" != "1" ]]; then
   MEDIA="$DEST/masar-media-$STAMP.tar.gz"
   log "archiving the local media disk"
   tar -czf "$MEDIA" -C storage/app public
@@ -58,6 +58,17 @@ sql_bytes=$(wc -c < "$SQL" | tr -d ' ')
 media=$(basename "${MEDIA:-none}")
 git=$(git rev-parse --short HEAD 2>/dev/null || echo unknown)
 MANIFEST
+
+# Exact row counts, one line per table, so verify-backup.sh can prove a
+# restore holds what was dumped. COUNT(*), not information_schema.table_rows,
+# which is an estimate for InnoDB.
+log "recording row counts"
+for t in $(MYSQL_PWD="$DB_PASS" mysql --host="${DB_HOST:-127.0.0.1}" --port="${DB_PORT:-3306}" --user="$DB_USER" \
+    --silent --skip-column-names -e "SELECT table_name FROM information_schema.tables WHERE table_schema='$DB_NAME' AND table_type='BASE TABLE' ORDER BY table_name"); do
+  n="$(MYSQL_PWD="$DB_PASS" mysql --host="${DB_HOST:-127.0.0.1}" --port="${DB_PORT:-3306}" --user="$DB_USER" \
+    --silent --skip-column-names -e "SELECT COUNT(*) FROM \`$DB_NAME\`.\`$t\`")"
+  printf 'rows.%s=%s\n' "$t" "$n" >> "$DEST/masar-$STAMP.manifest"
+done
 
 log "pruning backups older than $KEEP_DAYS days"
 find "$DEST" -name 'masar-*' -type f -mtime "+$KEEP_DAYS" -delete

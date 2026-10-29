@@ -69,6 +69,12 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Production is HTTPS only; generate every URL that way even when the
+        // edge terminates TLS and forwards plain HTTP.
+        if ($this->app->environment('production')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
+
         /*
          * entity_mentions is the fastest-growing table in the schema, and every
          * row stores two morph type strings. Aliasing keeps them short and, more

@@ -62,6 +62,9 @@ composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 "$PHP" artisan route:cache
 "$PHP" artisan view:cache
 "$PHP" artisan event:cache
+# The interface-translation register follows the files that just shipped:
+# a changed file loses its approval here rather than keeping a stale one.
+"$PHP" artisan masar:translations:sync >/dev/null
 
 # The application cache is flushed on every deploy for the same reason the
 # seeder flushes it: whatever is in there was computed against the previous

@@ -17,6 +17,17 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         /*
+         * Behind Cloudflare or a load balancer the connecting address is the
+         * proxy's, so every reader would share one rate-limit bucket and
+         * HTTPS would read as HTTP. TRUSTED_PROXIES names them (comma list,
+         * or `*` when the only route in is the proxy). Unset, nothing is
+         * trusted — the safe default for a bare server.
+         */
+        if (filled($proxies = env('TRUSTED_PROXIES'))) {
+            $middleware->trustProxies(at: $proxies === '*' ? '*' : array_map('trim', explode(',', $proxies)));
+        }
+
+        /*
          * Redirects and 404 logging both hang off the same missing-page path.
          * Global, not the `web` group: an unknown URL never matches a route, so
          * it 404s before any route middleware runs.

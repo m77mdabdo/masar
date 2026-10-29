@@ -35,3 +35,23 @@ it('locks out a sixth failed login attempt', function (): void {
 
     expect(auth()->check())->toBeFalse();
 });
+
+it('sends no more than two password-reset emails a minute, however often it is asked', function (): void {
+    // Filament's rateLimit(2) on the request page, watched refusing rather
+    // than read out of vendor/ (CLAUDE.md §7).
+    \Illuminate\Support\Facades\Notification::fake();
+    // A staff account: the panel sends resets only to users who may use it.
+    $user = staff('writer');
+
+    for ($i = 0; $i < 5; $i++) {
+        livewire(\Filament\Auth\Pages\PasswordReset\RequestPasswordReset::class)
+            ->fillForm(['email' => $user->email])
+            ->call('request');
+    }
+
+    // Measured: one. Laravel's password broker allows one reset mail per
+    // account per 60 seconds, stricter than Filament's two per minute; the
+    // property is that five requests cannot become five emails.
+    $sent = \Illuminate\Support\Facades\Notification::sent($user, \Filament\Auth\Notifications\ResetPassword::class)->count();
+    expect($sent)->toBeGreaterThanOrEqual(1)->toBeLessThanOrEqual(2);
+});

@@ -77,3 +77,18 @@ it('keeps the built assets tracked in git', function (): void {
     expect((string) file_get_contents(base_path('.gitignore')))
         ->not->toMatch('/^\/public\/build$/m');
 });
+
+it('records exact row counts with every backup, and verifies a restore against them', function (): void {
+    expect(script('backup.sh'))->toContain('rows.%s=%s')->toContain('SELECT COUNT(*)');
+
+    $verify = script('verify-backup.sh');
+    expect($verify)
+        // Never the application's own database.
+        ->toContain('refusing: $SCRATCH is the application\'s own database')
+        ->toContain('set -Eeuo pipefail')
+        ->toContain('does not restore what was dumped');
+});
+
+it('keeps the translation review register in step with each deploy', function (): void {
+    expect(script('deploy.sh'))->toContain('masar:translations:sync');
+});
