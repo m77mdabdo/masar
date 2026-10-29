@@ -127,6 +127,7 @@ return [
         'awaiting_translator' => 'अनुवादक की प्रतीक्षा',
         'failed' => 'विफल',
         'needs_review' => 'समीक्षा आवश्यक',
+        'owner_authorized' => 'मालिक की अनुमति से प्रकाशित — भाषा समीक्षा की प्रतीक्षा',
         'processing' => 'प्रक्रिया में',
         'queued' => 'कतार में',
         'reviewed' => 'समीक्षित',

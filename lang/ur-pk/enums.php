@@ -127,6 +127,7 @@ return [
         'awaiting_translator' => 'مترجم کا انتظار',
         'failed' => 'ناکام',
         'needs_review' => 'جائزہ درکار',
+        'owner_authorized' => 'مالک کی اجازت سے شائع — لسانی جائزے کا انتظار',
         'processing' => 'جاری',
         'queued' => 'قطار میں',
         'reviewed' => 'جائزہ مکمل',

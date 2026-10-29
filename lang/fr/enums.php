@@ -127,6 +127,7 @@ return [
         'awaiting_translator' => 'En attente d’un traducteur',
         'failed' => 'Échec',
         'needs_review' => 'À relire',
+        'owner_authorized' => 'Publiée sur autorisation du propriétaire — relecture linguistique en attente',
         'processing' => 'En cours',
         'queued' => 'En file d’attente',
         'reviewed' => 'Relue',

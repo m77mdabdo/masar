@@ -75,7 +75,11 @@
                 @unless ($locale === \App\Support\Locales::default())
                     @php
                         $reviews = \App\Models\TranslationReview::query()->where('locale', $locale)->pluck('status');
-                        $reviewed = $reviews->isNotEmpty() && $reviews->every(fn ($s) => $s === \App\Enums\TranslationReviewStatus::Approved);
+                        // "Reviewed" only when the interface is approved AND no story
+                        // in this edition is still a machine-assisted translation.
+                        $reviewed = $reviews->isNotEmpty() && $reviews->every(fn ($s) => $s === \App\Enums\TranslationReviewStatus::Approved)
+                            && ! \App\Models\Article::query()->published()->where('locale', $locale)
+                                ->where('translation_status', \App\Enums\TranslationStatus::OwnerAuthorized)->exists();
                     @endphp
                     <p>{{ $reviewed ? __('pages.standards.interface_reviewed') : __('pages.standards.interface_pending') }}</p>
                 @endunless

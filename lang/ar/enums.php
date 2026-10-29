@@ -130,6 +130,7 @@ return [
         'awaiting_translator' => 'بانتظار مترجم',
         'failed' => 'فشلت',
         'needs_review' => 'تحتاج مراجعة',
+        'owner_authorized' => 'منشورة بتفويض المالك — بانتظار مراجعة لغوية',
         'processing' => 'قيد الترجمة',
         'queued' => 'في الانتظار',
         'reviewed' => 'رُوجعت',

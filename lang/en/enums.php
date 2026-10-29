@@ -127,6 +127,7 @@ return [
         'awaiting_translator' => 'Awaiting a translator',
         'failed' => 'Failed',
         'needs_review' => 'Needs review',
+        'owner_authorized' => 'Published on owner authorisation — awaiting language review',
         'processing' => 'Processing',
         'queued' => 'Queued',
         'reviewed' => 'Reviewed',
