@@ -114,6 +114,7 @@ class ArticleBlocks
                     ->directory('articles/blocks')
                     ->maxSize((int) config('masar.media.max_upload_kb'))
                     ->acceptedFileTypes(config('masar.media.accepted'))
+                    ->rules([new \App\Rules\SafeImage])
                     ->required(),
                 TextInput::make('alt')->label('النص البديل')->required()
                     ->helperText('مطلوب لكل صورة، بلا استثناء.'),

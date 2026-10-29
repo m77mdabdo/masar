@@ -37,4 +37,9 @@ return [
         'target' => 'اللغة',
         'unknown_locale' => 'لغة غير معروفة: :locale',
     ],
+    'upload' => [
+        'dimensions' => 'أبعاد الصورة يجب ألا تتجاوز :max بكسل في كل اتجاه.',
+        'not_an_image' => 'هذا الملف ليس صورة JPEG أو PNG أو WebP صالحة.',
+        'too_large' => 'حجم الملف يتجاوز :kb كيلوبايت.',
+    ],
 ];

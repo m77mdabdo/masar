@@ -34,4 +34,9 @@ return [
         'target' => 'Langue',
         'unknown_locale' => 'Langue inconnue : :locale',
     ],
+    'upload' => [
+        'dimensions' => 'L’image ne doit pas dépasser :max pixels de côté.',
+        'not_an_image' => 'Ce fichier n’est pas une image JPEG, PNG ou WebP valide.',
+        'too_large' => 'Le fichier dépasse :kb Ko.',
+    ],
 ];

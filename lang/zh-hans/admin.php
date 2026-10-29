@@ -34,4 +34,9 @@ return [
         'target' => '语言',
         'unknown_locale' => '未知语言：:locale',
     ],
+    'upload' => [
+        'dimensions' => '图片任一边不得超过 :max 像素。',
+        'not_an_image' => '该文件不是有效的 JPEG、PNG 或 WebP 图片。',
+        'too_large' => '文件超过 :kb KB。',
+    ],
 ];

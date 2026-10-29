@@ -175,6 +175,7 @@ class ArticleForm
                     ->imageEditor()
                     ->maxSize((int) config('masar.media.max_upload_kb'))
                     ->acceptedFileTypes(config('masar.media.accepted'))
+                    ->rules([new \App\Rules\SafeImage])
                     ->helperText('مطلوبة للنشر — كل بطاقات العرض والقوائم تعتمد عليها.')
                     ->columnSpanFull(),
 

@@ -78,6 +78,7 @@ class PersonResource extends Resource
                 ->image()
                 ->disk('public')
                 ->directory('people')
+                ->maxSize((int) config('masar.media.max_upload_kb'))->acceptedFileTypes(config('masar.media.accepted'))->rules([new \App\Rules\SafeImage])
                 ->acceptedFileTypes(config('masar.media.accepted')),
 
             /*

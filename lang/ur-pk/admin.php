@@ -34,4 +34,9 @@ return [
         'target' => 'زبان',
         'unknown_locale' => 'نامعلوم زبان: :locale',
     ],
+    'upload' => [
+        'dimensions' => 'تصویر کسی بھی جانب :max پکسل سے بڑی نہیں ہونی چاہیے۔',
+        'not_an_image' => 'یہ فائل درست JPEG، PNG یا WebP تصویر نہیں ہے۔',
+        'too_large' => 'فائل :kb KB سے بڑی ہے۔',
+    ],
 ];

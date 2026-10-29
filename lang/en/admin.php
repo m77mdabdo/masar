@@ -34,4 +34,9 @@ return [
         'target' => 'Language',
         'unknown_locale' => 'Unknown language: :locale',
     ],
+    'upload' => [
+        'dimensions' => 'The image must be no larger than :max pixels on either side.',
+        'not_an_image' => 'This file is not a valid JPEG, PNG or WebP image.',
+        'too_large' => 'The file is larger than :kb KB.',
+    ],
 ];

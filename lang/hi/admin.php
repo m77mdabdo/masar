@@ -34,4 +34,9 @@ return [
         'target' => 'भाषा',
         'unknown_locale' => 'अज्ञात भाषा: :locale',
     ],
+    'upload' => [
+        'dimensions' => 'छवि किसी भी ओर :max पिक्सेल से बड़ी नहीं होनी चाहिए।',
+        'not_an_image' => 'यह फ़ाइल मान्य JPEG, PNG या WebP छवि नहीं है।',
+        'too_large' => 'फ़ाइल :kb KB से बड़ी है।',
+    ],
 ];

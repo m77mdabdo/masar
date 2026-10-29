@@ -101,6 +101,7 @@ class CompanyResource extends Resource
                 ->image()
                 ->disk('public')
                 ->directory('companies')
+                ->maxSize((int) config('masar.media.max_upload_kb'))->acceptedFileTypes(config('masar.media.accepted'))->rules([new \App\Rules\SafeImage])
                 ->acceptedFileTypes(config('masar.media.accepted')),
 
             Toggle::make('is_verified')

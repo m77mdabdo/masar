@@ -115,9 +115,9 @@ class ManageSettings extends Page implements HasSchemas
             ...self::perEdition('identity__tagline', 'الشعار النصي', 'يظهر بجوار الشعار في الترويسة. ثلاثة أسطر قصيرة.'),
             ...self::perEdition('identity__descriptor', 'وصف التغطية', 'يظهر في الشريط العلوي.'),
             ...self::perEdition('seo__description', 'الوصف الافتراضي لمحركات البحث', 'يُستخدم حين لا تحدد الصفحة وصفها.'),
-            FileUpload::make('identity__logo_path')->label('الشعار')->image()->disk('public')->directory('site'),
-            FileUpload::make('identity__favicon_path')->label('أيقونة الموقع')->image()->disk('public')->directory('site'),
-            FileUpload::make('identity__og_image_path')->label('صورة المشاركة الافتراضية')->image()->disk('public')->directory('site')
+            FileUpload::make('identity__logo_path')->label('الشعار')->image()->disk('public')->directory('site')->maxSize((int) config('masar.media.max_upload_kb'))->acceptedFileTypes(config('masar.media.accepted'))->rules([new \App\Rules\SafeImage]),
+            FileUpload::make('identity__favicon_path')->label('أيقونة الموقع')->image()->disk('public')->directory('site')->maxSize((int) config('masar.media.max_upload_kb'))->acceptedFileTypes(config('masar.media.accepted'))->rules([new \App\Rules\SafeImage]),
+            FileUpload::make('identity__og_image_path')->label('صورة المشاركة الافتراضية')->image()->disk('public')->directory('site')->maxSize((int) config('masar.media.max_upload_kb'))->acceptedFileTypes(config('masar.media.accepted'))->rules([new \App\Rules\SafeImage])
                 ->helperText('تُستخدم عندما لا تحدد المادة صورتها الخاصة.'),
         ])->columns(2);
     }

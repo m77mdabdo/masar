@@ -559,7 +559,10 @@ return [
             'og' => 1200,
         ],
         'max_upload_kb' => 12288,
-        'accepted' => ['image/jpeg', 'image/png', 'image/webp', 'image/avif'],
+        // JPEG, PNG and WebP only: every upload is re-encoded (App\Rules\SafeImage),
+        // and AVIF is not a format GD re-encodes reliably.
+        'accepted' => ['image/jpeg', 'image/png', 'image/webp'],
+        'max_dimension' => 8000,
 
         // Self-hosted video. H.264 in MP4 only: it is the one combination every
         // target browser decodes in hardware, and a format list is a promise
