@@ -81,8 +81,9 @@ it('switches to the same story in another edition, or says it will land on the f
 });
 
 it('hides the switcher while a single edition is live', function (): void {
-    config()->set('masar.locales.en.enabled', false);
-    config()->set('masar.locales.fr.enabled', false);
+    foreach (['en', 'fr', 'hi', 'ur-pk', 'zh-hans'] as $code) {
+        config()->set("masar.locales.{$code}.enabled", false);
+    }
 
     expect($this->get('/ar')->getContent())->not->toContain('aria-controls="language-switcher"');
 });

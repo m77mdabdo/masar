@@ -31,6 +31,7 @@ class RoleSeeder extends Seeder
         'article.seo',
         'article.translate',
         'article.translation.review',
+        'translation.review',
         'navigation.manage',
         'homepage.manage',
         'settings.manage',
@@ -51,7 +52,7 @@ class RoleSeeder extends Seeder
         'editor_in_chief' => [
             'article.view', 'article.create', 'article.update.own', 'article.update.any',
             'article.delete', 'article.transition', 'article.publish', 'article.factcheck',
-            'article.seo', 'article.translate', 'article.translation.review', 'navigation.manage', 'homepage.manage',
+            'article.seo', 'article.translate', 'article.translation.review', 'translation.review', 'navigation.manage', 'homepage.manage',
             'settings.manage', 'users.manage', 'intelligence.configure',
             'intelligence.triage', 'audit.view',
         ],

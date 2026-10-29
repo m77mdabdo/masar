@@ -20,16 +20,17 @@ return [
     | writing tradition, and a reader in Pakistan reads naskh as foreign.
     |
     | `enabled` gates routing, the switcher, the sitemap and the root redirect.
-    | An edition is switched on when its interface is translated and the
-    | fallback policy can serve it honestly, not before: an empty edition is
-    | worse than none.
+    | All six are on (owner's ruling, 2026-10-29). An edition with no published
+    | stories still serves its translated chrome, static pages and honest empty
+    | states; it is never switched off for being empty.
     */
 
     'locales' => (function (): array {
-        // Which editions are live is an environment decision: production
-        // switches one on when it can be served, a dev machine may switch
-        // them all on to audit them. Arabic is always on.
-        $enabled = array_filter(array_map('trim', explode(',', (string) env('MASAR_LOCALES_ENABLED', 'ar'))));
+        // All six are public by the owner's ruling (2026-10-29): the interface
+        // is served while its translation review is pending, and that review
+        // is recorded separately (translation_reviews). An environment can
+        // still take an edition off; Arabic is always on.
+        $enabled = array_filter(array_map('trim', explode(',', (string) env('MASAR_LOCALES_ENABLED', 'ar,en,fr,hi,ur-pk,zh-hans'))));
         $on = fn (string $code): bool => $code === 'ar' || in_array($code, $enabled, true);
 
         return [

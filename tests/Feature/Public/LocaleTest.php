@@ -19,19 +19,21 @@ it('404s an unknown locale', function (): void {
 });
 
 it('404s a locale that exists but is disabled', function (): void {
-    // English is architected from day one and has no content — an empty English
-    // site is worse than none.
-    expect(config('masar.locales.en.enabled'))->toBeFalse();
+    // An environment can still take an edition off; its URLs then 404.
+    config()->set('masar.locales.en.enabled', false);
 
     $this->get('/en')->assertNotFound();
 });
 
 it('redirects the bare root to a locale', function (): void {
-    $this->get('/')->assertRedirect(route('web.home', 'ar'));
+    // The test client sends `Accept-Language: en-us` unless told otherwise.
+    $this->get('/', ['Accept-Language' => 'ar'])->assertRedirect(route('web.home', 'ar'));
+    $this->get('/', ['Accept-Language' => 'de'])->assertRedirect(route('web.home', 'ar'));
 });
 
 it('honours Accept-Language among enabled locales only', function (): void {
-    // English is disabled, so asking for it still lands on Arabic.
+    // With English taken off, asking for it lands on Arabic.
+    config()->set('masar.locales.en.enabled', false);
     $this->get('/', ['Accept-Language' => 'en-GB,en;q=0.9'])
         ->assertRedirect(route('web.home', 'ar'));
 });
@@ -103,3 +105,11 @@ it('stores a locale longer than two characters', function (): void {
 
     expect($article->fresh()->locale)->toBe('zh-hans');
 });
+
+it('serves all six editions by default, empty or not', function (string $code): void {
+    expect(\App\Support\Locales::enabled())->toBe(['ar', 'en', 'fr', 'hi', 'ur-pk', 'zh-hans']);
+
+    $this->get('/'.$code)->assertOk();
+    $this->get('/'.$code.'/about')->assertOk();
+    $this->get('/'.$code.'/search?q=x')->assertOk();
+})->with(['ar', 'en', 'fr', 'hi', 'ur-pk', 'zh-hans']);
