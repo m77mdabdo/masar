@@ -65,6 +65,15 @@ it('offers the same structural page in every enabled edition', function (): void
         ->toContain('<meta property="og:locale:alternate" content="en_US">');
 });
 
+it('keeps the search and its filters when the reader changes edition', function (): void {
+    $html = $this->get('/en/search?q=aramco&page=2')->assertOk()->getContent();
+
+    // Symfony normalises the order of the parameters; their values travel intact.
+    $fr = e(route('web.search', 'fr').'?page=2&q=aramco');
+    expect($html)->toContain('hreflang="fr" href="'.$fr.'"')
+        ->toContain('href="'.$fr.'" hreflang="fr" lang="fr" dir="ltr"');
+});
+
 it('switches to the same story in another edition, or says it will land on the front page', function (): void {
     $source = Article::factory()->published()->create();
     $en = translated($source, 'en', true);

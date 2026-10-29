@@ -55,9 +55,13 @@ final class Alternates
             return [];
         }
 
+        // The reader's search and filters travel with them: switching the
+        // language of a results page lands on the same results.
+        $query = request()->getQueryString();
         $out = [];
         foreach (Locales::enabled() as $code) {
-            $out[$code] = route($route->getName(), array_merge($route->parameters(), ['locale' => $code]), true);
+            $url = route($route->getName(), array_merge($route->parameters(), ['locale' => $code]), true);
+            $out[$code] = $query ? $url.'?'.$query : $url;
         }
 
         return $out;
