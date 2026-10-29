@@ -35,7 +35,7 @@ return [
         'explore' => 'Explorer',
         'follow' => 'Suivez-nous',
         'legal' => 'Mentions légales',
-        'people_photos' => 'Les photos des équipes et des experts sont de vraies photographies de personnes réelles.',
+        'people_photos' => 'Dans cette version de démonstration, les portraits sont des photos d’archives et ne montrent pas les personnes citées.',
         'photo_credits' => 'Photographies : contributeurs d’Unsplash et de Pexels. Chaque photo est créditée à son auteur sur la page de l’article.',
         'platform' => 'La plateforme',
         'privacy' => 'Politique de confidentialité',
@@ -70,7 +70,7 @@ return [
         'search' => 'Rechercher',
     ],
     'newsletter' => [
-        'band_audience' => 'Rejoignez des lecteurs parmi les dirigeants, les investisseurs et les acteurs du changement.',
+        'band_audience' => 'Écrite pour les dirigeants, les investisseurs et les décideurs.',
         'band_body' => 'Une synthèse hebdomadaire de ce qui a changé sur le marché saoudien, et pourquoi c’est important.',
         'band_title' => 'De l’information à l’opportunité, chaque semaine',
         'check_inbox' => 'Consultez votre boîte mail : nous vous avons envoyé un message pour confirmer l’abonnement.',

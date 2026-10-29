@@ -35,7 +35,7 @@ return [
         'explore' => '探索',
         'follow' => '关注我们',
         'legal' => '法律信息',
-        'people_photos' => '团队与专家照片均为真实人物的实拍照片。',
+        'people_photos' => '在本演示版本中，人物照片均为图库照片，并非所提及的人物本人。',
         'photo_credits' => '图片：Unsplash 与 Pexels 贡献者。每张图片均在文章页注明摄影者。',
         'platform' => '平台',
         'privacy' => '隐私政策',
@@ -70,7 +70,7 @@ return [
         'search' => '搜索',
     ],
     'newsletter' => [
-        'band_audience' => '与企业领袖、投资者和变革者一同阅读。',
+        'band_audience' => '为企业领袖、投资者和决策者而写。',
         'band_body' => '每周梳理沙特市场的变化及其意义。',
         'band_title' => '从信息到机遇，每周一期',
         'check_inbox' => '请查收邮箱：我们已发送订阅确认邮件。',

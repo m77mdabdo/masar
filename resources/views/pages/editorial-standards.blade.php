@@ -66,6 +66,19 @@
                 <p>
                     {{ __('pages.standards.ai_body') }}
                 </p>
+
+                <h2>{{ __('pages.standards.translation') }}</h2>
+                <p>{{ __('pages.standards.translation_body') }}</p>
+                {{-- Read from the review register at request time, so the page
+                     cannot say a review happened that the register does not
+                     record (R11). Arabic is the source and says nothing. --}}
+                @unless ($locale === \App\Support\Locales::default())
+                    @php
+                        $reviews = \App\Models\TranslationReview::query()->where('locale', $locale)->pluck('status');
+                        $reviewed = $reviews->isNotEmpty() && $reviews->every(fn ($s) => $s === \App\Enums\TranslationReviewStatus::Approved);
+                    @endphp
+                    <p>{{ $reviewed ? __('pages.standards.interface_reviewed') : __('pages.standards.interface_pending') }}</p>
+                @endunless
             </div>
 
             <aside class="mt-12 rounded-xl border border-line bg-white p-6">

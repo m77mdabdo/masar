@@ -59,6 +59,7 @@
                 <h2>{{ __('pages.team.experts') }}</h2>
                 <p>
                     {{ __('pages.team.experts_body') }}
+                    @if (app(\App\Support\DemoMode::class)->isOn()) {{ __('pages.team.experts_demo') }} @endif
                 </p>
             </div>
         </div>

@@ -9,6 +9,7 @@ return [
     'fact_checked' => 'Fact-checked',
     'open_section' => 'Open the section',
     'opportunity' => 'The opportunity',
+    'photo_credit' => 'Photograph:',
     'promo' => [
         'body' => 'A weekly read on the Saudi economy, in your inbox.',
         'eyebrow' => 'The MASAR newsletter',

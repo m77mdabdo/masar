@@ -31,10 +31,11 @@
             <nav aria-labelledby="footer-legal">
                 <h2 id="footer-legal" class="mb-3 font-display text-sm font-semibold text-g-900">{{ __('site.footer.legal') }}</h2>
                 <ul class="space-y-2 text-sm">
+                    {{-- Privacy, terms and cookie links used to sit here, all three
+                         pointing at the About page: a link named "Privacy policy"
+                         to a page with no privacy policy is a false claim. They
+                         return with the pages (DEFERRED.md). --}}
                     <li><a href="{{ route('web.editorial-standards', $locale) }}" class="inline-flex min-h-6 items-center text-ink-3 transition hover:text-g-700">{{ __('site.footer.editorial_standards') }}</a></li>
-                    <li><a href="{{ route('web.about', $locale) }}" class="inline-flex min-h-6 items-center text-ink-3 transition hover:text-g-700">{{ __('site.footer.privacy') }}</a></li>
-                    <li><a href="{{ route('web.about', $locale) }}" class="inline-flex min-h-6 items-center text-ink-3 transition hover:text-g-700">{{ __('site.footer.terms') }}</a></li>
-                    <li><a href="{{ route('web.about', $locale) }}" class="inline-flex min-h-6 items-center text-ink-3 transition hover:text-g-700">{{ __('site.footer.cookies') }}</a></li>
                 </ul>
             </nav>
 
@@ -100,7 +101,9 @@
              one, and the licences these are used under require it too. --}}
         <p class="mt-6 text-[0.7rem] leading-relaxed text-ink-3">
             {{ __('site.footer.photo_credits') }}
-            {{ __('site.footer.people_photos') }}
+            {{-- Demo only: the portraits are stock photographs of strangers,
+                 and saying otherwise would be a claim about the people named. --}}
+            @if (app(\App\Support\DemoMode::class)->isOn()) {{ __('site.footer.people_photos') }} @endif
         </p>
     </x-ui.container>
 </footer>

@@ -9,6 +9,7 @@ return [
     'fact_checked' => '已核实',
     'open_section' => '打开栏目',
     'opportunity' => '机遇',
+    'photo_credit' => '图片：',
     'promo' => [
         'body' => '每周一期沙特经济解读，直达您的邮箱。',
         'eyebrow' => 'MASAR 通讯',

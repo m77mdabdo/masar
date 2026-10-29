@@ -35,7 +35,7 @@ return [
         'explore' => 'Explore',
         'follow' => 'Follow us',
         'legal' => 'Legal',
-        'people_photos' => 'Photographs of teams and experts are real photographs of real people.',
+        'people_photos' => 'In this demonstration version, portraits are stock photographs and do not show the people named.',
         'photo_credits' => 'Photographs: Unsplash and Pexels contributors. Each photograph is credited to its photographer on the story page.',
         'platform' => 'The platform',
         'privacy' => 'Privacy policy',
@@ -70,7 +70,7 @@ return [
         'search' => 'Search',
     ],
     'newsletter' => [
-        'band_audience' => 'Join readers from among business leaders, investors and changemakers.',
+        'band_audience' => 'Written for business leaders, investors and decision-makers.',
         'band_body' => 'A weekly briefing on what changed in the Saudi market, and why it matters.',
         'band_title' => 'From information to opportunity, every week',
         'check_inbox' => 'Check your inbox: we have sent an email to confirm your subscription.',

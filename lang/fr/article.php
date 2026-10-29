@@ -9,6 +9,7 @@ return [
     'fact_checked' => 'Faits vérifiés',
     'open_section' => 'Ouvrir la rubrique',
     'opportunity' => 'L’opportunité',
+    'photo_credit' => 'Photo :',
     'promo' => [
         'body' => 'Une lecture hebdomadaire de l’économie saoudienne, dans votre boîte mail.',
         'eyebrow' => 'La lettre MASAR',

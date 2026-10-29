@@ -9,6 +9,7 @@ return [
     'fact_checked' => 'حقائق کی جانچ مکمل',
     'open_section' => 'سیکشن کھولیں',
     'opportunity' => 'موقع',
+    'photo_credit' => 'تصویر:',
     'promo' => [
         'body' => 'سعودی معیشت پر ہفتہ وار تجزیہ، آپ کے ان باکس میں۔',
         'eyebrow' => 'مسار نیوز لیٹر',

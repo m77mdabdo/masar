@@ -12,6 +12,7 @@ return [
     'fact_checked' => 'دُقّقت المعلومات',
     'open_section' => 'افتح القسم',
     'opportunity' => 'الفرصة',
+    'photo_credit' => 'الصورة:',
     'promo' => [
         'body' => 'قراءة أسبوعية للاقتصاد السعودي، في بريدك.',
         'eyebrow' => 'نشرة مسار',
