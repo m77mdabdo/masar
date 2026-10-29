@@ -378,22 +378,29 @@ Any later change to the file returns it to pending.
 
 ## Found in the 2026-10-29 sweep, not built
 
-- **Privacy, terms and cookie pages.** The footer linked all three to the
-  About page; the links are removed. Writing them is legal drafting, not
-  engineering, and inventing the commitments would be the failure §5 forbids.
+- **Privacy, terms and cookie pages — built 2026-10-29**, describing only what
+  the code does. Not stated because nobody has decided them; **the owner must
+  confirm before relying on these pages legally:** the operator's legal name,
+  registration and address; a contact address for privacy requests (the pages
+  point to the contact page, whose addresses are settings and currently empty);
+  the governing law and jurisdiction (e.g. whether Saudi PDPL applies, and how);
+  retention periods for subscribers, web-server logs and 404 records; the
+  hosting provider and its region; the email provider; whether the measurement
+  cookie (`masar_vid`) needs consent under the applicable law — there is no
+  consent banner; and a minimum-age statement, if any.
 - **The weekly newsletter itself.** Subscription, confirmation and
   unsubscribe work; nothing composes or sends an issue. The pages now say so.
-- **Re-encoding uploads.** Uploads are validated as images by real MIME
-  type (Laravel's `image` rule, SVG excluded) but stored as uploaded; media
-  conversions are re-encoded, the originals and the settings images are not.
-  CLAUDE.md §5 asks for re-encoding.
-- **Content-Security-Policy.** Not set at the app or in
-  `deploy/nginx/security-headers.conf`; HSTS is ready but commented out
-  until the domain cutover.
-- **`config:cache` in the deploy.** The brief asked for it; the deploy
-  deliberately does not cache config (a changed `.env` then silently does
-  nothing — the stale-snapshot register), and a test holds that. Kept, and
-  raised with the owner rather than reversed.
+- **Re-encoding uploads — done 2026-10-29** (`App\Rules\SafeImage` on all
+  seven upload fields).
+- **Content-Security-Policy — public site done 2026-10-29.** Remaining:
+  `'unsafe-eval'` for Alpine's standard build (the CSP build would remove it,
+  at the cost of rewriting every `x-data` as a registered component), and the
+  admin panel, which runs its own middleware stack and is covered only by the
+  nginx headers. HSTS waits for the domain cutover.
+- **`config:cache` in the deploy — kept off, decided 2026-10-29.** The owner
+  allowed it only if config is regenerated whenever it changes. It would also
+  null `env('TRUSTED_PROXIES')` in `bootstrap/app.php`, silently dropping
+  Cloudflare trust. Reasons in `deploy/RUNBOOK.md`.
 - **First question above the CTA on phones.** Measured at 375×667: the CTA
   sits at 526–572 and the first question at 620–690, so a grid `order` that
   puts the question first would start it at 526 — 94px earlier, fully visible. Not implemented,

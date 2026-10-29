@@ -20,6 +20,25 @@ Fail-fast (`set -Eeuo pipefail`) and safe to re-run. It:
 10. validates nginx before reloading it;
 11. ends with `masar:smoke`, which reads the rendered site.
 
+## Why config is not cached
+
+`config:cache` stops `.env` being read at runtime, so `env()` returns null outside
+`config/`. `bootstrap/app.php` reads `TRUSTED_PROXIES` that way: with config cached,
+trusted proxies would silently disappear and every reader behind Cloudflare would
+share one rate-limit bucket. A changed `.env` would also do nothing until the next
+cache. Routes, views and events are cached; config is not, and a test holds that.
+
+## Cloudflare
+
+- Point the domain at Cloudflare with the proxy on.
+- Firewall the origin so only Cloudflare's ranges (https://www.cloudflare.com/ips/)
+  reach ports 80/443.
+- Then set `TRUSTED_PROXIES=*`. Without the firewall, list the ranges instead of `*`.
+- Check: `ProductionConfigTest` proves one reader's burst does not throttle
+  another arriving through the same proxy.
+- Enable HSTS in `deploy/nginx/security-headers.conf` once TLS is verified on the
+  real domain.
+
 ## Roll back a deploy
 
 1. `deploy/deploy.sh <previous-ref>`: code and assets go back together.

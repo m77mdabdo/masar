@@ -51,3 +51,24 @@ it('trusts no proxy unless told to', function (): void {
 
     expect(request()->ip())->not->toBe('203.0.113.9');
 });
+
+it('limits each reader separately behind a trusted proxy, and all of them together without one', function (): void {
+    // TRUSTED_PROXIES=* (Cloudflare, origin firewalled to it): the limiter is
+    // keyed on the forwarded client address, so one reader's burst does not
+    // lock out another arriving through the same edge.
+    \Illuminate\Http\Middleware\TrustProxies::at('*');
+    $this->app->instance('request', request());
+
+    try {
+        $as = fn (string $ip) => $this->withServerVariables(['REMOTE_ADDR' => '198.51.100.1'])
+            ->get('/ar/search?q=x', ['X-Forwarded-For' => $ip]);
+
+        for ($i = 0; $i < 30; $i++) {
+            $as('203.0.113.10')->assertOk();
+        }
+        $as('203.0.113.10')->assertStatus(429);
+        $as('203.0.113.20')->assertOk();
+    } finally {
+        \Illuminate\Http\Middleware\TrustProxies::flushState();
+    }
+});
