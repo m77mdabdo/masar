@@ -337,17 +337,28 @@ structured labels, the translation workflow and its gate. What is left, measured
   `app/Exceptions`, and 58 runs in `resources/views/filament`. A scope
   decision, not a failure of public localisation.
 - **Per-edition settings in the admin — done 2026-10-29** for tagline,
-  descriptor and the default SEO description. Market labels are still
-  editor-entered once, in Arabic, and render marked `lang="ar"` elsewhere.
-- **Structured data beyond labels.** Sections, topics, menus and homepage
-  titles are in all six. Section descriptions, company and person names,
-  bios and industry/country names exist in Arabic only and fall back,
-  marked with their language. Company names are proper nouns and are not
-  to be machine-transliterated; they want an editor.
-- **Cross-edition listings.** An edition lists only its own stories; with
-  no translated stories published, the other five editions show their
-  chrome and honest empty states. A listing that shows an original-language
-  card, labelled and linking to the original, was considered and not built.
+  descriptor and the default SEO description. Market labels and values are
+  translated through the `market.translations` setting (seeded); there is no
+  admin form for it yet, so a new Arabic label renders marked `lang="ar"` in
+  the other editions until the map is extended.
+- **Database content — done 2026-10-29, machine-assisted, owner-authorised.**
+  Every published story (83), entity record (71), opportunity (19), image
+  alt and credit, byline and market label exists in all six editions
+  (`masar:translations:coverage`). None of it has been reviewed by a native
+  speaker. Company and person names were transliterated by the same pass,
+  not by an editor; a person should check them first, because a proper noun
+  spelled wrongly is a factual error rather than a style one. Chinese keeps
+  Western digits with Chinese units («40 十亿里亚尔»), which is
+  understandable but not idiomatic («400亿»).
+- **New content after the seed.** A story written today in Arabic has no
+  translation until someone makes one: the provider seam has only the null
+  driver, so `CreateTranslationDraft` produces an untranslated draft for a
+  person to write. The content dictionaries are a one-time import, not a
+  pipeline.
+- **Cross-edition listings.** An edition lists only its own stories. Today
+  every edition carries all 83; a story published later in Arabic only is
+  absent from the other five until it is translated. A card showing the
+  original, labelled and linking to it, was considered and not built.
 - **Re-translation when a published original is edited.** Automatic
   re-runs hang off (re)publication; an edit to a live article raises no
   event, so its translations are flagged outdated on the article page and
@@ -365,16 +376,17 @@ All six editions are public and **owner-approved for publication** (recorded
 with `masar:translations:authorize-publication`, by the owner's directive of
 2026-10-29). None has been reviewed by a native speaker; that is a separate
 status and is still pending. Counts are strings (keys), across 10 files per
-edition (9 groups + the framework JSON), after the legal pages were added.
+edition (9 groups + the framework JSON), re-approved for publication after
+the localization pass of 2026-10-29 changed the files.
 
 | edition | strings | untranslated | publication | linguistic review | reviewed | pending |
 |---|---|---|---|---|---|---|
-| ar (source) | 530 | — | owner approved | source | — | — |
-| en | 530 | 0 | owner approved | pending | 0 | 530 |
-| fr | 530 | 0 | owner approved | pending | 0 | 530 |
-| hi | 530 | 0 | owner approved | pending | 0 | 530 |
-| ur-pk | 530 | 0 | owner approved | pending | 0 | 530 |
-| zh-hans | 530 | 0 | owner approved | pending | 0 | 530 |
+| ar (source) | 531 | — | owner approved | source | — | — |
+| en | 531 | 0 | owner approved | pending | 0 | 531 |
+| fr | 531 | 0 | owner approved | pending | 0 | 531 |
+| hi | 531 | 0 | owner approved | pending | 0 | 531 |
+| ur-pk | 531 | 0 | owner approved | pending | 0 | 531 |
+| zh-hans | 531 | 0 | owner approved | pending | 0 | 531 |
 
 Record a native review after reading a file:
 `php artisan masar:translations:approve fr site.php --reviewer=<email>`.
