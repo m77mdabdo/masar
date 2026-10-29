@@ -33,7 +33,7 @@
 <body class="flex min-h-screen flex-col bg-cream text-ink antialiased">
     <header class="border-b border-line">
         <x-ui.container>
-            <div class="flex h-[4.875rem] items-center">
+            <div class="flex h-[3.375rem] items-center">
                 <span class="flex items-baseline gap-2.5">
                     <span class="font-display text-[2.375rem] font-semibold leading-none tracking-[0.05em] text-g-950">MASAR</span>
                     <span class="font-display text-[1.5rem] font-bold leading-none text-g-700">مسار</span>

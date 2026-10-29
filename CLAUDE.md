@@ -138,6 +138,26 @@ field, measured 1.0–1.7 on the daylight photographs. Re-measure if any opacity
 halo or `--q-*` move. Re-measure if any local scrim's inset, blur or
 opacity moves.
 
+**Fold budget (measured 2026-10-29, Arabic, launch baseline = demo banner off).** The
+banner occupies the topbar's fixed 30px slot, so on and off measured identical at
+every size. Above the hero: topbar 31 · masthead 55 · ticker 122 (phones, wraps to
+two columns × three rows) / 86 (768) / 50 (≥1024).
+
+| device | hero top / height | first question (top–bottom) | result |
+|---|---|---|---|
+| 375×667 | 208 / 796 | 620–690, fold 667 | starts 47 above, last 23px below — within the 100px allowance |
+| 390×844 | 208 / 770 | 594–663 | fully visible |
+| 430×932 | 208 / 770 | 594–663 | fully visible |
+| 768×1024 | 172 / 738 | 593–640 | fully visible |
+| 1440×788 (real window) | 136 / 676 | 310–379 | visible; CTA 20 and controls 12 above the fold |
+| 1440×900 | 136 / 720 | 332–401 | visible; CTA 88 above |
+| 844×390 landscape | 172 / 738 | 593–640 | 203 below the fold (no rule set) |
+
+Rule: at 390×844 and up the first question is fully visible; at 375×667 it starts
+within 100px of the fold. Re-measure if the ticker, masthead or hero copy move.
+Moving the first question above the CTA on phones (grid `order`) was evaluated and
+not implemented, pending a decision.
+
 **The big story moves (owner's rulings, Tasks 2.10 and 2.11).** Each photograph drifts
 from `scale(1.04)` to `scale(1.0)`, then cross-fades to the next.
 - **Timing.** Dwell **5s**. That is the owner's floor: under it the hero reads as a
