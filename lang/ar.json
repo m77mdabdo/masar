@@ -3,5 +3,10 @@
     "Whoops!": "عذرًا",
     "Regards,": "تحياتنا،",
     "All rights reserved.": "جميع الحقوق محفوظة.",
-    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:": "إن تعذّر عليك الضغط على زر «:actionText»، انسخ الرابط التالي والصقه في متصفحك:"
+    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:": "إن تعذّر عليك الضغط على زر «:actionText»، انسخ الرابط التالي والصقه في متصفحك:",
+    "Reset Password Notification": "إعادة تعيين كلمة المرور",
+    "You are receiving this email because we received a password reset request for your account.": "تصلك هذه الرسالة لأننا تلقّينا طلبًا لإعادة تعيين كلمة مرور حسابك.",
+    "Reset Password": "إعادة تعيين كلمة المرور",
+    "This password reset link will expire in :count minutes.": "تنتهي صلاحية هذا الرابط بعد :count دقيقة.",
+    "If you did not request a password reset, no further action is required.": "إن لم تطلب إعادة تعيين كلمة المرور، فلا حاجة لأي إجراء."
 }

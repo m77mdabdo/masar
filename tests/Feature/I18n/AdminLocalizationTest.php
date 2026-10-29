@@ -205,3 +205,21 @@ it('presents an audit entry in the panel language without changing what was stor
     // The evidence is untouched.
     expect($entry->fresh()->description)->toBe('مُسندة ← فكرة')->and($created->fresh()->description)->toBe('created');
 });
+
+it('sends the password-reset mail in the user’s language', function (string $code): void {
+    // Filament's reset mail reads Laravel's own strings by their English text,
+    // from lang/{code}.json; until 2026-10-29 every edition received English.
+    config()->set('mail.default', 'array');
+    $user = User::factory()->create(['locale' => $code]);
+
+    $notification = new \Filament\Auth\Notifications\ResetPassword('token');
+    $notification->url = 'https://masar.test/reset';
+    $user->notify($notification);
+
+    $message = collect(app('mailer')->getSymfonyTransport()->messages())->last()->getOriginalMessage();
+    expect($message->getSubject())->toBe(\Illuminate\Support\Facades\Lang::get('Reset Password Notification', [], $code))
+        ->and(html_entity_decode(strip_tags((string) $message->getHtmlBody()), ENT_QUOTES))->toContain(\Illuminate\Support\Facades\Lang::get('If you did not request a password reset, no further action is required.', [], $code));
+    if ($code !== 'en') {
+        expect($message->getSubject())->not->toBe('Reset Password Notification');
+    }
+})->with(['ar', 'en', 'fr', 'hi', 'ur-pk', 'zh-hans']);
