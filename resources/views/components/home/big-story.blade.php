@@ -50,11 +50,9 @@
             'alt' => $i === 0 && $backdrop
                 ? (string) $backdrop->getCustomProperty('alt')
                 : ($article->hero_alt ?? ''),
-            // A backdrop carries its own focal point (its tower's position);
-            // article photographs keep the stage's default.
-            'focal' => $i === 0 && $backdrop
-                ? (string) $backdrop->getCustomProperty('focal', '50% 40%')
-                : '50% 40%',
+            // Every image may carry its own focal point (the media record's
+            // `focal`); without one the stage's default applies.
+            'focal' => (string) ($image?->getCustomProperty('focal') ?: '50% 40%'),
             'lead' => implode(' ', $words),
             'emphasis' => $emphasis,
             'steps' => $stepsFor($article),

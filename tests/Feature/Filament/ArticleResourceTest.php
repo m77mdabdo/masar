@@ -160,3 +160,34 @@ it('scopes the list to a writer\'s own work', function (): void {
 
     expect($ids)->toContain($own->id)->and($ids)->not->toContain($other->id);
 });
+
+it('creates an original article in any of the six editions', function (string $locale, string $title): void {
+    $category = Category::factory()->create();
+
+    livewire(CreateArticle::class)
+        ->fillForm([
+            'title' => $title,
+            'slug' => 'original-in-'.$locale,
+            'category_id' => $category->id,
+            'locale' => $locale,
+            'content_type' => 'news',
+            'why_it_matters' => $title,
+            'summary' => [['point' => $title], ['point' => $title]],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $article = Article::where('slug', 'original-in-'.$locale)->sole();
+
+    // An original, in its own language, at the start of the workflow.
+    expect($article->locale)->toBe($locale)
+        ->and($article->source_article_id)->toBeNull()
+        ->and($article->status->value)->toBe('idea')
+        ->and($article->published_at)->toBeNull();
+})->with([
+    ['en', 'Trading volume reaches a record'],
+    ['fr', 'Le volume des échanges atteint un record'],
+    ['hi', 'कारोबार की मात्रा रिकॉर्ड स्तर पर'],
+    ['ur-pk', 'تجارتی حجم ریکارڈ سطح پر'],
+    ['zh-hans', '成交量创下纪录'],
+]);

@@ -22,6 +22,7 @@
             :fill="true"
             :eager="true"
             :sizes="$sizes"
+            :focal="$article->heroMedia->getCustomProperty('focal')"
             class="-z-10"
         />
     @endif

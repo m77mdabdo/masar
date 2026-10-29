@@ -108,6 +108,17 @@ class ImageLibrarySeeder extends Seeder
      * `focal` is per image: on a phone the stage is portrait and `cover` keeps
      * a vertical band of each picture, so the band is centred on its tower.
      */
+    /**
+     * Where a hero photograph's subject sits, for the crops that cut it. Only
+     * where measured (Task 2.11 / 2026-10-29): the big story's portrait stage
+     * on a phone and its near-square stage at 768 lost these two subjects at
+     * the default 50% 40%. Same values as the 2026_10_29_110000 migration.
+     */
+    public const FOCAL = [
+        'pexels-aburhman187-29859597.jpg' => '56% 40%',
+        'pexels-tima-miroshnichenko-5717315.jpg' => '40% 40%',
+    ];
+
     private const BACKDROPS = [
         ['file' => 'home.jpg', 'name' => 'home-backdrop.jpg', 'focal' => '50% 40%',
             'alt' => 'أفق مدينة عند الغروب، تنخفض الشمس عند الأفق وتضيء الأبراج من الداخل وتسير حركة المرور على الطرق أدناه.'],
@@ -417,12 +428,13 @@ class ImageLibrarySeeder extends Seeder
                             ->preservingOriginal()
                             ->usingName(pathinfo($entry['file'], PATHINFO_FILENAME))
                             ->usingFileName($this->storedFileName($entry['file']))
-                            ->withCustomProperties([
+                            ->withCustomProperties(array_filter([
                                 'alt' => $entry['alt'],
                                 'credit' => $entry['credit'],
                                 'source_file' => $entry['file'],
                                 'orientation' => $entry['orientation'],
-                            ])
+                                'focal' => self::FOCAL[$entry['file']] ?? null,
+                            ]))
                             ->toMediaCollection('hero')
                     );
 
