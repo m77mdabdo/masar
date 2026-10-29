@@ -329,13 +329,12 @@ The six-edition foundation shipped: registry, routing, interface strings in
 all six, the switcher, valid-only hreflang and sitemap, per-edition identity,
 structured labels, the translation workflow and its gate. What is left, measured:
 
-- **The admin panel's own labels — intentionally deferred (owner's ruling,
-  2026-10-29).** The panel is used by Arabic-speaking staff. Filament's own
-  strings and direction already follow `users.locale`; MASAR's custom panel
-  labels stay Arabic. Verified 2026-10-29: 900 Arabic string literals across
-  54 files in `app/Filament`, `app/Actions`, `app/Notifications` and
-  `app/Exceptions`, and 58 runs in `resources/views/filament`. A scope
-  decision, not a failure of public localisation.
+- **The admin panel's own labels — done 2026-10-29 (owner's ruling revoked the
+  deferral).** 798 literals across the panel, actions, notifications and
+  exceptions, and the admin views, are in six languages: 596 strings in
+  `lang/admin/{code}.json`. Kept Arabic on purpose, as data or stored records:
+  the transliteration and folding tables, the importance scorer's stored
+  rationale, audit descriptions (presented localized), console output.
 - **Per-edition settings in the admin — done 2026-10-29** for tagline,
   descriptor and the default SEO description. Market labels and values are
   translated through the `market.translations` setting (seeded); there is no

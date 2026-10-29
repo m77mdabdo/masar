@@ -1,3 +1,50 @@
+# MASAR — six-language platform: admin dashboard, system messages, browser verification
+
+Date: 2026-10-29. Full measured results: `LOCALIZATION_AUDIT.md`.
+
+## Status
+
+- **Admin dashboard in six languages** (owner's ruling, revoking "admin stays Arabic"):
+  - 798 literals and 9 views → 596 strings in `lang/admin/{code}.json`;
+  - per-user language, kept across sessions and Livewire updates;
+  - a picker on the sign-in page;
+  - mail in the recipient's language.
+- **System messages:**
+  - Laravel's validation, auth, password and pagination files exist in all six. Five editions had been rendering raw keys.
+  - 1,058 Filament keys resolve in every edition with fallback off.
+  - FilePond labels are translated.
+- **Verified in a browser:**
+  - **Public:** 2,346 checks, 0 defects.
+  - **Admin:** 52 URLs × 17 viewports × 6 languages on an isolated copy, 0 defects in the final runs.
+  - **Validation errors** were read back in all six languages.
+- **Pre-existing defects found by the admin audit and fixed:**
+  - Three admin resources returned 500 on real data, because Filament closure parameters had the wrong names.
+  - The homepage preview's stylesheet was blocked by CSP.
+  - Urdu rendered in a broken naskh fallback.
+- **Owner publication approval** is re-recorded for 247 files. **Native review: none**, in every edition.
+- **Not deployed:** no verified server or domain.
+
+## Disk recovery (owner-authorised)
+
+The disk filled at 100% while `deploy/backup.sh` was writing its 3.2 GB media archive a second time.
+- **Deleted:**
+  - the truncated archive, which failed `gzip -t`;
+  - 1,524 disposable screenshots and browser artifacts;
+  - 488 more screenshots after this pass's analysis.
+- **Kept:** every SQL dump and the newest complete backup set (`masar-20261029T123614Z`: SQL, media and manifest; all pass `gzip -t`).
+- **Recovered:** 3,052 MB. 4.6 GB free at the end.
+
+## Tests and decay
+
+- **`php artisan test`:** 1,152 passed. **`php artisan masar:decay`:** no decay found. Queue: depth 0, failed 0, worker running.
+- **Every flow ok.**
+- **Skipped:**
+  - `migrate:fresh --seed`: not re-run, since no migration or seeder changed in this pass. It last ran clean today on scratch: 9,843 rows.
+  - Source polling: disabled by design.
+  - Redirects: none configured.
+
+---
+
 # MASAR — localization audit: every public page and every record in six editions
 
 Date: 2026-10-29. Tested commit: `4ee8c09`.
