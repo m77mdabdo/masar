@@ -139,3 +139,57 @@ body, .fi-body {
 .masar-gate-fail {
     border-inline-start: 3px solid #B4522E;
 }
+
+/*
+ * Type per writing system, as on the public site (app.css, html[data-script]).
+ * The brand faces cover Arabic and Latin only; set over Urdu, a face without
+ * Urdu's letters falls back glyph by glyph and breaks the joins — «مضامین»
+ * rendered in pieces. Urdu is Nastaliq, never naskh, and its descenders need
+ * looser leading. Nothing is fetched: these are the reader's system faces.
+ */
+html:lang(ur) :is(body, .fi-body, .fi-header-heading, .fi-section-header-heading, .fi-modal-heading, .fi-sidebar-group-label) {
+    font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Urdu Typesetting', 'IBM Plex Sans Arabic', serif;
+    letter-spacing: 0;
+}
+
+html:lang(ur) body {
+    line-height: 2.1;
+}
+
+html:lang(hi) :is(body, .fi-body, .fi-header-heading, .fi-section-header-heading, .fi-modal-heading, .fi-sidebar-group-label) {
+    font-family: 'Kohinoor Devanagari', 'Noto Sans Devanagari', 'Nirmala UI', 'Mangal', 'IBM Plex Sans Arabic', sans-serif;
+    letter-spacing: 0;
+}
+
+html:lang(zh) :is(body, .fi-body, .fi-header-heading, .fi-section-header-heading, .fi-modal-heading, .fi-sidebar-group-label) {
+    font-family: 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans SC', 'Source Han Sans SC', 'Microsoft YaHei', 'IBM Plex Sans Arabic', sans-serif;
+    letter-spacing: 0;
+}
+
+/* Filament's own components read these variables (the sidebar labels among
+   them), so the per-script face has to be set here too, not only on elements. */
+html:lang(ur) {
+    --font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Urdu Typesetting', 'IBM Plex Sans Arabic', serif;
+    --font-sans: var(--font-family);
+    --font-display: var(--font-family);
+}
+
+html:lang(hi) {
+    --font-family: 'Kohinoor Devanagari', 'Noto Sans Devanagari', 'Nirmala UI', 'Mangal', 'IBM Plex Sans Arabic', sans-serif;
+    --font-sans: var(--font-family);
+    --font-display: var(--font-family);
+}
+
+html:lang(zh) {
+    --font-family: 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans SC', 'Source Han Sans SC', 'Microsoft YaHei', 'IBM Plex Sans Arabic', sans-serif;
+    --font-sans: var(--font-family);
+    --font-display: var(--font-family);
+}
+
+/* Nastaliq's descenders fall far below the line: a truncating label
+   (overflow: hidden) at Latin leading crops them, and a final ی loses its
+   tail and reads as a broken word. Give clipped Urdu text a line box tall
+   enough for the script. */
+html:lang(ur) :is(.truncate, .fi-sidebar-item-label, .fi-sidebar-group-label, .fi-ta-text-item-label, .fi-badge, .fi-tabs-item-label, .fi-btn-label, .fi-dropdown-list-item-label, .fi-breadcrumbs-item-label) {
+    line-height: 2.2;
+}
