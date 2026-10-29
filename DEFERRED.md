@@ -329,18 +329,16 @@ The six-edition foundation shipped: registry, routing, interface strings in
 all six, the switcher, valid-only hreflang and sitemap, per-edition identity,
 structured labels, the translation workflow and its gate. What is left, measured:
 
-- **The admin panel's own labels.** Filament's packaged strings switch with
-  `users.locale`, and so does direction; MASAR's own labels in the panel do
-  not. 900 Arabic string literals across 54 files in `app/Filament`,
-  `app/Actions`, `app/Notifications` and `app/Exceptions`, plus 58 runs in
-  `resources/views/filament`, are still Arabic in every panel language. The
-  same pipeline as the public site applies (keys in `lang/*/admin.php`, the
-  parity test covers it the day the group grows).
-- **Per-edition settings in the admin.** Identity settings default per
-  edition, and `Settings::get()` resolves a per-edition value; the Settings
-  page still writes a plain string, which then applies to every edition.
-  Its identity fields want the TranslationsField treatment. Market labels
-  are editor-entered in Arabic and render marked `lang="ar"` elsewhere.
+- **The admin panel's own labels — intentionally deferred (owner's ruling,
+  2026-10-29).** The panel is used by Arabic-speaking staff. Filament's own
+  strings and direction already follow `users.locale`; MASAR's custom panel
+  labels stay Arabic. Verified 2026-10-29: 900 Arabic string literals across
+  54 files in `app/Filament`, `app/Actions`, `app/Notifications` and
+  `app/Exceptions`, and 58 runs in `resources/views/filament`. A scope
+  decision, not a failure of public localisation.
+- **Per-edition settings in the admin — done 2026-10-29** for tagline,
+  descriptor and the default SEO description. Market labels are still
+  editor-entered once, in Arabic, and render marked `lang="ar"` elsewhere.
 - **Structured data beyond labels.** Sections, topics, menus and homepage
   titles are in all six. Section descriptions, company and person names,
   bios and industry/country names exist in Arabic only and fall back,
@@ -360,3 +358,43 @@ structured labels, the translation workflow and its gate. What is left, measured
 - **Self-hosted faces for Nastaliq, Devanagari and Han.** System faces by
   ruling (nothing fetched from outside). Rendering then depends on the
   reader's platform; Windows without Urdu Typesetting falls back to naskh.
+
+## Interface translation review — counts (2026-10-29, from `translation_reviews`)
+
+Every edition is public; none has been reviewed by a person. Counts are
+strings (keys), across 10 files per edition (9 groups + the framework JSON).
+
+| edition | strings | untranslated | reviewed | pending review |
+|---|---|---|---|---|
+| ar (source) | 474 | — | — | — |
+| en | 474 | 0 | 0 | 474 |
+| fr | 474 | 0 | 0 | 474 |
+| hi | 474 | 0 | 0 | 474 |
+| ur-pk | 474 | 0 | 0 | 474 |
+| zh-hans | 474 | 0 | 0 | 474 |
+
+Approve a file after reading it: `php artisan masar:translations:approve fr site.php --reviewer=<email>`.
+Any later change to the file returns it to pending.
+
+## Found in the 2026-10-29 sweep, not built
+
+- **Privacy, terms and cookie pages.** The footer linked all three to the
+  About page; the links are removed. Writing them is legal drafting, not
+  engineering, and inventing the commitments would be the failure §5 forbids.
+- **The weekly newsletter itself.** Subscription, confirmation and
+  unsubscribe work; nothing composes or sends an issue. The pages now say so.
+- **Re-encoding uploads.** Uploads are validated as images by real MIME
+  type (Laravel's `image` rule, SVG excluded) but stored as uploaded; media
+  conversions are re-encoded, the originals and the settings images are not.
+  CLAUDE.md §5 asks for re-encoding.
+- **Content-Security-Policy.** Not set at the app or in
+  `deploy/nginx/security-headers.conf`; HSTS is ready but commented out
+  until the domain cutover.
+- **`config:cache` in the deploy.** The brief asked for it; the deploy
+  deliberately does not cache config (a changed `.env` then silently does
+  nothing — the stale-snapshot register), and a test holds that. Kept, and
+  raised with the owner rather than reversed.
+- **First question above the CTA on phones.** Measured at 375×667: the CTA
+  sits at 526–572 and the first question at 620–690, so a grid `order` that
+  puts the question first would start it at 526 — 94px earlier, fully visible. Not implemented,
+  pending approval. Landscape phones (844×390) show it 203px below the fold.
