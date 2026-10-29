@@ -1,3 +1,198 @@
+# MASAR — localization audit: every public page and every record in six editions
+
+Date: 2026-10-29. Tested commit: `4ee8c09`.
+
+## Status in one paragraph
+
+- **Done and committed:** the public site serves every page and every published record in all six editions. That covers interface text and database content: stories, citations, sponsors, bylines, entities, opportunities, image alt text and credits, market labels, SEO and OG metadata, and JSON-LD.
+- **Verified:**
+  - **Leak crawl:** 825 pages in the five non-Arabic editions. No Arabic outside the «مسار» lockup and the language switcher, in either the body or the `<head>`.
+  - **Browser audit:** 138 pages at 17 viewports, 2,346 checks, all clean.
+  - **Suite:** 1,128 passed.
+  - **Decay check:** green.
+  - **Fresh seed:** on a scratch database, it comes out 83 of 83 in every edition.
+- **Pushed** to `origin/main` (see Git).
+- **Not deployed:** there is still no verified server or domain.
+- **Not done, and not claimed:**
+  - **Native review:** no translation has been reviewed by a native speaker. All non-Arabic text, interface and content, is machine-assisted and published on the owner's authorisation, recorded as such.
+  - **New stories:** anything written in Arabic after today has no translation until a person writes one.
+
+## Publication approval and native review — two separate states
+
+- **Stories:** every translated story is `translation_status = owner_authorized`, `translation_origin = machine-assisted`, with no reviewer recorded.
+- **The publish gate:**
+  - It admits `owner_authorized` only while `MASAR_TRANSLATION_OWNER_AUTHORIZED` is on (default true). Switched off, the gate accepts reviewed translations only.
+  - A test refuses the owner-authorised row with the switch off.
+- **Interface publication approval** was re-recorded against the final file fingerprints:
+  - all 60 lang files, by "Mohamed Abdo (project owner)", basis the 2026-10-29 directive;
+  - `fr/site.php` again after its label changed.
+- **Linguistic review:** 0 of 531 strings reviewed in every edition, unchanged. No review was fabricated.
+- **Editorial standards page:** says exactly this. Originals are written by people, the other editions are machine-assisted and not yet reviewed by native speakers, and the Arabic text is the reference. It shows the "reviewed" wording only when every interface file is approved and no owner-authorised story is published in that edition.
+
+## Coverage — records and strings
+
+| | en | fr | hi | ur-pk | zh-hans |
+|---|---|---|---|---|---|
+| Interface strings (9 groups + JSON) | 531/531 | 531/531 | 531/531 | 531/531 | 531/531 |
+| Published stories | 83/83 | 83/83 | 83/83 | 83/83 | 83/83 |
+| Entity and taxonomy records (companies, people, topics, sections, industries, countries, markets) | 71/71 | 71/71 | 71/71 | 71/71 | 71/71 |
+| Opportunities | 19/19 | 19/19 | 19/19 | 19/19 | 19/19 |
+| Image alt text and credits | complete | complete | complete | complete | complete |
+| Bylines, market labels, sponsors | complete | complete | complete | complete | complete |
+| Content dictionary strings | 742 | 742 | 742 | 742 | 742 |
+| **Missing** | **0** | **0** | **0** | **0** | **0** |
+
+Completeness is 100% of records and strings in every edition. Source: `php artisan masar:translations:coverage`, which exits non-zero on any gap, plus `translation_reviews`. Arabic is the source edition.
+
+**Allowed exceptions** (left as-is by design):
+- the MASAR brand and the «مسار» lockup;
+- the native language names in the switcher;
+- URLs, emails, tickers and slugs (slugs are transliterated Latin, the same in every edition).
+
+**DB coverage held for any seed, not only this one.** The demo stories are assembled at random from fixed pools, and the first dictionaries matched only the draw on dev. A fresh seed on scratch came out **38 of 83**.
+- **The fix:** the whole closure the factories can generate is now translated. That is every pool string, all 150 subject × predicate headlines and every riyal value from 1 to 40.
+- **The check:** re-seeding scratch gave 83 of 83 in every edition.
+- **The guard:** a test fails if any string the factories can produce lacks a translation in any edition.
+
+## Missing-translation detection (tests that fail on leaks)
+
+- **`ContentTranslationsTest`:**
+  - **Publication path:** a complete dictionary publishes as `owner_authorized`; an incomplete one publishes nothing and reports the gap; no existing translation is ever overwritten.
+  - **Leak checks:** the English story page and its category listing must carry no Arabic outside lang-marked elements. This includes a sponsored story with an Arabic sponsor and fact-checker, and JSON-LD. A detector self-test proves it catches an untranslated byline.
+  - **Mechanisms:** a byline read from a column-limited load throws; the factory closure is fully translated.
+- **Existing tests:**
+  - `TranslationParityTest`: every key, the same placeholders, each edition in its own script.
+  - `NoHardcodedInterfaceTextTest`: no Arabic in public templates.
+  - The ruling on editorial-standards wording.
+
+## Leak crawl — defects found and fixed
+
+All 825 pages in five editions: every published story, section, topic, company, person, author and opportunity, plus the static pages. Found on the first pass:
+
+| leak | where | cause | fix |
+|---|---|---|---|
+| «مجموعة الأفق القابضة», «شركة التمكين للخدمات» | sponsor label and JSON-LD on sponsored stories (all article pages via rails) | `sponsor_name` was not a translatable segment | made it one; dictionaries for both sponsors; seeder fills fields still identical to the Arabic source |
+| «مدقق معلومات», «رئيس التحرير» | source list's fact-checker | template read `->name` | `display_name` |
+| «كاتب» | every card byline on listings | `author:id,name` eager loads dropped `name_translations`; fallback printed Arabic silently | select the column in the three public queries; `display_name` now throws on a column-limited load (a mutant 500s) |
+| «المؤشر العام التجريبي» | chart `aria-label` on the homepage | label not passed through `MarketText` | passed through |
+
+Re-crawl: **0 leaks** in body text, alt, aria-label, title and placeholder in 825 pages. **0 Arabic** in `<head>` (titles, meta, OG) or JSON-LD across 133 pages × 4 non-RTL editions; the head crawl excluded Urdu, whose script is Arabic. In Urdu, no element is marked `lang="ar"` outside the lockup and switcher. The one 404 per edition is an opportunity that is closed in every edition, Arabic included.
+
+## SEO
+
+- **`<html lang/dir>`:** correct on 2,346 of 2,346 checks. `ar` and `ur-PK` are RTL; `en`, `fr`, `hi` and `zh-Hans` are LTR.
+- **Canonical and hreflang:**
+  - Each story lists its published translations as reciprocal alternates.
+  - Structural pages list the same route in each edition.
+  - A missing edition is absent, never pointed at a front page.
+- **Sitemap:**
+  - It lists only published rows, so drafts and incomplete translations are excluded. An incomplete story is never published: the seeder skips it and the gate refuses it.
+  - Reciprocal hreflang sets are tested.
+  - It is hidden in demo mode on purpose, as `robots.txt` disallows all.
+- **Switcher:** keeps the page, the story and the query string. `/en/search?q=aramco&page=2` → `/fr/search?page=2&q=aramco` (Symfony orders the parameters). New test.
+
+## Responsive and typography audit
+
+Playwright, every route type in every edition:
+- **Routes:** home, section, article, topic, company, person, author, search, markets, video, opportunities, opportunity, newsletter, about, contact, team, advertise, corrections, standards, privacy, terms, cookies, and 404.
+- **Viewports (17):** 320, 360, 375, 390, 414, 480, 576, 768, 820, 1024, 1280, 1440, 1920 and 2560, plus landscape 667×375, 844×390 and 1024×768.
+- **Checks:**
+  - horizontal scroll and elements escaping the viewport;
+  - raw translation keys;
+  - broken images in view;
+  - console and page errors;
+  - lang/dir;
+  - unmarked Arabic-script text.
+
+| run | checks | h-scroll | escaping | raw keys | broken images | errors (non-404) | unmarked Arabic | lang/dir |
+|---|---|---|---|---|---|---|---|---|
+| first | 2,346 | 3 | 3 | 0 | 0 | 0 | 0 | 0 wrong |
+| final | 2,346 | **0** | **0** | 0 | 0 | 0 | 0 | 0 wrong |
+
+**Defects fixed:**
+- **French topic, company and person pages at 320px scrolled sideways by 4–11px.** A long transliterated name in the "appears with" list is a flex item that cannot shrink, so it widened the grid column. Fixed with `min-w-0` on the column and the link.
+- **Topbar newsletter button:**
+  - In French it wrapped to two lines ("Lettre d'information"); the label is now "Newsletter", common French usage.
+  - In Urdu and Chinese at 320px it was squeezed to 32px tall; it now has `shrink-0 whitespace-nowrap`.
+  - Measured afterwards: 24px tall, no overflow, in all six editions at 320 and 375.
+
+**Screenshots:** 276 captures (375 and 1440, every route, every edition), written to the session scratchpad, not the repository. Inspected by eye:
+- **Hindi article 375:** Devanagari, the sponsor and the fact-check all translated.
+- **Urdu article 1440 and home 375:** Nastaliq, RTL, mirrored layout.
+- **Chinese home 1440 and opportunity 375:** Western digits.
+- **French company 375 and article 1440.**
+- **Arabic home 375:** unchanged.
+
+The design, CSP, upload sanitisation, legal pages and backups were not changed by this pass.
+
+## Admin
+
+Still Arabic, by ruling. The articles list has a new column, «النسخ المنشورة» (X/6 editions published, counting published rows only; tested). Each translation's status shows on the article: owner-authorised, needs review, reviewed or outdated. Creating and editing a translation goes through the existing draft → review → gate workflow, unchanged.
+
+## Data operations on dev
+
+Before the import, a verified backup: `masar-20261029T123022Z.sql.gz`, 56 tables, 5,043 rows. Then:
+1. the content import;
+2. `masar:recount`;
+3. `cache:clear`.
+
+**Incident:** a second, smaller run (sponsor names on 10 translated rows) started after a backup attempt had failed, because the commands were joined with `;`. That backup failed because `deploy/backup.sh` defaults to the production path. The 12:30 backup covers the state before that run. A verified backup was taken right after it: `masar-20261029T123614Z.sql.gz`. No production system exists or was touched. `migrate:fresh` ran only on scratch databases, and both were dropped afterwards.
+
+## Tests and decay
+
+- **`php artisan test`:** `Tests: 1128 passed (4298 assertions) · Duration: 92.29s`.
+- **Migration:** `2026_10_29_140000_add_name_translations_to_users_table` migrates, rolls back and re-migrates cleanly (`masar_test`).
+- **`php artisan masar:decay --with-seed`:**
+
+| check | state | detail |
+|---|---|---|
+| suite | MANUAL | recorded above |
+| queue | ok | depth 0 · failed 0 · worker running |
+| migrate:fresh --seed | ok | scratch db · 9843 rows · 278 published articles* |
+| flow: published article is served | ok | #198 renders with its headline |
+| flow: homepage links published articles | ok | 40 of the latest 50 published articles linked from /ar |
+| flow: navigation renders in the masthead | ok | 14 links in `<header>`, 23 menu items in db |
+| flow: homepage sections have distinct positions | ok | 18 distinct positions for 18 sections |
+| flow: newsletter form posts to the subscribe route | ok | rendered form POSTs to web.newsletter.subscribe |
+| flow: source polling succeeds | SKIP | polling disabled — 7 active sources, none polled |
+| flow: market ticker renders | ok | rendered |
+| flow: configured redirects answer | SKIP | 0 redirects configured |
+| public forms | ok | 6 forms, all addressed |
+
+\*278 is the run that exposed the seed gap. The decay check reports it as ok because it checks that the seed runs, not translation coverage. After the closure fix, re-seeding scratch gives 83 of 83 in every edition, which is 498 published rows.
+
+## Limitations
+
+- **Native review:** none. Proper nouns were transliterated by the same machine-assisted pass and want a person first, because a misspelt name is a factual error: fictional companies, demo people, sponsors.
+  - Chinese keeps Western digits with Chinese units («40 十亿里亚尔»); that is understandable but not idiomatic («400亿»).
+  - A fictional company «شركة المسار الصناعية» is rendered "Al Masar Industrial Company" and similar, never as the brand.
+- **No translation pipeline:** the dictionaries are a one-time import. The provider seam still has only the null driver, by ruling.
+- **No admin form for `market.translations`:** a new market label renders marked `lang="ar"` in the other editions until the map is extended.
+- **System fonts:** Nastaliq, Devanagari and Han use the reader's system face. Windows without Urdu Typesetting falls back to naskh.
+- **Admin labels** remain Arabic, by ruling.
+- **No production measurement exists.** Every figure here is from dev on 127.0.0.1:8000.
+
+## Git
+
+Commits on top of `bcc7d92`:
+- `6f8e87c` feat(translation): publish machine-assisted editions on the owner's authority
+- `f4336b2` feat(i18n): render bylines, image text and market labels in the page's edition
+- `72df7cf` feat(seed): import every published story and entity in five editions
+- `59f4c46` feat(admin): show how many editions carry each story
+- `40bf9db` fix(i18n): keep the search and filters when switching edition
+- `4d8bd7c` fix(layout): stop sideways scroll and wrapped buttons at 320px
+- `c36d819` docs(pages): state that the other editions are machine-assisted and unreviewed
+- `4ee8c09` docs: record the owner-authorised publication ruling and content coverage — **the tested commit**
+- this report
+
+Push target: `origin/main` (`https://github.com/m77mdabdo/masar.git`). The tested code is `4ee8c09`; the report commit adds only this file.
+
+## Deployment — not attempted
+
+As directed: no verified production server or domain exists. The missing information is unchanged from the release report below: host, SSH user and port, domain and Cloudflare, server state, and whether there is production data to preserve.
+
+---
+
 # MASAR — release report: publication approval, security completion, legal pages
 
 Date: 2026-10-29.
