@@ -319,7 +319,7 @@
              enough: measured, it fired at 243ms and the hero painted at 262ms,
              and the chunk was requested in between. Load, then the image's
              decode, then two frames, so at least one has been painted. --}}
-        <script type="module">
+        <script type="module" nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
             const load = () => (document.querySelector('[data-carousel] img')?.decode() ?? Promise.resolve()).catch(() => {})
                 .then(() => requestAnimationFrame(() => requestAnimationFrame(() => import(@js(Vite::asset('resources/js/big-story.js'))))));
             document.readyState === 'complete' ? load() : addEventListener('load', load, { once: true });

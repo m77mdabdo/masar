@@ -110,3 +110,42 @@ it('leaves editorial publication to the gate, whatever the interface review says
 
     expect(array_column(app(\App\Actions\Articles\EvaluatePublishGate::class)->detailed($draft), 'rule'))->toContain('translation_review');
 });
+
+it('records owner publication approval without recording a linguistic review', function (): void {
+    $this->artisan('masar:translations:authorize-publication', ['locales' => ['all'], '--by' => 'Owner <owner@example.com>', '--basis' => 'Owner directive, 2026-10-29'])
+        ->assertSuccessful();
+
+    $rows = TranslationReview::query()->get();
+    expect($rows->every(fn ($r) => $r->publication_status === 'owner_approved' && $r->publication_hash === $r->content_hash))->toBeTrue()
+        // Linguistic review untouched: still pending, no reviewer.
+        ->and($rows->where('locale', '!=', 'ar')->every(fn ($r) => $r->status === TranslationReviewStatus::PendingReview && $r->reviewer_id === null && $r->reviewed_strings === 0))->toBeTrue();
+
+    // The public notice still says the interface is not reviewed.
+    $this->get('/fr/editorial-standards')->assertSee(__('pages.standards.interface_pending', [], 'fr'), false);
+});
+
+it('refuses a publication approval with no author or basis', function (): void {
+    $this->artisan('masar:translations:authorize-publication', ['locales' => ['fr'], '--by' => 'someone'])->assertFailed();
+    $this->artisan('masar:translations:authorize-publication', ['locales' => ['xx'], '--by' => 'a', '--basis' => 'b'])->assertFailed();
+
+    expect(TranslationReview::query()->where('publication_status', 'owner_approved')->count())->toBe(0);
+});
+
+it('voids the publication approval of a file that changes afterwards', function (): void {
+    $this->artisan('masar:translations:authorize-publication', ['locales' => ['fr'], '--by' => 'Owner', '--basis' => 'test'])->assertSuccessful();
+
+    $file = base_path('lang/fr/site.php');
+    $original = file_get_contents($file);
+    file_put_contents($file, $original."\n// edited\n");
+
+    try {
+        app(SyncTranslationReviews::class)();
+        $site = TranslationReview::query()->where('path', 'lang/fr/site.php')->sole();
+        $home = TranslationReview::query()->where('path', 'lang/fr/home.php')->sole();
+
+        expect($site->publication_status)->toBe('unapproved')->and($site->publication_approved_by)->toBeNull()
+            ->and($home->publication_status)->toBe('owner_approved');
+    } finally {
+        file_put_contents($file, $original);
+    }
+});

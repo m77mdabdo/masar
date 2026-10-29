@@ -64,6 +64,13 @@ final class SyncTranslationReviews
             ]);
         }
 
+        // Owner publication approval is bound to the words it approved, like a
+        // review: a changed file is no longer the file that was authorised.
+        if ($row->publication_status === 'owner_approved' && $row->publication_hash !== $hash) {
+            $row->fill(['publication_status' => 'unapproved', 'publication_approved_by' => null, 'publication_basis' => null,
+                'publication_hash' => null, 'publication_approved_at' => null]);
+        }
+
         if (! $source) {
             $approved = $row->status === TranslationReviewStatus::Approved;
             $row->fill(['reviewed_strings' => $approved ? $total : 0, 'pending_strings' => $approved ? 0 : $total]);

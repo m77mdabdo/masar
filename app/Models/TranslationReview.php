@@ -25,6 +25,11 @@ class TranslationReview extends Model
         'reviewed_at',
         'invalidated_at',
         'file_modified_at',
+        'publication_status',
+        'publication_approved_by',
+        'publication_basis',
+        'publication_hash',
+        'publication_approved_at',
     ];
 
     protected function casts(): array
@@ -37,6 +42,7 @@ class TranslationReview extends Model
             'reviewed_at' => 'datetime',
             'invalidated_at' => 'datetime',
             'file_modified_at' => 'datetime',
+            'publication_approved_at' => 'datetime',
         ];
     }
 

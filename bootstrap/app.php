@@ -46,7 +46,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(prepend: [IssueVisitorId::class]);
 
         // The editor's maintenance switch. Admin paths are exempt inside it.
-        $middleware->web(append: [ServeMaintenancePage::class]);
+        $middleware->web(append: [ServeMaintenancePage::class, \App\Http\Middleware\ContentSecurityPolicy::class]);
 
         // The locale segment is user input; SetLocale is what validates it.
         $middleware->alias([
