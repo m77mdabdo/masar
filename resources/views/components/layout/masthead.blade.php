@@ -18,9 +18,10 @@
                 {{-- The Latin wordmark is the brand's large mark and leads the
                      lockup; the Arabic one sits beside it a size down. --}}
                 <span class="font-display text-[2.375rem] font-semibold leading-none tracking-[0.05em] text-g-950">MASAR</span>
-                {{-- The lockup is the brand, the same in every edition: the
-                     Arabic name is the default edition's, marked as Arabic. --}}
-                <span lang="ar" dir="rtl" class="font-display text-[1.5rem] font-bold leading-none text-g-700">{{ setting()->forLocale('identity.site_name', \App\Support\Locales::default()) }}</span>
+                {{-- The lockup is artwork, the same in every edition: the
+                     Arabic wordmark beside the Latin one. Not the site_name
+                     setting, which is MASAR everywhere (owner's ruling). --}}
+                <span lang="ar" dir="rtl" class="font-display text-[1.5rem] font-bold leading-none text-g-700">مسار</span>
             </a>
 
             <span class="hidden h-9 w-px shrink-0 bg-line lg:block" aria-hidden="true"></span>

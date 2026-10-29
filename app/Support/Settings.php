@@ -41,6 +41,45 @@ class Settings
         return $this->forEdition($value);
     }
 
+    /** Settings whose value is a map of edition code => text. */
+    public const PER_EDITION = ['identity.tagline', 'identity.descriptor', 'seo.description'];
+
+    /**
+     * A per-edition setting as its full map, every edition present. A value
+     * stored before the setting was per edition is a plain string; it is the
+     * default edition's, and the other editions fall back to the defaults.
+     *
+     * @return array<string, string>
+     */
+    public function editions(string $key): array
+    {
+        $all = $this->all();
+        // Indexed, not dot-addressed: the keys themselves contain dots.
+        $default = (array) (((array) config('masar.settings.defaults'))[$key] ?? []);
+        $stored = $all[$key] ?? [];
+        $stored = is_array($stored) ? $stored : [Locales::default() => (string) $stored];
+
+        return collect(Locales::codes())->mapWithKeys(fn (string $c): array => [$c => (string) ($stored[$c] ?? $default[$c] ?? '')])->all();
+    }
+
+    /**
+     * Writes some editions of a per-edition setting and leaves the others as
+     * they are, so saving English can never blank Urdu.
+     *
+     * @param  array<string, string|null>  $values
+     */
+    public function setEditions(string $key, array $values): void
+    {
+        $merged = $this->editions($key);
+        foreach ($values as $code => $text) {
+            if (Locales::exists((string) $code) && $text !== null) {
+                $merged[$code] = (string) $text;
+            }
+        }
+
+        $this->set($key, $merged);
+    }
+
     /** One edition's value of a setting, whatever edition the page is in. */
     public function forLocale(string $key, string $locale): mixed
     {

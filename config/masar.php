@@ -208,10 +208,10 @@ return [
         'defaults' => [
             'site.demo_mode' => true,
 
-            // Per edition: a value keyed by every edition code is resolved to
-            // the current one by Settings::get(). The brand is «مسار» in the
-            // editions written in Arabic script and MASAR in the others.
-            'identity.site_name' => ['ar' => 'مسار', 'en' => 'MASAR', 'fr' => 'MASAR', 'hi' => 'MASAR', 'ur-pk' => 'مسار', 'zh-hans' => 'MASAR'],
+            // The brand is MASAR in every edition (owner's ruling, 2026-10-29):
+            // one value, not translated. The Arabic wordmark «مسار» is part of
+            // the lockup's artwork in the masthead, not this setting.
+            'identity.site_name' => 'MASAR',
             'identity.tagline' => ['ar' => 'من المعلومة إلى الفرصة', 'en' => 'From information to opportunity', 'fr' => 'De l’information à l’opportunité', 'hi' => 'सूचना से अवसर तक', 'ur-pk' => 'معلومات سے موقع تک', 'zh-hans' => '从信息到机遇'],
             // The strip above the masthead says what MASAR covers; the tagline
             // beside the wordmark says what it is for. They were the same
@@ -231,7 +231,9 @@ return [
             'editorial.articles_per_page' => 12,
             'editorial.reading_speed_wpm' => 180,
 
-            'seo.title_template' => ['ar' => ':title | مسار', 'en' => ':title | MASAR', 'fr' => ':title | MASAR', 'hi' => ':title | MASAR', 'ur-pk' => ':title | مسار', 'zh-hans' => ':title | MASAR'],
+            'seo.title_template' => ':title | MASAR',
+            // Per edition. The description a page carries when it sets none.
+            'seo.description' => ['ar' => 'منصة إعلامية عربية للأعمال والاقتصاد والأسواق والفرص، بتركيز على السوق السعودية.', 'en' => 'An Arabic-first media platform for business, the economy, markets and opportunities, focused on the Saudi market.', 'fr' => 'Une plateforme médiatique arabe consacrée aux affaires, à l’économie, aux marchés et aux opportunités, centrée sur le marché saoudien.', 'hi' => 'व्यापार, अर्थव्यवस्था, बाज़ार और अवसरों पर अरबी-प्रथम मीडिया मंच, सऊदी बाज़ार पर केंद्रित।', 'ur-pk' => 'کاروبار، معیشت، مارکیٹس اور مواقع پر عربی اوّلین میڈیا پلیٹ فارم، سعودی مارکیٹ پر مرکوز۔', 'zh-hans' => '以阿拉伯语为先的商业、经济、市场与机遇媒体平台，专注沙特市场。'],
             'seo.robots' => "User-agent: *\nAllow: /\n",
             'seo.verification_tags' => null,
 

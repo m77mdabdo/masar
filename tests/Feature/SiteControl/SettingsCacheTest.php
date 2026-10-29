@@ -15,7 +15,7 @@ function settings(): Settings
 }
 
 it('falls back to config defaults before anything is saved', function (): void {
-    expect(setting('identity.site_name'))->toBe('مسار')
+    expect(setting('identity.site_name'))->toBe('MASAR')
         ->and(setting('editorial.articles_per_page'))->toBe(12);
 });
 

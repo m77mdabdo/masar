@@ -34,11 +34,10 @@ it('never overwrites a label someone already wrote', function (): void {
 
 it('resolves a per-edition setting to the current edition and leaves other settings alone', function (): void {
     app()->setLocale('en');
-    expect(setting('identity.site_name'))->toBe('MASAR')
-        ->and(setting('seo.title_template'))->toBe(':title | MASAR');
+    expect(setting('identity.tagline'))->toBe('From information to opportunity');
 
     app()->setLocale('ur-pk');
-    expect(setting('identity.site_name'))->toBe('مسار');
+    expect(setting('identity.tagline'))->toBe('معلومات سے موقع تک');
 
     // A list is not a per-edition map.
     app(\App\Support\Settings::class)->set('market.ticker', [['label' => 'TASI']]);
@@ -76,4 +75,50 @@ it('marks Arabic-script text with its language on a page in another script', fun
 
     app()->setLocale('ur-pk');
     expect(trim(view('components.ui.bidi', ['text' => 'مؤشر أ'])->render()))->toBe('مؤشر أ');
+});
+
+it('keeps the brand MASAR in every edition', function (string $code): void {
+    app()->setLocale($code);
+
+    expect(setting('identity.site_name'))->toBe('MASAR');
+    $this->get('/'.$code.'/about')->assertSee('| MASAR</title>', false);
+})->with(['ar', 'en', 'ur-pk', 'zh-hans']);
+
+it('stores each edition of a per-edition setting independently', function (): void {
+    $settings = app(\App\Support\Settings::class);
+
+    $settings->setEditions('identity.tagline', ['en' => 'Signals, not noise']);
+    $settings->setEditions('identity.tagline', ['fr' => 'Des signaux, pas du bruit']);
+
+    $tagline = $settings->editions('identity.tagline');
+    expect($tagline['en'])->toBe('Signals, not noise')
+        ->and($tagline['fr'])->toBe('Des signaux, pas du bruit')
+        // Untouched editions keep their defaults.
+        ->and($tagline['ar'])->toBe('من المعلومة إلى الفرصة');
+
+    // Persisted, not only memoised.
+    expect(\App\Models\Setting::query()->where('key', 'identity.tagline')->exists())->toBeTrue();
+    app()->setLocale('fr');
+    expect(app(\App\Support\Settings::class)->get('identity.tagline'))->toBe('Des signaux, pas du bruit');
+});
+
+it('reads a tagline stored before it was per edition as the Arabic one', function (): void {
+    app(\App\Support\Settings::class)->set('identity.tagline', 'شعار قديم');
+
+    expect(app(\App\Support\Settings::class)->editions('identity.tagline'))
+        ->toMatchArray(['ar' => 'شعار قديم', 'en' => 'From information to opportunity']);
+});
+
+it('saves one edition from the settings page without overwriting another', function (): void {
+    $settings = app(\App\Support\Settings::class);
+    $settings->setEditions('identity.descriptor', ['ur-pk' => 'اردو وضاحت']);
+
+    $this->actingAs(staff('super_admin'));
+    \Pest\Livewire\livewire(\App\Filament\Pages\ManageSettings::class)
+        ->set('data.identity__descriptor.en', 'Business · Markets')
+        ->call('save');
+
+    $saved = app(\App\Support\Settings::class)->editions('identity.descriptor');
+    expect($saved['en'])->toBe('Business · Markets')
+        ->and($saved['ur-pk'])->toBe('اردو وضاحت');
 });

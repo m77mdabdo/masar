@@ -80,7 +80,10 @@ class ManageSettings extends Page implements HasSchemas
             collect(array_keys((array) config('masar.settings.defaults')))
                 ->mapWithKeys(fn (string $key): array => [
                     // Dots are the settings namespace, not a nesting hint.
-                    str_replace('.', '__', $key) => $settings->get($key),
+                    // A per-edition setting fills as its whole map.
+                    str_replace('.', '__', $key) => in_array($key, Settings::PER_EDITION, true)
+                        ? $settings->editions($key)
+                        : $settings->get($key),
                 ])
                 ->all(),
         );
@@ -107,10 +110,11 @@ class ManageSettings extends Page implements HasSchemas
     {
         return Tab::make('الهوية')->id('identity')->schema([
             TextInput::make('identity__site_name')->label('اسم الموقع')->required(),
-            TextInput::make('identity__tagline')->label('الشعار النصي')
-                ->helperText('يظهر بجوار الشعار في الترويسة. ثلاثة أسطر قصيرة.'),
-            TextInput::make('identity__descriptor')->label('وصف التغطية')
-                ->helperText('يظهر في الشريط العلوي.'),
+            // One input per edition: each language is its own value, and
+            // saving writes each one into its own slot (Settings::setEditions).
+            ...self::perEdition('identity__tagline', 'الشعار النصي', 'يظهر بجوار الشعار في الترويسة. ثلاثة أسطر قصيرة.'),
+            ...self::perEdition('identity__descriptor', 'وصف التغطية', 'يظهر في الشريط العلوي.'),
+            ...self::perEdition('seo__description', 'الوصف الافتراضي لمحركات البحث', 'يُستخدم حين لا تحدد الصفحة وصفها.'),
             FileUpload::make('identity__logo_path')->label('الشعار')->image()->disk('public')->directory('site'),
             FileUpload::make('identity__favicon_path')->label('أيقونة الموقع')->image()->disk('public')->directory('site'),
             FileUpload::make('identity__og_image_path')->label('صورة المشاركة الافتراضية')->image()->disk('public')->directory('site')
@@ -294,6 +298,18 @@ class ManageSettings extends Page implements HasSchemas
         ]);
     }
 
+    /** @return array<int, TextInput> */
+    private static function perEdition(string $field, string $label, string $help): array
+    {
+        return array_map(
+            fn (string $code): TextInput => TextInput::make("{$field}.{$code}")
+                ->label($label.' — '.\App\Support\Locales::name($code))
+                ->helperText($code === \App\Support\Locales::default() ? $help : null)
+                ->extraInputAttributes(['lang' => \App\Support\Locales::tag($code), 'dir' => \App\Support\Locales::dir($code)]),
+            \App\Support\Locales::codes(),
+        );
+    }
+
     public function save(): void
     {
         Gate::authorize('update', Setting::class);
@@ -309,6 +325,12 @@ class ManageSettings extends Page implements HasSchemas
             // A blank secret means "leave it alone", not "erase it" — the field
             // renders empty by design and saving the form must not wipe a key.
             if ($settings->isEncrypted($key) && blank($value)) {
+                continue;
+            }
+
+            if (in_array($key, Settings::PER_EDITION, true)) {
+                $settings->setEditions($key, (array) $value);
+
                 continue;
             }
 

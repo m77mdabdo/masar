@@ -19,6 +19,8 @@
     // page is the same route in each enabled edition.
     $pageAlternates = $alternates ?: \App\Support\Alternates::forCurrentRoute();
     $siteName = setting('identity.site_name');
+    // A page with no description of its own carries the edition's default.
+    $description = $description ?: setting('seo.description');
     $pageTitle = $title
         ? str_replace(':title', $title, (string) setting('seo.title_template'))
         : $siteName;
