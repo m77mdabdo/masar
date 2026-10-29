@@ -1,3 +1,137 @@
+# MASAR — release report: publication approval, security completion, legal pages
+
+Date: 2026-10-29.
+
+## Status in one paragraph
+
+- **Done and committed:**
+  - all six editions public and owner-approved for publication (no native
+    review is recorded, because none happened);
+  - the Content-Security-Policy and upload re-encoding;
+  - privacy, terms and cookie pages in six languages;
+  - the 768px tower clipping fixed.
+- **Tested:** the suite passes (1,119), the browser matrix passes (1,932 of
+  1,932), migrations and a backup were verified on scratch databases, and
+  decay is green.
+- **Pushed** to `origin/main`.
+- **Not deployed.** No production target exists to verify (see Deployment).
+  No production database was touched, and none was backed up, because none
+  can be reached.
+
+## Translation publication and review
+
+| edition | public | publication | native review | strings | pending review |
+|---|---|---|---|---|---|
+| Arabic `ar` | yes | owner approved | source text | 530 | — |
+| English `en` | yes | owner approved | pending | 530 | 530 |
+| French `fr` | yes | owner approved | pending | 530 | 530 |
+| Hindi `hi` | yes | owner approved | pending | 530 | 530 |
+| Urdu `ur-pk` | yes | owner approved | pending | 530 | 530 |
+| Chinese `zh-hans` | yes | owner approved | pending | 530 | 530 |
+
+- **Owner approval** is a separate record (`publication_status`, approver,
+  basis, hash, time), written by `masar:translations:authorize-publication`.
+  It was recorded on the dev database as "Mohamed Abdo (project owner)", on
+  the basis of your directive.
+- **It never writes the review fields.** The public notice therefore still
+  says, correctly, that the interface awaits native review.
+- **A changed file voids both** its approval and its review.
+- **Production:** run the same command there after deploy (it's in the runbook).
+
+## Security
+
+| Item | Result |
+|---|---|
+| CSP (public) | Per-response nonce on every executable script, with no `'unsafe-inline'` for scripts or style elements. `object-src 'none'`; base, form and frame-ancestors restricted to self; media from the media host only; frames from youtube-nocookie only; upgrade-insecure-requests in production. A browser walk of 1,932 checks found 0 violations, and the carousel, switcher, mobile menu and newsletter form all work under it. `'unsafe-eval'` remains, because Alpine's standard build needs it. The admin is not covered; it is outside the `web` group. |
+| Uploads | `SafeImage` on all 7 upload fields: magic-byte check (JPEG, PNG, WebP), size and dimension limits, a GD decode, then re-encoding in place. A PHP file renamed `.jpg`, SVG, GIF, PE and ELF files are refused. A payload appended to a real JPEG is stripped. AVIF was dropped. A test fails if an upload field is added without the guard. |
+| Cloudflare and rate limits | `TRUSTED_PROXIES` from env. Proven: behind a trusted proxy, reader A's 31st search is refused while reader B still gets through. The origin-firewall procedure is in the runbook. |
+| HTTPS, cookies, sessions | Forced HTTPS and secure session cookies in production, both tested. CSRF is on the web group. Login locks on the sixth attempt; password reset sends one email for five requests. |
+| config:cache | **Kept off.** It would null `env('TRUSTED_PROXIES')` in `bootstrap/app.php` and drop Cloudflare trust. The reasoning is in the runbook. |
+
+## Legal pages
+
+`/{edition}/privacy`, `/terms` and `/cookies` are live in all six editions and
+linked from the footer.
+- **What they state:** only behaviour the code has:
+  - the visitor cookie and its counting window;
+  - what a subscription stores;
+  - momentary IP use for rate limits;
+  - 404 logging without IPs;
+  - no stored searches;
+  - no third-party analytics, cookies or ad networks;
+  - YouTube only after a click.
+- **The cookie table** is generated from the code that sets each cookie, and a
+  test holds it equal to the cookies a real response sets: `masar-session`,
+  `XSRF-TOKEN`, `masar_edition`, `masar_vid`.
+- **Not stated, for you to confirm before relying on them legally:**
+  - the operator's legal name, registration and address;
+  - a privacy contact (the contact settings are empty);
+  - governing law and jurisdiction, for example PDPL;
+  - retention periods;
+  - the hosting and email providers;
+  - whether the measurement cookie needs consent (there is no banner);
+  - any age statement.
+
+## Frontend
+
+- **Tower at 768:** an image may now carry `focal_md` for the 768–1023 stage.
+  The towers photograph uses 65% there and 56% on phones. Measured from
+  pixels, the tower's body ends at 0.878 of the frame; the visible edge at the
+  zoom start is now 0.883.
+- **Contrast:** re-measured across the motion; the floor is 4.62, above 4.58.
+- **First question:** layout unchanged, as you directed.
+
+## Tests
+
+| Check | Result |
+|---|---|
+| `php artisan test` | **1119 passed (4264 assertions)** — previously 1075 |
+| Responsive and i18n browser matrix | **1,932 / 1,932** (23 pages × 6 editions × 14 viewports) — previously 1,680 |
+| CSP violations in the browser | 0 |
+| Migrations, scratch database | all 18 new migrations rolled back and re-applied; schema identical |
+| Backup and restore, scratch database | 56 tables, 5,042 rows, all match the manifest |
+| `masar:decay` | no decay |
+
+## Git
+
+Release commits:
+- `7d09f45` — CSP and owner publication approval
+- `77d4697` — uploads
+- `c4d6b7a` — legal pages
+- `efb1d09` — tower at 768
+- `0d61a82` — Cloudflare and config decisions
+- the release docs commit
+
+Pushed to `https://github.com/m77mdabdo/masar.git`, branch `main`. The tested
+commit is the pushed commit.
+
+## Deployment — BLOCKED, production unchanged
+
+**No production target can be verified, so I stopped before production as
+directed.** The repository names no server: `deploy/nginx/masar.conf` still
+has `server_name _` "replaced at domain cutover". Nothing names a host, SSH
+user, domain or deploy key for MASAR. The SSH keys on this machine can't be
+identified as MASAR's, and I didn't try them.
+
+To deploy, I need:
+1. **The server:** hostname or IP, SSH user and port. Authenticate
+   interactively or with a key; never paste a password in chat.
+2. **The domain**, and whether Cloudflare fronts it.
+3. **Server state:** is it provisioned (`deploy/provision.sh`) with a `.env`
+   from `deploy/env.production.example`, or new?
+4. **The data:** whether it holds a production database that must be backed
+   up and preserved first, or is fresh.
+
+From there it is the runbook:
+1. `deploy/backup.sh` and `deploy/verify-backup.sh`.
+2. `deploy/deploy.sh <ref>`, which runs `migrate --force` and never
+   `migrate:fresh`.
+3. Record the publication approval.
+4. Post-deploy checks of all six editions, legal pages, headers, logs and
+   workers.
+
+---
+
 # MASAR — task report: six public editions, review register, commitments, operations
 
 Date: 2026-10-29. Commits `354288c` … `a4abf0d` (7), on top of the 12 from

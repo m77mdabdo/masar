@@ -84,6 +84,11 @@ The Horizon dashboard is `super_admin` only, in every environment.
 - **Which editions are public:** `MASAR_LOCALES_ENABLED` in `.env`. All six by
   default; Arabic is always on. Run `php artisan cache:clear` after changing it.
 - **Interface review status:** `php artisan masar:translations:sync`
+- **Owner publication approval** (not a review): after the first deploy, and after
+  any release that changes `lang/`, record it on that server's database:
+
+      php artisan masar:translations:authorize-publication all --by="<owner>" --basis="<where it was given>"
+
 - **Record a review:** `php artisan masar:translations:approve <locale> <file> --reviewer=<email>`
   - The reviewer must be a real account with `translation.review`.
   - A file that changes afterwards returns to pending by itself.

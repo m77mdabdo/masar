@@ -361,20 +361,24 @@ structured labels, the translation workflow and its gate. What is left, measured
 
 ## Interface translation review — counts (2026-10-29, from `translation_reviews`)
 
-Every edition is public; none has been reviewed by a person. Counts are
-strings (keys), across 10 files per edition (9 groups + the framework JSON).
+All six editions are public and **owner-approved for publication** (recorded
+with `masar:translations:authorize-publication`, by the owner's directive of
+2026-10-29). None has been reviewed by a native speaker; that is a separate
+status and is still pending. Counts are strings (keys), across 10 files per
+edition (9 groups + the framework JSON), after the legal pages were added.
 
-| edition | strings | untranslated | reviewed | pending review |
-|---|---|---|---|---|
-| ar (source) | 474 | — | — | — |
-| en | 474 | 0 | 0 | 474 |
-| fr | 474 | 0 | 0 | 474 |
-| hi | 474 | 0 | 0 | 474 |
-| ur-pk | 474 | 0 | 0 | 474 |
-| zh-hans | 474 | 0 | 0 | 474 |
+| edition | strings | untranslated | publication | linguistic review | reviewed | pending |
+|---|---|---|---|---|---|---|
+| ar (source) | 530 | — | owner approved | source | — | — |
+| en | 530 | 0 | owner approved | pending | 0 | 530 |
+| fr | 530 | 0 | owner approved | pending | 0 | 530 |
+| hi | 530 | 0 | owner approved | pending | 0 | 530 |
+| ur-pk | 530 | 0 | owner approved | pending | 0 | 530 |
+| zh-hans | 530 | 0 | owner approved | pending | 0 | 530 |
 
-Approve a file after reading it: `php artisan masar:translations:approve fr site.php --reviewer=<email>`.
-Any later change to the file returns it to pending.
+Record a native review after reading a file:
+`php artisan masar:translations:approve fr site.php --reviewer=<email>`.
+Any later change to a file voids both its publication approval and its review.
 
 ## Found in the 2026-10-29 sweep, not built
 
