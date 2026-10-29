@@ -1,3 +1,193 @@
+# MASAR — task report: six public editions, review register, commitments, operations
+
+Date: 2026-10-29. Commits `354288c` … `a4abf0d` (7), on top of the 12 from
+2026-10-28. Not pushed, not deployed.
+
+**Technical readiness is not the same as production deployment or linguistic
+approval.**
+- All six public editions are enabled and pass every executed check.
+- Nothing is deployed.
+- No interface translation has been reviewed by a person. All 2,370
+  non-Arabic strings are recorded as `pending_review`.
+
+## Language status
+
+| edition | URL | direction | public | strings | untranslated | reviewed | pending review |
+|---|---|---|---|---|---|---|---|
+| Arabic | `/ar` | RTL | yes | 474 (source) | — | — | — |
+| English | `/en` | LTR | yes | 474 | 0 | 0 | 474 |
+| French | `/fr` | LTR | yes | 474 | 0 | 0 | 474 |
+| Hindi | `/hi` | LTR | yes | 474 | 0 | 0 | 474 |
+| Urdu | `/ur-pk` | RTL | yes | 474 | 0 | 0 | 474 |
+| Chinese | `/zh-hans` | LTR | yes | 474 | 0 | 0 | 474 |
+
+## What changed
+
+| Area | Result |
+|---|---|
+| **R11 — review register** | A `translation_reviews` row per edition and file, holding content hash, string counts and status (`source` / `pending_review` / `approved`). `masar:translations:sync` never approves. `masar:translations:approve <locale> <file> --reviewer=<email>` is the only path to approved; it needs a real account with `translation.review` and the hash on disk. A changed file falls back to pending, with `invalidated_at` recorded. The deploy syncs the register. |
+| **Activation** | `MASAR_LOCALES_ENABLED` defaults to all six. Three separate controls: public availability, interface review, editorial publication. An edition is never switched off for having no stories. |
+| **R12 — commitments** | Every claim on the public pages was checked against the code. Ten discrepancies were fixed (matrix below). |
+| **Settings** | The brand is MASAR in every edition. Tagline, descriptor and a new default SEO description are per edition, with one field per language in Settings; saving one language cannot overwrite another. |
+| **Article workflow** | Originals can be created in all six editions through the form (tested). Translation drafts, review by someone other than the translator, the gate and the outdated hash are unchanged. |
+| **Focal points** | The towers photograph is cropped at `56% 40%` and the meeting-room photograph at `40% 40%`, stored on their media records (8 and 9 rows) by a reversible migration and read by the big story and the article hero. The right-hand tower stays whole at 768 at rest but is still clipped at the edge at the 1.04 zoom start. |
+| **Ops** | Backups record exact per-table row counts; `verify-backup.sh` proves a restore. Trusted proxies come from env, HTTPS is forced in production, and the session cookie is secure by default in production. Adds `deploy/env.production.example` and `deploy/RUNBOOK.md`. |
+
+## R12 — commitments matrix
+
+All six editions render the same sentence from the same key. "Test" names the
+test that now holds the claim to its mechanism.
+
+| Claim (page) | Implementation | Result before | Corrective action | Test |
+|---|---|---|---|---|
+| Every story passes research → writing → fact-check → review → publish; none skipped (team) | `ArticleStatus::allowedTransitions` | **False:** research can be skipped | Now names the enforced order: writing → fact-check → editor review → publication | `CommitmentsTest`: Published unreachable without any one of the three |
+| Every story answers all four questions (about, standards) | Gate requires `why_it_matters` only | **Overstated** | Says only "why it matters" is enforced; the other three are a commitment; opinion pieces and success stories excepted | `PublishGateTest` |
+| Each photo credited on its story page (footer) | Inline blocks only; hero credit never rendered | **False for the hero** | Hero credit now rendered | `CommitmentsTest` |
+| One email a week; unsubscribe link in every email (newsletter, confirmed page, confirmation mail) | Nothing sends a newsletter | **False** | "Has not started yet; every issue will carry an unsubscribe link" | — (no mechanism yet; DEFERRED) |
+| Story shows its last-update date (team) | Byline shows it only after an update past publication | **Overstated** | "…if it was changed after publication" | existing byline logic |
+| Experts are real people who agreed (team) | Demo people are fictional | **False in demo** | Commitment wording, plus a demo-only sentence saying they are fictional | `CommitmentsTest` |
+| Team/expert photos are real photos of real people (footer) | Stock portraits of strangers | **Misleading** | Demo-only: "stock photographs, not the people named" | `CommitmentsTest` |
+| Readers are business leaders… (band, advertise) | No readership data | **Unverifiable** | "Written for…" | — |
+| Privacy / Terms / Cookies (footer links) | All three went to /about | **False** | Links removed | `CommitmentsTest` |
+| Sponsored label «محتوى مدعوم» (advertise) | Renders «محتوى مدفوع» | Fixed 2026-10-28 | Takes the component's own label | `CommitmentsTest` |
+| No generated text; written by a person (standards) | Null provider only | True | Narrowed to stories; "written or translated" | `TranslationWorkflowTest` guard |
+| Translation reviewed by someone other than the translator before publishing (new) | Gate `require_translation_review`, action check | True | New section | `TranslationWorkflowTest` |
+| Interface pending native review (new, non-Arabic editions) | Read from `translation_reviews` at request time | True by construction | New sentence; switches when every file is approved | `CommitmentsTest` |
+| Fact-checker ≠ writer (standards) | `TransitionArticleStatus` | True | — | `FactCheckIndependenceTest` |
+| Source with a link required (standards, team) | Gate `require_source` (URL filled) | True | — | `PublishGateTest` |
+| Sponsored needs sponsor name; label can't be removed (advertise, standards) | Gate, `DisclosureCannotBeWithdrawn` | True | — | `DisclosureIrreversibleTest` |
+| Disclosed in page data for search engines (standards) | NewsArticle JSON-LD `sponsor` | True | — | `SchemaTest` |
+| Status changes in an audit log with a name (standards) | `RecordStatusAudit` → `causedBy` | True | — | existing |
+| Only editorial roles publish (advertise, team) | `article.publish` permission | True | — | `ArticlePolicyTest` |
+| Corrections, independence, what we refuse | Phrased as "we", not as a mechanism | Commitments | — | — |
+
+## Responsive matrix (executed, real browser)
+
+- **Coverage:** 20 pages in 6 editions at 14 viewports: 320, 375, 390, 430,
+  768, 820, 1024, 1280, 1440, 1920 and 2560, plus landscape 667×375, 844×390
+  and 1024×768. That makes **1,680 checks**, run against the live :8000 server
+  with all six editions on.
+- **Checks:** horizontal scroll a reader can perform; elements escaping the
+  viewport; raw translation keys; broken in-view images; console and page
+  errors; `<html lang/dir>`; Arabic-script text left unmarked in
+  other-script editions.
+- **Result: 0 failures in every edition (280 checks each), 0 escaping
+  elements, 0 unmarked foreign text.**
+- The article and opportunity pages return 404 outside Arabic. Those records
+  exist only in Arabic; this is the fallback policy working, not a defect.
+- Screenshots at 375 and 1440 for every page and edition are in the
+  scratchpad's `i18n-audit/shots/`. I viewed a sample, not all 240.
+
+## Hero fold (Arabic; banner on and off measured identical)
+
+Details are in CLAUDE.md §2.
+
+| device | first question | result |
+|---|---|---|
+| 375×667 | 620–690, fold 667 | **PASS** (starts above the fold; last 23px below) |
+| 390×844 | 594–663 | **PASS** (fully visible) |
+| 430×932 / 360×800 / 375×812 | fully visible | **PASS** |
+| 768×1024, 1024×768, 1280×800, 1440×900, 1920×1080 | fully visible | **PASS** |
+| 1440×788 (real window) | 310–379; CTA 20 above the fold, controls 12 above | **PASS** |
+| 844×390 landscape | 203 below the fold | no rule set; reported |
+
+- Mobile ticker: 122px on phones, not 150.
+- The standalone error page's 78px bar now matches the live 54px masthead.
+  The translation work had changed only its `lang`/`dir` and copy.
+- Moving the question above the CTA: measured at 94px earlier on 375×667.
+  Not implemented, pending your approval.
+
+## Database
+
+- **Scratch database `masar_migtest`:** `migrate:fresh --seed` gave 56 tables
+  and 4,929 rows. Rolling back all 16 new migrations worked: `articles.locale`
+  back to length 2, new columns and table gone. Re-applying all 16 gave a
+  **schema identical** to the fresh migration and **row counts identical in
+  every table**. The scratch database was dropped afterwards.
+- **One designed refusal:** the twelve `widen_locale_*` migrations refuse to
+  roll back while a row holds `ur-pk` or `zh-hans`, because narrowing would
+  truncate those rows. It is documented in the runbook.
+- **Dev database:** gained the two new migrations; `RoleSeeder` was re-run
+  (adds `translation.review`).
+
+## Backup and restore
+
+- `deploy/backup.sh` was run against the dev database, with media skipped:
+  the local media disk is 3.1 GB, and production media live on R2.
+- `deploy/verify-backup.sh` restored the dump into `masar_restore_check`:
+  **56 tables, 5,039 rows, all match the manifest.**
+- It refuses the application's own database by name.
+- A tampered manifest is caught: `articles: manifest 999999, restored 108`.
+
+## Security and production configuration
+
+- **Fixed:**
+  - no trusted proxies (every reader would share one rate-limit bucket behind
+    Cloudflare);
+  - no forced HTTPS in production;
+  - the session cookie was not marked secure in production.
+- **Verified by test:**
+  - login lockout on the sixth attempt;
+  - password reset: five requests send one email;
+  - no proxy trusted by default;
+  - HTTPS URLs and secure cookies in production;
+  - every `{!! !!}` in a public view escapes its dynamic part.
+- **Inspected and unchanged:**
+  - CSRF (the web group);
+  - search and newsletter limiters;
+  - nginx headers (nosniff, frame, referrer, permissions);
+  - HSTS ready but commented out until cutover;
+  - `deploy.sh` refuses `APP_DEBUG` anything but false.
+- **Open:**
+  - no Content-Security-Policy;
+  - uploads are MIME-validated but not re-encoded;
+  - `config:cache` is deliberately absent from the deploy. You asked for it;
+    the project's earlier decision and its test say no. I kept it and am
+    raising it.
+
+All three are in DEFERRED.md.
+
+## Tests
+
+- `php artisan test`: **1075 passed (4110 assertions)**, run fresh at the end.
+- `masar:decay`: no decay (queue drained, worker running; flows and 6 forms
+  ok).
+- New tests cover:
+  - R11: register, no false approval, invalidation, publication separate;
+  - six-language activation;
+  - commitments;
+  - per-edition settings, including the settings page itself;
+  - creating originals in five languages;
+  - focal points and their rollback;
+  - production config;
+  - the reset throttle;
+  - backup verification in the deploy scripts.
+
+## Acceptance
+
+| Criterion | Status |
+|---|---|
+| All six public interfaces enabled | **PASS** |
+| All six routes load | **PASS** (tests and 1,680 checks) |
+| Language switching works | **PASS** |
+| RTL and LTR correct | **PASS** |
+| Interface keys complete | **PASS** (0 untranslated; parity test) |
+| Review status accurately recorded | **PASS** (all pending; no approval recorded) |
+| Editorial safeguards intact | **PASS** |
+| Localized settings independent | **PASS** |
+| SEO references valid; no hreflang to drafts | **PASS** |
+| Responsive matrix passes | **PASS** (1,680/1,680) |
+| Migrations forward and back | **PASS** (scratch database; one designed refusal documented) |
+| Security checks | **PASS** for the scope inspected; CSP and upload re-encoding **DEFERRED** |
+| Deployment files present | **PASS** (deploy, backup, restore, verify, Supervisor with Horizon and scheduler, env example, runbook) |
+| Backup restoration tested | **PASS** |
+| Core functionality operational | **PASS** |
+| Admin panel custom labels | **DEFERRED** by your ruling (900 + 58) |
+| Native linguistic approval | **NOT DONE**; it is yours (`masar:translations:approve`) |
+| Production deployment | **NOT DONE**; needs your go-ahead |
+
+---
+
 # MASAR — task report: six editions and article translation
 
 Date: 2026-10-28. Commits `d2c093c` … `ece2fee` (11). Not pushed.
