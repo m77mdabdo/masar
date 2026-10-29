@@ -184,3 +184,24 @@ it('has a translation in every edition for every string the demo factories can g
         expect($missing)->toBe([], "{$locale} has no translation for ".count($missing).' generated strings');
     }
 });
+
+it('corrects imported machine text only where it is still the machine’s, never a person’s edit', function (): void {
+    $source = originalStory();
+    $source->forceFill(['subtitle' => 'نمو 40 مليار ريال'])->save();
+    $source = $source->fresh(['blocks', 'sources']);
+    $dict = englishFor($source);
+    $dict[sha1('نمو 40 مليار ريال')] = '增长 40 十亿里亚尔';
+    (new ContentTranslationsSeeder)->withDictionaries(['zh-hans' => $dict])->run();
+    $zh = Article::query()->where('locale', 'zh-hans')->sole();
+    expect($zh->subtitle)->toBe('增长 40 十亿里亚尔');
+
+    // A person edits the title; the correction must reach only the untouched subtitle.
+    $zh->forceFill(['title' => 'Edited by a person'])->save();
+    $fixes = [sha1('增长 40 十亿里亚尔') => '增长 400亿里亚尔', sha1('EN title') => 'should not land'];
+    (new ContentTranslationsSeeder)->withDictionaries(['zh-hans' => $dict])->withCorrections(['zh-hans' => $fixes])->run();
+
+    $zh = $zh->fresh();
+    expect($zh->subtitle)->toBe('增长 400亿里亚尔')
+        ->and($zh->title)->toBe('Edited by a person')
+        ->and($source->fresh()->subtitle)->toBe('نمو 40 مليار ريال');
+});

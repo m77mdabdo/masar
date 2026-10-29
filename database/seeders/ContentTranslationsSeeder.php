@@ -37,6 +37,17 @@ class ContentTranslationsSeeder extends Seeder
     /** @var array<string, int> */
     public array $missing = [];
 
+    /** @var array<string, array<string, string>> locale => sha1(old machine text) => corrected text */
+    private array $corrections = [];
+
+    /** @param array<string, array<string, string>> $corrections */
+    public function withCorrections(array $corrections): static
+    {
+        $this->corrections = $corrections;
+
+        return $this;
+    }
+
     /** @param array<string, array<string, string>> $dictionaries locale => sha1(ar) => text */
     public function withDictionaries(array $dictionaries): static
     {
@@ -50,8 +61,14 @@ class ContentTranslationsSeeder extends Seeder
         foreach ($this->dict === [] ? Locales::codes() : [] as $locale) {
             // {locale}.json plus any {locale}-*.json supplement.
             foreach (array_merge(glob(database_path("seeders/data/content/{$locale}.json")) ?: [], glob(database_path("seeders/data/content/{$locale}-*.json")) ?: []) as $file) {
-                if ($locale !== Locales::default() && is_file($file)) {
-                    $this->dict[$locale] = array_merge($this->dict[$locale] ?? [], (array) json_decode((string) file_get_contents($file), true));
+                if ($locale === Locales::default() || ! is_file($file)) {
+                    continue;
+                }
+                $entries = (array) json_decode((string) file_get_contents($file), true);
+                if (str_ends_with($file, '-corrections.json')) {
+                    $this->corrections[$locale] = $entries;
+                } else {
+                    $this->dict[$locale] = array_merge($this->dict[$locale] ?? [], $entries);
                 }
             }
         }
@@ -63,6 +80,7 @@ class ContentTranslationsSeeder extends Seeder
             $this->media($locale);
             $this->bylines($locale);
             $this->market($locale);
+            $this->corrections($locale);
         }
 
         foreach ($this->missing as $locale => $n) {
@@ -281,5 +299,48 @@ class ContentTranslationsSeeder extends Seeder
         }
 
         $settings->set('market.translations', $map);
+    }
+
+    /**
+     * A correction to the machine-assisted text already imported — Chinese
+     * amounts regrouped from 十亿/百万 into 亿/万, for one. A stored segment is
+     * replaced only while it is still exactly the old machine output, so a
+     * person's edit to that sentence is never overwritten.
+     */
+    private function corrections(string $locale): void
+    {
+        $fixes = $this->corrections[$locale] ?? [];
+        if ($fixes === []) {
+            return;
+        }
+        $content = app(TranslatableContent::class);
+
+        $stories = Article::query()->where('locale', $locale)->where('translation_origin', 'machine-assisted')->with(['blocks', 'sources'])->get();
+        foreach ($stories as $story) {
+            $segments = [];
+            foreach ($content->segments($story) as $path => $text) {
+                if (isset($fixes[sha1(trim($text))])) {
+                    $segments[$path] = $fixes[sha1(trim($text))];
+                }
+            }
+            if ($segments !== []) {
+                $content->apply($story, $segments);
+                $story->save();
+            }
+        }
+
+        $settings = app(Settings::class);
+        $map = (array) $settings->forLocale('market.translations', Locales::default());
+        $changed = false;
+        foreach ($map as $ar => $editions) {
+            $current = (string) ($editions[$locale] ?? '');
+            if ($current !== '' && isset($fixes[sha1(trim($current))])) {
+                $map[$ar][$locale] = $fixes[sha1(trim($current))];
+                $changed = true;
+            }
+        }
+        if ($changed) {
+            $settings->set('market.translations', $map);
+        }
     }
 }
