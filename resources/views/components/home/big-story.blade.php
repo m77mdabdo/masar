@@ -53,6 +53,8 @@
             // Every image may carry its own focal point (the media record's
             // `focal`); without one the stage's default applies.
             'focal' => (string) ($image?->getCustomProperty('focal') ?: '50% 40%'),
+            // The near-square tablet stage's own centre, when the image has one.
+            'focal_md' => $image?->getCustomProperty('focal_md'),
             'lead' => implode(' ', $words),
             'emphasis' => $emphasis,
             'steps' => $stepsFor($article),
@@ -95,7 +97,7 @@
                  so the frame never dips. Only the current, outgoing and next
                  slides are in the tree, so only the next image is fetched. --}}
             <div @class(['hero-photo absolute inset-0 z-0', 'is-armed' => $count > 1 && $k === 0])
-                 style="--focal: {{ $slide['focal'] ?? '50% 50%' }};@if ($count > 1 && $k > 0) display:none @endif"
+                 style="--focal: {{ $slide['focal'] ?? '50% 50%' }};@if ($slide['focal_md']) --focal-md: {{ $slide['focal_md'] }};@endif @if ($count > 1 && $k > 0) display:none @endif"
                  @if ($count > 1) x-bind="photo({{ $k }})" @endif>
                 {{-- `ratio` does not shape this box: with :fill the parent owns it,
                      and the ratio only sets the img's width/height attributes,
@@ -112,7 +114,7 @@
                          tower complete from its top to its base, the sunset
                          behind it, and the lit streets along the bottom edge —
                          centred, the frame lost all three. --}}
-                    :focal="$slide['focal']"
+                    :focal="'var(--focal-at)'"
                 />
             </div>
         @endforeach

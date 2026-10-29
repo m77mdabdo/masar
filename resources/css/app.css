@@ -413,7 +413,7 @@
         }
 
         [data-carousel] .hero-photo img {
-            transform-origin: var(--focal, 50% 50%);
+            transform-origin: var(--focal-at, var(--focal, 50% 50%));
         }
 
         [data-carousel] .hero-photo.is-armed img {
@@ -445,6 +445,21 @@
      */
     .hero-photo {
         filter: contrast(0.92) brightness(1.06);
+        /* The crop and the zoom origin both read --focal-at. */
+        --focal-at: var(--focal, 50% 50%);
+    }
+
+    /*
+     * 768–1023: the stage is near-square, the one shape where a photograph's
+     * phone crop and its tablet crop want different centres. An image may
+     * carry `focal_md` for this range (the towers photograph does: at 56% the
+     * right-hand tower was clipped at the zoom's start, and at 65% the phone
+     * crop lost the bicycles). Below 768 and from 1024 up, `focal` alone.
+     */
+    @media (min-width: 48rem) and (max-width: 63.999rem) {
+        .hero-photo {
+            --focal-at: var(--focal-md, var(--focal, 50% 50%));
+        }
     }
 
     /*

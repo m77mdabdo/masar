@@ -119,6 +119,11 @@ class ImageLibrarySeeder extends Seeder
         'pexels-tima-miroshnichenko-5717315.jpg' => '40% 40%',
     ];
 
+    /** The 768–1023 stage's centre, where it differs (2026_10_29_130000). */
+    public const FOCAL_MD = [
+        'pexels-aburhman187-29859597.jpg' => '65% 40%',
+    ];
+
     private const BACKDROPS = [
         ['file' => 'home.jpg', 'name' => 'home-backdrop.jpg', 'focal' => '50% 40%',
             'alt' => 'أفق مدينة عند الغروب، تنخفض الشمس عند الأفق وتضيء الأبراج من الداخل وتسير حركة المرور على الطرق أدناه.'],
@@ -434,6 +439,7 @@ class ImageLibrarySeeder extends Seeder
                                 'source_file' => $entry['file'],
                                 'orientation' => $entry['orientation'],
                                 'focal' => self::FOCAL[$entry['file']] ?? null,
+                                'focal_md' => self::FOCAL_MD[$entry['file']] ?? null,
                             ]))
                             ->toMediaCollection('hero')
                     );

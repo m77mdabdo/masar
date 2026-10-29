@@ -36,3 +36,23 @@ it('sets the two measured focal points and rolls back only its own values', func
     expect($mine->fresh()->getCustomProperty('focal'))->toBeNull()
         ->and($edited->fresh()->getCustomProperty('focal'))->toBe('60% 30%');
 });
+
+it('gives the near-square tablet stage its own crop centre when the image has one', function (): void {
+    // The towers photograph: 56% on phones, 65% at 768–1023 so the right-hand
+    // tower survives the zoom's start (measured: right edge 0.883 vs 0.878).
+    $css = file_get_contents(resource_path('css/app.css'));
+    expect($css)->toContain('@media (min-width: 48rem) and (max-width: 63.999rem)')
+        ->toContain('--focal-at: var(--focal-md, var(--focal, 50% 50%));')
+        ->toContain('transform-origin: var(--focal-at, var(--focal, 50% 50%));');
+
+    $slides = collect(range(1, 2))->map(fn () => \App\Models\Article::factory()->withHeroImage()->create());
+    $slides[1]->heroMedia->setCustomProperty('focal', '56% 40%')->setCustomProperty('focal_md', '65% 40%')->save();
+
+    $html = view('components.home.big-story', [
+        'section' => ['title' => 'x', 'items' => $slides->map->fresh()], 'backdrop' => null,
+        'attributes' => new \Illuminate\View\ComponentAttributeBag,
+    ])->render();
+
+    expect($html)->toContain('--focal: 56% 40%; --focal-md: 65% 40%;')
+        ->toContain('object-position: var(--focal-at)');
+});

@@ -188,7 +188,8 @@ from `scale(1.04)` to `scale(1.0)`, then cross-fades to the next.
   | 1440 | 4.93 | 4.94 | 4.91 | 4.92 | 5.13 |
   | 1920 | 4.94 | 4.93 | 4.93 | 4.90 | 5.06 |
 
-  The floor is 4.76: a numeral at 1024 on slide two, at 1.04. That is with
+  The floor is 4.62 (re-measured 2026-10-29 after the per-image focal points;
+  it was 4.76 at the old 50% crop): a numeral at 1024 on slide two, at 1.04. That is with
   `--q-num` back at 0.90. Task 2.10 had raised it to 0.92 because at 1.06 the same
   numeral measured 4.55. The smaller excursion removed the need, so it was
   reverted.
