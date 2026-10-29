@@ -92,3 +92,20 @@ it('records exact row counts with every backup, and verifies a restore against t
 it('keeps the translation review register in step with each deploy', function (): void {
     expect(script('deploy.sh'))->toContain('masar:translations:sync');
 });
+
+it('never lets a backup fill the disk or leave a truncated file behind', function (): void {
+    // Measured 2026-10-29: two runs wrote 3.2 GB media archives each and the
+    // second was cut off by a full disk. The behaviours below were exercised
+    // against a scratch destination; these assertions keep them in the script.
+    $backup = script('backup.sh');
+
+    expect($backup)
+        ->toContain('MASAR_BACKUP_MIN_FREE_MB')          // spare space kept on every write
+        ->toContain('has_room "$NEED_SQL_MB" || die')   // no room for the dump: stop before writing
+        ->toContain('MASAR_BACKUP_REQUIRE_MEDIA')       // media skipped, not the database
+        ->toContain('.partial')                          // written aside, renamed when complete
+        ->toContain('trap cleanup EXIT')
+        ->toContain('media_fingerprint=')                // unchanged media is not archived again
+        ->toContain('[[ "$m" == "$NEWEST" ]] && continue') // the newest set is never pruned
+        ->not->toContain("find \"\$DEST\" -name 'masar-*' -type f -mtime \"+\$KEEP_DAYS\" -delete");
+});

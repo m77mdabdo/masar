@@ -56,6 +56,16 @@ cache. Routes, views and events are cached; config is not, and a test holds that
 - **Nightly:** cron runs `deploy/backup.sh` (installed by `provision.sh`). It
   writes a dump, a media archive when the media disk is local, and a manifest
   with exact row counts per table.
+  - **Disk safety:** each file is written as `.partial` and renamed only when
+    complete. Free space is checked first, keeping `MASAR_BACKUP_MIN_FREE_MB`
+    (default 1024) spare: too little for the dump stops the run before it
+    writes anything; too little for media backs up the database and skips
+    media with a warning (`MASAR_BACKUP_REQUIRE_MEDIA=1` makes that fatal).
+  - **Media is not archived again while unchanged:** the manifest carries a
+    fingerprint of the media files and reuses the newest matching archive.
+  - **Retention** (`MASAR_BACKUP_KEEP_DAYS`, default 14) removes complete sets
+    only, never the newest, and a media archive only when no remaining
+    manifest refers to it.
 - **Verify a backup without touching production:**
 
       deploy/verify-backup.sh /var/backups/masar/masar-<STAMP>.sql.gz masar_restore_check
