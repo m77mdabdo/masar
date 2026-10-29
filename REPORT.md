@@ -1,3 +1,27 @@
+# MASAR — release readiness: Chinese amounts, names, auth flows, backup safety
+
+Date: 2026-10-29. Baseline `28a0499`. Detail and tables: `LOCALIZATION_AUDIT.md`, "Release-readiness pass".
+
+- **Chinese amounts** are grouped in 亿/万: 50 dictionary strings converted, with exact values asserted, and 49 imported stories plus the market labels corrected on dev. Only untouched machine text is replaced.
+- **Names:**
+  - All 18 demo entities are fiction; their only record is the project's own slug.
+  - English and French match it for all 18, and every edition spells each entity consistently wherever it appears.
+  - Still needing a person: every Hindi, Urdu and Chinese spelling, the 12 sponsor names, and two flagged readings («तुर्की» in Hindi, «沙地» in Chinese).
+- **Password reset and 2FA enrollment** were verified end to end in a real browser in all six languages. The run used isolated mail delivery and real tokens, and checked every step at 17 viewports.
+  - The defect it found: the reset mail went out in English in every edition. That is fixed, with a test.
+- **Backups:**
+  - free-space checks before every write;
+  - `.partial` writes;
+  - media reused while unchanged;
+  - retention that never removes the newest set or a still-referenced archive.
+
+  Every path was exercised on a scratch destination; no existing backup was touched.
+- **Tests:** `php artisan test` (1,160 in its last pre-commit run; see Git for the release-commit run). The Chinese public edition was re-audited: 391 checks, 0 defects.
+- **Owner publication approval** re-recorded for 247 files. **Native review: none.**
+- **Not deployed:** no verified server or domain.
+
+---
+
 # MASAR — six-language platform: admin dashboard, system messages, browser verification
 
 Date: 2026-10-29. Full measured results: `LOCALIZATION_AUDIT.md`.

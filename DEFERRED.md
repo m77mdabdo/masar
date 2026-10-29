@@ -348,7 +348,10 @@ structured labels, the translation workflow and its gate. What is left, measured
   not by an editor; a person should check them first, because a proper noun
   spelled wrongly is a factual error rather than a style one. Chinese keeps
   Western digits with Chinese units («40 十亿里亚尔»), which is
-  understandable but not idiomatic («400亿»).
+  understandable but not idiomatic («400亿») — corrected 2026-10-29: amounts
+  are grouped in 亿/万, values unchanged. Names: every Hindi, Urdu and Chinese
+  spelling of the demo companies, people and sponsors still wants a person
+  (no record exists beyond the Latin slug); see LOCALIZATION_AUDIT.md.
 - **New content after the seed.** A story written today in Arabic has no
   translation until someone makes one: the provider seam has only the null
   driver, so `CreateTranslationDraft` produces an untranslated draft for a

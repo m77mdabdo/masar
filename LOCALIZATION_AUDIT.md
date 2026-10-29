@@ -51,9 +51,7 @@ crawl adds every individual record page: 165 per non-Arabic edition, 825 in tota
 - **Resources (list, create, edit):** articles, categories, companies, countries, industries, markets, opportunities, people, redirects, roles, sources, topics, users.
 - **List only:** audit log, intelligence inbox, subscribers.
 - **Guest:** login, password-reset request.
-- **Not audited, with the reason:**
-  - `password-reset/reset` needs a mailed token.
-  - `multi-factor-authentication/set-up` only renders for a user without 2FA, and every audit user has it by design.
+- **`password-reset/reset` and `multi-factor-authentication/set-up`** were not in the route sweep (one needs a mailed token, the other a user without 2FA). Both were then audited end to end in their own flows, in all six languages at 17 viewports. See "Password reset and 2FA enrollment" below.
 
 ## Translation resources
 
@@ -142,3 +140,75 @@ review: **0 strings** in every edition.
 - **Localization tests** (`tests/Feature/I18n`, `tests/Feature/Translation`): all pass.
 - **`php artisan masar:decay`:** green.
 - **The `name_translations` migration:** forward, rollback and re-migrate verified. No new migrations were added in this pass.
+
+## Release-readiness pass (2026-10-29, after `28a0499`)
+
+### Chinese amounts
+
+Chinese reckons large amounts in 万 (10⁴) and 亿 (10⁸). The machine pass had written «40 十亿里亚尔» and «300 百万里亚尔».
+- **Dictionaries:** 50 strings regrouped (40 十亿 → 400亿, 300 百万 → 3亿, 18 百万 → 1800万), using exact decimal arithmetic. Each conversion is asserted to keep every amount's value and currency.
+- **Dev database:** 49 Chinese stories and the market labels corrected through `zh-hans-corrections.json`. A stored segment is replaced only while it is still exactly the old machine text; a test proves a person's edit survives.
+- **Result:** 0 of 83 Chinese stories still use 十亿/百万. The Chinese public edition was re-audited: 391 checks, 0 defects.
+
+### Transliterated names
+
+Every company, person and sponsor in the product is demo fiction (`is_demo = true`, website `*.example`; sponsors and citation publishers are labelled «تخيّلي»). There is therefore no external authority to check against. The authoritative record is the project's own: the Arabic name and the editorially chosen Latin slug (from the demo cast, 2026-10-27).
+
+| entity (Arabic) | slug | EN/FR match slug | same spelling in every story, per edition (en · fr · hi · ur · zh) |
+|---|---|---|---|
+| زيزفون الرمال للطاقة المتجددة | zayzafoon-sands | ✓ ✓ | 6/6 in all five |
+| دُرّاق للمدفوعات | durraq-payments | ✓ ✓ | 2/2 in all five |
+| صدفة القلزم للشحن البحري | sadafat-al-qulzum | ✓ ✓ | 2/2 in all five |
+| دار القمرية للضيافة التراثية | dar-al-qamariya | ✓ ✓ | 1/1 in all five |
+| شعاع النفود للطاقة | shuaa-al-nafud | ✓ ✓ | 2/2 in all five |
+| قطميرة للأغذية | qitmira-foods | ✓ ✓ | 1/1 in all five |
+| عرصات · رُقيم · أثلة · مرقاة | arasat-development · ruqaym-data · athla-agritech · mirqah-learning | ✓ ✓ | not named in any story |
+| 8 people (لمى الحربي … سعد المطيري) | lama-al-harbi … saad-al-mutairi | ✓ ✓ | not named in story text |
+
+**Needing human confirmation.** No record exists for these, so nothing was changed by guesswork:
+- **Every Hindi, Urdu and Chinese spelling** of the 10 companies, 8 people and 12 sponsor names. Only the Latin slug exists as a record.
+- **Two specific readings:**
+  - Hindi «तुर्की अल-सुबैई» (Turki): «तुर्की» is also the Hindi word for Turkey/Turkish.
+  - Chinese «扎伊扎丰沙地…» translates "Sands" (沙地) where the Latin name keeps it as part of the name.
+- **The 12 sponsor names**, which have no slug at all, in all five editions.
+
+### Password reset and 2FA enrollment, in a real browser
+
+Both flows were run end to end in every language, on an isolated copy with a local SMTP sink, so no mail left the machine.
+- **Password reset:** request in the visitor's language → mail delivered → real token link → new password → sign-in with the new password and 2FA → `/admin`.
+- **2FA enrollment:** a fresh editor-in-chief without 2FA is forced to `/admin/multi-factor-authentication/set-up` → authenticator modal → code from the shown secret → recovery codes → `/admin`. 2FA was confirmed saved for all six users.
+
+Every page of both flows was checked at the 17 viewports for language, direction, sideways scroll, off-screen controls and leaked strings.
+
+| | ar | en | fr | hi | ur | zh |
+|---|---|---|---|---|---|---|
+| reset request / new-password pages (17 widths each) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| reset mail in the user's language | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| signed in with the new password + 2FA | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| forced to enrol; set-up page, modal, recovery codes (17 widths each) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| enrolled user reaches the panel | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+
+**Defect found and fixed:** the reset mail was in English in every edition, Arabic included. Filament sends it with Laravel's own strings, which are keyed by their English text, and `lang/{code}.json` held none of them. The five sentences are now in all six editions, with a test that sends the mail per edition.
+
+### Backups
+
+`deploy/backup.sh` now:
+- writes `.partial` files and renames them only when complete;
+- checks free space before each write, keeping `MASAR_BACKUP_MIN_FREE_MB` (default 1024) spare;
+- skips media when short of space, rather than the database, unless media is required;
+- reuses the newest media archive while the media fingerprint is unchanged;
+- prunes complete sets only, never the newest, and a media archive only when nothing references it.
+
+Each behaviour was exercised against a scratch destination:
+
+| case | result |
+|---|---|
+| unchanged media | reused, exit 0 |
+| room for the dump, not the media | media skipped, exit 0 |
+| same, with media required | refused, exit 1 |
+| no room for the dump | refused before writing |
+| room for both | new archive |
+| dump fails mid-way | no partial left |
+| retention | aged sets and their unreferenced archive removed; a still-referenced archive kept |
+
+No existing backup was touched.
