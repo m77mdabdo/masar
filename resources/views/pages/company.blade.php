@@ -102,14 +102,14 @@
                 <x-ui.section-rule :title="__('pages.company.co_mentions')" id="company-co-mentions" />
                 <div class="grid gap-6 sm:grid-cols-2">
                     @foreach ($coMentions as $type => $rows)
-                        <div>
+                        <div class="min-w-0">
                             <h3 class="mb-2 text-[0.7rem] uppercase tracking-[0.08em] text-ink-3">
                                 {{ $type === 'person' ? __('site.ui.people') : ($type === 'company' ? __('site.ui.companies') : __('site.ui.topics')) }}
                             </h3>
                             <ul class="space-y-1.5">
                                 @foreach ($rows as $row)
                                     <li class="flex items-baseline justify-between gap-3">
-                                        <a class="truncate text-sm text-g-900 underline-offset-2 hover:underline"
+                                        <a class="min-w-0 truncate text-sm text-g-900 underline-offset-2 hover:underline"
                                            href="{{ $type === 'person'
                                                ? route('web.person.show', [$locale, $row['slug']])
                                                : ($type === 'company'

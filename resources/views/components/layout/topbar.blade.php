@@ -36,7 +36,7 @@
                 </a>
 
                 <a href="{{ route('web.newsletter', $locale) }}"
-                   class="inline-flex min-h-6 items-center rounded-full bg-g-900 px-4 text-xs font-medium text-cream transition hover:bg-g-700">
+                   class="inline-flex min-h-6 shrink-0 items-center whitespace-nowrap rounded-full bg-g-900 px-4 text-xs font-medium text-cream transition hover:bg-g-700">
                     {{ __('site.nav.newsletter') }}
                 </a>
             </nav>
