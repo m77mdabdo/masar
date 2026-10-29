@@ -48,7 +48,7 @@
             'url' => $urls->for($article),
             'image' => $image,
             'alt' => $i === 0 && $backdrop
-                ? (string) $backdrop->getCustomProperty('alt')
+                ? \App\Support\MediaText::alt($backdrop)
                 : ($article->hero_alt ?? ''),
             // Every image may carry its own focal point (the media record's
             // `focal`); without one the stage's default applies.
@@ -200,7 +200,7 @@
                         @endif
 
                         <p class="mt-5 flex flex-wrap items-center gap-x-3 text-xs text-cream/65">
-                            @if ($slide['article']->author)<span>{{ __('site.article.by', ['name' => $slide['article']->author->name]) }}</span>@endif
+                            @if ($slide['article']->author)<span>{{ __('site.article.by', ['name' => $slide['article']->author->display_name]) }}</span>@endif
                             @if ($slide['article']->published_at)
                                 <span aria-hidden="true">·</span>
                                 <time datetime="{{ $slide['article']->published_at->toIso8601String() }}" class="ltr-isolate nums-tabular">

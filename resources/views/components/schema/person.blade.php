@@ -5,7 +5,7 @@
 
     $person = array_filter([
         '@type' => 'Person',
-        'name' => $author->name,
+        'name' => $author->display_name,
         'url' => $canonical,
         'jobTitle' => __('entity.journalist'),
         'worksFor' => [

@@ -12,7 +12,7 @@
         <time datetime="{{ $asOf->toIso8601String() }}" class="ltr-isolate nums-tabular">{{ $asOf->format('Y-m-d H:i') }}</time>
         @if ($figures->source())
             <span aria-hidden="true">·</span>
-            <span><x-ui.bidi :text="$figures->source()" /></span>
+            <span><x-ui.bidi :text="\App\Support\MarketText::for($figures->source())" /></span>
         @endif
     </p>
 @endif

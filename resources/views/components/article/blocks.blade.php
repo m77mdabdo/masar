@@ -25,12 +25,12 @@
                 <x-ui.responsive-image
                     :media="$blockMedia"
                     :src="$data['path'] ?? null"
-                    :alt="$blockMedia?->getCustomProperty('alt') ?? ($data['alt'] ?? '')"
+                    :alt="\App\Support\MediaText::alt($blockMedia, $data['alt'] ?? '')"
                     ratio="inline"
                     sizes="(max-width: 768px) 100vw, 720px"
                     class="rounded-xl"
                 />
-                @php $blockCredit = $blockMedia?->getCustomProperty('credit') ?? ($data['credit'] ?? null); @endphp
+                @php $blockCredit = \App\Support\MediaText::credit($blockMedia, $data['credit'] ?? null); @endphp
                 @if (filled($data['caption'] ?? null) || filled($blockCredit))
                     <figcaption class="mt-2 text-sm text-ink-3">
                         {{ $data['caption'] ?? '' }}

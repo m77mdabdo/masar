@@ -16,7 +16,7 @@
         'articleSection' => $article->category?->name,
         'author' => $article->author ? [
             '@type' => 'Person',
-            'name' => $article->author->name,
+            'name' => $article->author->display_name,
             'url' => $urls->for($article->author, $article->locale, true),
         ] : null,
         'publisher' => [

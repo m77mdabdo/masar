@@ -84,7 +84,7 @@
              and for the hero — the one photograph every story has — it was
              not. The media record's credit wins over the article's copy.
              contrast-safe: cream/75 on the g-950 hero ground. --}}
-        @php $heroCredit = $article->heroMedia?->getCustomProperty('credit') ?: $article->hero_credit; @endphp
+        @php $heroCredit = \App\Support\MediaText::credit($article->heroMedia) ?: $article->hero_credit; @endphp
         @if ($article->heroMedia && filled($heroCredit))
             <p class="pb-4 text-end text-[0.6875rem] text-cream/75">
                 {{ __('article.photo_credit') }} <bdi>{{ $heroCredit }}</bdi>

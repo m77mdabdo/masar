@@ -21,7 +21,7 @@
                 'flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-display text-sm',
                 'bg-cream/15 text-cream' => $dark,
                 'bg-g-900 text-cream' => ! $dark,
-            ]) aria-hidden="true">{{ mb_substr($article->author?->name ?? __('site.ui.unknown_initial'), 0, 1) }}</span>
+            ]) aria-hidden="true">{{ mb_substr($article->author?->display_name ?? __('site.ui.unknown_initial'), 0, 1) }}</span>
         @endif
 
         <div class="min-w-0 text-sm">
@@ -34,7 +34,7 @@
                        'block truncate py-0.5 font-medium transition',
                        'text-cream hover:text-mint' => $dark,
                        'text-g-900 hover:text-g-700' => ! $dark,
-                   ])>{{ $article->author->name }}</a>
+                   ])>{{ $article->author->display_name }}</a>
             @endif
 
             <div @class([

@@ -33,7 +33,7 @@ class PublishedArticlesQuery
                 // category *name*, and loading the parent alone is an N+1 in disguise.
                 'category:id,slug,color',
                 'category.translations',
-                'author:id,name',
+                'author:id,name,name_translations',
                 'heroMedia',
             ]);
     }

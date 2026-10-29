@@ -46,7 +46,7 @@
                 <div class="text-xs leading-relaxed">
                     <p class="font-display text-sm font-semibold text-g-950">{{ __('article.fact_checked') }}</p>
                     @if ($article->factChecker)
-                        <p class="text-ink-3">{{ $article->factChecker->name }}</p>
+                        <p class="text-ink-3">{{ $article->factChecker->display_name }}</p>
                     @endif
                     <time datetime="{{ $article->fact_checked_at->toIso8601String() }}" class="ltr-isolate nums-tabular text-ink-3">
                         {{ $article->fact_checked_at->format('Y-m-d') }}

@@ -53,7 +53,7 @@ class EntityContentQuery
                 fn (Builder $q) => $q->published(),
             )
             ->with(['mentionable' => fn (MorphTo $morphTo) => $morphTo->morphWith([
-                Article::class => ['category:id,slug,color', 'category.translations', 'author:id,name', 'heroMedia'],
+                Article::class => ['category:id,slug,color', 'category.translations', 'author:id,name,name_translations', 'heroMedia'],
                 Opportunity::class => ['industry.translations', 'country.translations'],
             ])])
             ->orderByDesc('created_at')
@@ -82,7 +82,7 @@ class EntityContentQuery
                 fn (Builder $q) => $q->published(),
             )
             ->with(['mentionable' => fn (MorphTo $morphTo) => $morphTo->morphWith([
-                Article::class => ['category:id,slug,color', 'category.translations', 'author:id,name'],
+                Article::class => ['category:id,slug,color', 'category.translations', 'author:id,name,name_translations'],
                 Opportunity::class => ['industry.translations', 'country.translations'],
             ])]);
     }

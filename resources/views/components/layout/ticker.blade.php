@@ -52,9 +52,9 @@
 
                         <span class="min-w-0">
                             <span class="block truncate font-display text-[0.5625rem] font-bold uppercase leading-tight tracking-[0.12em] text-mint-2">
-                                <x-ui.bidi :text="$cell['label']" />
+                                <x-ui.bidi :text="\App\Support\MarketText::for($cell['label'])" />
                             </span>
-                            <bdi class="nums-tabular block font-display text-[0.9375rem] font-semibold leading-tight tracking-[0.01em] text-white">{{ $cell['value'] }}</bdi>
+                            <bdi class="nums-tabular block font-display text-[0.9375rem] font-semibold leading-tight tracking-[0.01em] text-white">{{ \App\Support\MarketText::for($cell['value']) }}</bdi>
                         </span>
 
                         @if ($cell['change'] !== null)

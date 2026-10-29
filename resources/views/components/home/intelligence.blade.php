@@ -61,7 +61,7 @@
                                                     'bg-g-600' => ($row['change'] ?? 0) >= 0,
                                                     'bg-gold-ink' => ($row['change'] ?? 0) < 0,
                                                 ]) aria-hidden="true"></span>
-                                                <span class="truncate"><x-ui.bidi :text="$row['label']" /></span>
+                                                <span class="truncate"><x-ui.bidi :text="\App\Support\MarketText::for($row['label'])" /></span>
                                             </span>
                                             <x-data.figure :value="$row['value']" :change="$row['change']" size="sm" />
                                         </li>
@@ -149,7 +149,7 @@
                         <div class="grid gap-px overflow-hidden rounded-lg bg-line sm:grid-cols-2">
                             @foreach ($keyNumbers as $row)
                                 <div class="bg-white p-4">
-                                    <span class="block text-[0.75rem] text-ink-3"><x-ui.bidi :text="$row['label']" /></span>
+                                    <span class="block text-[0.75rem] text-ink-3"><x-ui.bidi :text="\App\Support\MarketText::for($row['label'])" /></span>
                                     <x-data.figure :value="$row['value']" :change="$row['change']" />
                                 </div>
                             @endforeach

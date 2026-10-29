@@ -6,7 +6,7 @@
     $sizes = ['sm' => 'text-sm', 'md' => 'text-lg', 'lg' => 'text-2xl'][$size];
 @endphp
 <span {{ $attributes->class(['inline-flex flex-wrap items-baseline gap-x-2']) }}>
-    <bdi class="nums-tabular font-display font-semibold {{ $sizes }}">{{ $value }}</bdi>
+    <bdi class="nums-tabular font-display font-semibold {{ $sizes }}">{{ \App\Support\MarketText::for($value) }}</bdi>
 
     @if ($change !== null)
         {{-- A direction glyph as well as a colour: colour alone is not a way to

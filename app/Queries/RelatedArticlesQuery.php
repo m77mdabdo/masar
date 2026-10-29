@@ -20,7 +20,7 @@ class RelatedArticlesQuery
     {
         $curated = $article->related()
             ->published()
-            ->with(['category.translations', 'author:id,name', 'heroMedia'])
+            ->with(['category.translations', 'author:id,name,name_translations', 'heroMedia'])
             ->take($limit)
             ->get();
 

@@ -41,7 +41,7 @@
 
         <div class="mt-auto flex items-center gap-2 border-t border-line pt-3 text-[0.7rem] text-ink-3">
             @unless ($compact)
-                @if ($article->author)<span class="truncate font-medium text-ink">{{ $article->author->name }}</span>@endif
+                @if ($article->author)<span class="truncate font-medium text-ink">{{ $article->author->display_name }}</span>@endif
             @endunless
             @if ($article->published_at)
                 <time datetime="{{ $article->published_at->toIso8601String() }}" class="ltr-isolate nums-tabular">

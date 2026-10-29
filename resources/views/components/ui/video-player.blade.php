@@ -34,8 +34,8 @@
     // that simply has no such method.
     $isMedia = fn ($m): bool => $m instanceof \Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-    $clipAlt = $isMedia($media) ? $media->getCustomProperty('alt') : null;
-    $posterAlt = $isMedia($poster) ? $poster->getCustomProperty('alt') : null;
+    $clipAlt = $isMedia($media) ? \App\Support\MediaText::alt($media) : null;
+    $posterAlt = $isMedia($poster) ? \App\Support\MediaText::alt($poster) : null;
 
     $describe = filled($description) ? $description : (filled($clipAlt) ? $clipAlt : $posterAlt);
 

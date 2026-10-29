@@ -10,6 +10,7 @@ use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthenticationRecovery;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -30,6 +31,7 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
         'photo_path',
         'password',
         'locale',
+        'name_translations',
     ];
 
     protected $hidden = [
@@ -42,6 +44,7 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
     protected function casts(): array
     {
         return [
+            'name_translations' => 'array',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
@@ -149,5 +152,22 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
     public function canPublish(): bool
     {
         return $this->hasPermissionTo('article.publish');
+    }
+
+    /**
+     * The byline in the page's edition (users.name_translations), else `name`.
+     *
+     * A column-limited load (`author:id,name`) leaves the translations out,
+     * and the fallback then prints the Arabic name on every card of every
+     * other edition with no error. That shipped on all listing pages, so a
+     * missing column is refused instead of read as "no translation".
+     */
+    public function getDisplayNameAttribute(): string
+    {
+        if ($this->exists && ! array_key_exists('name_translations', $this->getAttributes())) {
+            throw new MissingAttributeException($this, 'name_translations');
+        }
+
+        return (string) (($this->name_translations ?? [])[app()->getLocale()] ?? $this->name);
     }
 }
