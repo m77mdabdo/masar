@@ -23,6 +23,19 @@ it('renders the article list', function (): void {
     livewire(ListArticles::class)->assertOk();
 });
 
+it('shows how many of the six editions carry a story, counting published rows only', function (): void {
+    $source = Article::factory()->published()->create(['locale' => 'ar']);
+    foreach (['en' => true, 'fr' => true, 'hi' => false] as $locale => $published) {
+        ($published ? Article::factory()->published() : Article::factory()->draft())->create([
+            'locale' => $locale, 'translation_group_id' => $source->translation_group_id,
+            'source_article_id' => $source->id, 'category_id' => $source->category_id, 'slug' => $source->slug,
+        ]);
+    }
+
+    // The Arabic original and two published translations; the Hindi draft is not an edition yet.
+    livewire(ListArticles::class)->assertTableColumnStateSet('editions_published', '3/6', $source);
+});
+
 it('renders the create form', function (): void {
     livewire(CreateArticle::class)->assertOk();
 });

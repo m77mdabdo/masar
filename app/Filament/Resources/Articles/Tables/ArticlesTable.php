@@ -32,7 +32,9 @@ class ArticlesTable
              * category.translations is needed for the name; author is the byline.
              * Blocks, sources and revisions are never loaded here.
              */
-            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with([
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->addSelect(['editions_published' => \App\Models\Article::query()->from('articles as editions')
+                ->selectRaw('count(*)')->whereColumn('editions.translation_group_id', 'articles.translation_group_id')
+                ->where('editions.status', \App\Enums\ArticleStatus::Published->value)->whereNull('editions.deleted_at')])->with([
                 'category:id,slug,color',
                 'category.translations',
                 'author:id,name',
@@ -87,6 +89,15 @@ class ArticlesTable
                 TextColumn::make('locale')
                     ->label(__('admin.translation.language'))
                     ->formatStateUsing(fn (?string $state): string => \App\Support\Locales::name((string) $state))
+                    ->toggleable(),
+
+                // How many of the six editions carry this story, published. A
+                // subquery in the list query, so it costs nothing per row.
+                TextColumn::make('editions_published')
+                    ->label('النسخ المنشورة')
+                    ->state(fn (\App\Models\Article $record): string => ((int) $record->editions_published).'/'.count(\App\Support\Locales::codes()))
+                    ->badge()
+                    ->color(fn (\App\Models\Article $record): string => (int) $record->editions_published >= count(\App\Support\Locales::codes()) ? 'success' : 'warning')
                     ->toggleable(),
 
                 // The stored status only. "Outdated" needs the source's blocks,
