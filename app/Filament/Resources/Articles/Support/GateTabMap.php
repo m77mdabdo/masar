@@ -45,7 +45,7 @@ class GateTabMap
                 'tab' => $target['tab'] ?? '',
                 'tab_label' => in_array($failure['rule'], self::NO_TAB, true)
                     ? ''
-                    : ($target['label'] ?? ''),
+                    : (isset($target['label']) ? __($target['label']) : ''),
             ];
         }, $failures);
     }

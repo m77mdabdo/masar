@@ -35,30 +35,33 @@ class CompanyResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice2;
 
-    protected static string|UnitEnum|null $navigationGroup = 'الكيانات';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('الكيانات');
+    }
 
     protected static ?int $navigationSort = 1;
 
     public static function getModelLabel(): string
     {
-        return 'شركة';
+        return __('شركة');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'الشركات';
+        return __('الشركات');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'الشركات';
+        return __('الشركات');
     }
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
             TextInput::make('slug')
-                ->label('المسار')
+                ->label(__('المسار'))
                 ->required()
                 ->unique(ignoreRecord: true)
                 ->rules(['regex:/^[a-z0-9-]+$/'])
@@ -66,38 +69,38 @@ class CompanyResource extends Resource
 
             // A startup is a company with type = startup, never its own table.
             Select::make('type')
-                ->label('النوع')
+                ->label(__('النوع'))
                 ->options(CompanyType::options())
                 ->default(CompanyType::Company->value)
                 ->required(),
 
             Select::make('industry_id')
-                ->label('القطاع')
+                ->label(__('القطاع'))
                 ->relationship('industry', 'slug')
-                ->getOptionLabelFromRecordUsing(fn ($r): string => $r->name ?? $r->slug)
+                ->getOptionLabelFromRecordUsing(fn ($record): string => $record->name ?? $record->slug)
                 ->searchable()
                 ->preload(),
 
             Select::make('country_id')
-                ->label('الدولة')
+                ->label(__('الدولة'))
                 ->relationship('country', 'slug')
-                ->getOptionLabelFromRecordUsing(fn ($r): string => $r->name ?? $r->slug)
+                ->getOptionLabelFromRecordUsing(fn ($record): string => $record->name ?? $record->slug)
                 ->searchable()
                 ->preload(),
 
-            TextInput::make('founded_year')->label('سنة التأسيس')->numeric()->minValue(1800)->maxValue((int) date('Y')),
+            TextInput::make('founded_year')->label(__('سنة التأسيس'))->numeric()->minValue(1800)->maxValue((int) date('Y')),
 
             TextInput::make('website')
-                ->label('الموقع')
+                ->label(__('الموقع'))
                 ->url()
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
 
             TextInput::make('ticker')
-                ->label('الرمز في السوق')
+                ->label(__('الرمز في السوق'))
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
 
             FileUpload::make('logo_path')
-                ->label('الشعار')
+                ->label(__('الشعار'))
                 ->image()
                 ->disk('public')
                 ->directory('companies')
@@ -105,13 +108,13 @@ class CompanyResource extends Resource
                 ->acceptedFileTypes(config('masar.media.accepted')),
 
             Toggle::make('is_verified')
-                ->label('موثّقة')
-                ->helperText('فعّلها بعد التحقق من البيانات من مصدر رسمي.'),
+                ->label(__('موثّقة'))
+                ->helperText(__('فعّلها بعد التحقق من البيانات من مصدر رسمي.')),
 
             TranslationsField::make([
-                TextInput::make('name')->label('الاسم')->required(),
-                TextInput::make('short_description')->label('وصف مختصر'),
-                Textarea::make('description')->label('الوصف')->rows(3),
+                TextInput::make('name')->label(__('الاسم'))->required(),
+                TextInput::make('short_description')->label(__('وصف مختصر')),
+                Textarea::make('description')->label(__('الوصف'))->rows(3),
             ]),
         ])->columns(2);
     }
@@ -125,35 +128,35 @@ class CompanyResource extends Resource
             ->defaultSort('mentions_count', 'desc')
             ->columns([
                 TextColumn::make('name')
-                    ->label('الاسم')
-                    ->getStateUsing(fn (Company $r): ?string => $r->name)
+                    ->label(__('الاسم'))
+                    ->getStateUsing(fn (Company $record): ?string => $record->name)
                     ->searchable(query: fn (Builder $query, string $search): Builder => $query->whereHas(
                         'translations',
                         fn (Builder $t) => $t->where('name', 'like', "%{$search}%"),
                     )),
                 TextColumn::make('type')
-                    ->label('النوع')
+                    ->label(__('النوع'))
                     ->badge()
-                    ->formatStateUsing(fn (CompanyType $s): string => $s->label()),
+                    ->formatStateUsing(fn (CompanyType $state): string => $state->label()),
                 TextColumn::make('industry.name')
-                    ->label('القطاع')
-                    ->getStateUsing(fn (Company $r): ?string => $r->industry?->name)
+                    ->label(__('القطاع'))
+                    ->getStateUsing(fn (Company $record): ?string => $record->industry?->name)
                     ->placeholder('—'),
                 TextColumn::make('ticker')
-                    ->label('الرمز')
+                    ->label(__('الرمز'))
                     ->badge()
                     ->placeholder('—')
                     ->extraAttributes(['class' => 'masar-ltr']),
-                TextColumn::make('mentions_count')->label('الإشارات')->numeric()->sortable(),
-                IconColumn::make('is_verified')->label('موثّقة')->boolean(),
+                TextColumn::make('mentions_count')->label(__('الإشارات'))->numeric()->sortable(),
+                IconColumn::make('is_verified')->label(__('موثّقة'))->boolean(),
             ])
             ->filters([
-                SelectFilter::make('type')->label('النوع')->options(CompanyType::options())->multiple(),
-                SelectFilter::make('industry')->label('القطاع')->relationship('industry', 'slug')->searchable()->preload(),
-                SelectFilter::make('country')->label('الدولة')->relationship('country', 'slug')->searchable()->preload(),
-                TernaryFilter::make('is_verified')->label('موثّقة'),
+                SelectFilter::make('type')->label(__('النوع'))->options(CompanyType::options())->multiple(),
+                SelectFilter::make('industry')->label(__('القطاع'))->relationship('industry', 'slug')->searchable()->preload(),
+                SelectFilter::make('country')->label(__('الدولة'))->relationship('country', 'slug')->searchable()->preload(),
+                TernaryFilter::make('is_verified')->label(__('موثّقة')),
             ])
-            ->recordActions([EditAction::make()->label('تحرير')]);
+            ->recordActions([EditAction::make()->label(__('تحرير'))]);
     }
 
     public static function getRelations(): array

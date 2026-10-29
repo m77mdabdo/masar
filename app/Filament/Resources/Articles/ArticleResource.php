@@ -24,7 +24,10 @@ class ArticleResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedNewspaper;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'المحتوى';
+    public static function getNavigationGroup(): string|\UnitEnum|null
+    {
+        return __('المحتوى');
+    }
 
     protected static ?int $navigationSort = 1;
 
@@ -32,17 +35,17 @@ class ArticleResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return 'مادة';
+        return __('مادة');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'المواد';
+        return __('المواد');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'المواد';
+        return __('المواد');
     }
 
     /**

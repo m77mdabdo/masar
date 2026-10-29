@@ -26,41 +26,44 @@ class MarketResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBar;
 
-    protected static string|UnitEnum|null $navigationGroup = 'الكيانات';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('الكيانات');
+    }
 
     protected static ?int $navigationSort = 6;
 
     public static function getModelLabel(): string
     {
-        return 'سوق';
+        return __('سوق');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'الأسواق';
+        return __('الأسواق');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'الأسواق';
+        return __('الأسواق');
     }
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
             TextInput::make('slug')
-                ->label('المسار')
+                ->label(__('المسار'))
                 ->required()
                 ->unique(ignoreRecord: true)
                 ->rules(['regex:/^[a-z0-9-]+$/'])
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
 
             TextInput::make('code')
-                ->label('الرمز')
+                ->label(__('الرمز'))
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
 
             TranslationsField::make([
-                TextInput::make('name')->label('الاسم')->required(),
+                TextInput::make('name')->label(__('الاسم'))->required(),
             ], columns: 2),
         ])->columns(2);
     }
@@ -72,16 +75,16 @@ class MarketResource extends Resource
             ->defaultSort('slug')
             ->columns([
                 TextColumn::make('name')
-                    ->label('الاسم')
-                    ->getStateUsing(fn (Market $r): ?string => $r->name)
+                    ->label(__('الاسم'))
+                    ->getStateUsing(fn (Market $record): ?string => $record->name)
                     ->searchable(query: fn (Builder $query, string $search): Builder => $query->whereHas(
                         'translations',
                         fn (Builder $t) => $t->where('name', 'like', "%{$search}%"),
                     )),
-                TextColumn::make('slug')->label('المسار')->badge()->color('gray')->searchable(),
-                TextColumn::make('code')->label('الرمز')->badge()->placeholder('—'),
+                TextColumn::make('slug')->label(__('المسار'))->badge()->color('gray')->searchable(),
+                TextColumn::make('code')->label(__('الرمز'))->badge()->placeholder('—'),
             ])
-            ->recordActions([EditAction::make()->label('تحرير')]);
+            ->recordActions([EditAction::make()->label(__('تحرير'))]);
     }
 
     public static function getPages(): array

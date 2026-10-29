@@ -8,18 +8,18 @@
         slug: $wire.$entangle('data.slug'),
         locale: $wire.$entangle('data.locale'),
         get shownTitle() {
-            const t = (this.title || this.fallbackTitle || 'عنوان المادة').trim()
+            const t = (this.title || this.fallbackTitle || @js(__('عنوان المادة'))).trim()
             return t.length > 60 ? t.slice(0, 59) + '…' : t
         },
         get shownDescription() {
-            const d = (this.description || 'أضف وصف ميتا ليظهر هنا كما سيراه القارئ في نتائج البحث.').trim()
+            const d = (this.description || @js(__('أضف وصف ميتا ليظهر هنا كما سيراه القارئ في نتائج البحث.'))).trim()
             return d.length > 160 ? d.slice(0, 159) + '…' : d
         },
     }"
     class="fi-section rounded-xl border border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-gray-900"
 >
     <p class="mb-3 text-xs font-medium text-gray-500 dark:text-gray-400">
-        معاينة نتيجة البحث
+        {{ __('معاينة نتيجة البحث') }}
     </p>
 
     <div class="space-y-1">

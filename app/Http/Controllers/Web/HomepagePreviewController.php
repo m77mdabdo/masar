@@ -17,7 +17,8 @@ class HomepagePreviewController
 
         return view('filament.pages.homepage-preview', [
             'layout' => $layout,
-            'sections' => $compose($layout, config('masar.default_locale')),
+            // The edition the editor works in: an English panel previews the English front page.
+            'sections' => $compose($layout, \App\Support\Locales::exists(app()->getLocale()) ? app()->getLocale() : \App\Support\Locales::default()),
         ]);
     }
 }

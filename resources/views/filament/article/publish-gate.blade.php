@@ -18,18 +18,18 @@
     <div class="mb-3 flex items-center gap-2">
         @if ($passes)
             <x-filament::icon icon="heroicon-o-check-circle" class="h-5 w-5 text-[#1E5E3F]" />
-            <span class="text-sm font-semibold text-[#1E5E3F]">جاهزة للنشر</span>
+            <span class="text-sm font-semibold text-[#1E5E3F]">{{ __('جاهزة للنشر') }}</span>
         @else
             <x-filament::icon icon="heroicon-o-exclamation-triangle" class="h-5 w-5 text-[#B4522E]" />
             <span class="text-sm font-semibold text-[#B4522E]">
-                {{ count($failures) }} من متطلبات النشر غير مكتملة
+                {{ __(':count من متطلبات النشر غير مكتملة', ['count' => count($failures)]) }}
             </span>
         @endif
     </div>
 
     @if ($passes)
         <p class="text-sm text-gray-600 dark:text-gray-400">
-            استوفت المادة كل شروط بوابة النشر.
+            {{ __('استوفت المادة كل شروط بوابة النشر.') }}
         </p>
     @else
         <ul class="space-y-2">

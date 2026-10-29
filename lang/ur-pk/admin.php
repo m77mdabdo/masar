@@ -3,11 +3,48 @@
 declare(strict_types=1);
 
 return [
+    'filepond' => [
+        'labelButtonAbortItemLoad' => 'روکیں',
+        'labelButtonAbortItemProcessing' => 'منسوخ کریں',
+        'labelButtonProcessItem' => 'اپ لوڈ کریں',
+        'labelButtonRemoveItem' => 'ہٹائیں',
+        'labelButtonRetryItemLoad' => 'دوبارہ کوشش کریں',
+        'labelButtonRetryItemProcessing' => 'دوبارہ کوشش کریں',
+        'labelButtonUndoItemProcessing' => 'واپس لیں',
+        'labelFileLoadError' => 'لوڈ کرتے وقت خرابی',
+        'labelFileLoading' => 'لوڈ ہو رہا ہے',
+        'labelFileProcessing' => 'اپ لوڈ ہو رہا ہے',
+        'labelFileProcessingAborted' => 'اپ لوڈ منسوخ کر دیا گیا',
+        'labelFileProcessingComplete' => 'اپ لوڈ مکمل ہو گیا',
+        'labelFileProcessingError' => 'اپ لوڈ کرتے وقت خرابی',
+        'labelFileProcessingRevertError' => 'واپس لیتے وقت خرابی',
+        'labelFileRemoveError' => 'ہٹاتے وقت خرابی',
+        'labelFileSizeNotAvailable' => 'سائز دستیاب نہیں',
+        'labelFileTypeNotAllowed' => 'غلط قسم کی فائل',
+        'labelFileWaitingForSize' => 'سائز کا انتظار ہے',
+        'labelIdle' => 'اپنی فائلیں گھسیٹ کر یہاں چھوڑیں یا <span class="filepond--label-action">براؤز کریں</span>',
+        'labelInvalidField' => 'فیلڈ میں غلط فائلیں ہیں',
+        'labelMaxFileSize' => 'زیادہ سے زیادہ فائل سائز {filesize} ہے',
+        'labelMaxFileSizeExceeded' => 'فائل بہت بڑی ہے',
+        'labelMaxTotalFileSize' => 'زیادہ سے زیادہ کل فائل سائز {filesize} ہے',
+        'labelMaxTotalFileSizeExceeded' => 'زیادہ سے زیادہ کل سائز سے تجاوز ہو گیا',
+        'labelTapToCancel' => 'منسوخ کرنے کے لیے ٹیپ کریں',
+        'labelTapToRetry' => 'دوبارہ کوشش کے لیے ٹیپ کریں',
+        'labelTapToUndo' => 'واپس لینے کے لیے ٹیپ کریں',
+    ],
     'gate' => [
         'translation_unreviewed' => 'اس ترجمے کا جائزہ نہیں لیا گیا۔ جب تک مترجم کے علاوہ کوئی اور اس کی منظوری نہ دے، ترجمہ شائع نہیں ہوتا۔',
     ],
     'language' => [
         'menu' => 'پینل کی زبان',
+        'names' => [
+            'ar' => 'عربی',
+            'en' => 'انگریزی',
+            'fr' => 'فرانسیسی',
+            'hi' => 'ہندی',
+            'ur-pk' => 'اردو',
+            'zh-hans' => 'آسان چینی',
+        ],
     ],
     'translation' => [
         'action_retry' => 'ترجمہ دوبارہ چلائیں',

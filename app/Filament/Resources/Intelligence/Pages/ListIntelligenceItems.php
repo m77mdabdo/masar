@@ -13,6 +13,6 @@ class ListIntelligenceItems extends ListRecords
 
     public function getTitle(): string
     {
-        return 'صندوق الرصد';
+        return __('صندوق الرصد');
     }
 }

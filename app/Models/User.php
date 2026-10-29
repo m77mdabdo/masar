@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Concerns\IsDemoContent;
+use App\Support\Locales;
 use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthentication;
 use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthenticationRecovery;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -18,7 +20,7 @@ use Illuminate\Notifications\Notifiable;
 use SensitiveParameter;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery
+class User extends Authenticatable implements FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery, HasLocalePreference
 {
     use HasFactory;
     use HasRoles;
@@ -152,6 +154,17 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
     public function canPublish(): bool
     {
         return $this->hasPermissionTo('article.publish');
+    }
+
+    /**
+     * Notifications and mail reach each person in their own panel language:
+     * Laravel renders a notification inside this locale for this recipient,
+     * so a source alert sent by a worker is not in whatever locale the queue
+     * happened to boot with.
+     */
+    public function preferredLocale(): string
+    {
+        return Locales::exists((string) $this->locale) ? (string) $this->locale : Locales::default();
     }
 
     /**

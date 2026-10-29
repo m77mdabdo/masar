@@ -42,7 +42,10 @@ class ManageSettings extends Page implements HasSchemas
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
 
-    protected static string|UnitEnum|null $navigationGroup = 'النظام';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('النظام');
+    }
 
     protected static ?int $navigationSort = 3;
 
@@ -57,12 +60,12 @@ class ManageSettings extends Page implements HasSchemas
 
     public static function getNavigationLabel(): string
     {
-        return 'الإعدادات';
+        return __('الإعدادات');
     }
 
     public function getTitle(): string
     {
-        return 'إعدادات الموقع';
+        return __('إعدادات الموقع');
     }
 
     public static function canAccess(): bool
@@ -108,51 +111,51 @@ class ManageSettings extends Page implements HasSchemas
 
     private function identityTab(): Tab
     {
-        return Tab::make('الهوية')->id('identity')->schema([
-            TextInput::make('identity__site_name')->label('اسم الموقع')->required(),
+        return Tab::make(__('الهوية'))->id('identity')->schema([
+            TextInput::make('identity__site_name')->label(__('اسم الموقع'))->required(),
             // One input per edition: each language is its own value, and
             // saving writes each one into its own slot (Settings::setEditions).
-            ...self::perEdition('identity__tagline', 'الشعار النصي', 'يظهر بجوار الشعار في الترويسة. ثلاثة أسطر قصيرة.'),
-            ...self::perEdition('identity__descriptor', 'وصف التغطية', 'يظهر في الشريط العلوي.'),
-            ...self::perEdition('seo__description', 'الوصف الافتراضي لمحركات البحث', 'يُستخدم حين لا تحدد الصفحة وصفها.'),
-            FileUpload::make('identity__logo_path')->label('الشعار')->image()->disk('public')->directory('site')->maxSize((int) config('masar.media.max_upload_kb'))->acceptedFileTypes(config('masar.media.accepted'))->rules([new \App\Rules\SafeImage]),
-            FileUpload::make('identity__favicon_path')->label('أيقونة الموقع')->image()->disk('public')->directory('site')->maxSize((int) config('masar.media.max_upload_kb'))->acceptedFileTypes(config('masar.media.accepted'))->rules([new \App\Rules\SafeImage]),
-            FileUpload::make('identity__og_image_path')->label('صورة المشاركة الافتراضية')->image()->disk('public')->directory('site')->maxSize((int) config('masar.media.max_upload_kb'))->acceptedFileTypes(config('masar.media.accepted'))->rules([new \App\Rules\SafeImage])
-                ->helperText('تُستخدم عندما لا تحدد المادة صورتها الخاصة.'),
+            ...self::perEdition('identity__tagline', __('الشعار النصي'), __('يظهر بجوار الشعار في الترويسة. ثلاثة أسطر قصيرة.')),
+            ...self::perEdition('identity__descriptor', __('وصف التغطية'), __('يظهر في الشريط العلوي.')),
+            ...self::perEdition('seo__description', __('الوصف الافتراضي لمحركات البحث'), __('يُستخدم حين لا تحدد الصفحة وصفها.')),
+            FileUpload::make('identity__logo_path')->label(__('الشعار'))->image()->disk('public')->directory('site')->maxSize((int) config('masar.media.max_upload_kb'))->acceptedFileTypes(config('masar.media.accepted'))->rules([new \App\Rules\SafeImage]),
+            FileUpload::make('identity__favicon_path')->label(__('أيقونة الموقع'))->image()->disk('public')->directory('site')->maxSize((int) config('masar.media.max_upload_kb'))->acceptedFileTypes(config('masar.media.accepted'))->rules([new \App\Rules\SafeImage]),
+            FileUpload::make('identity__og_image_path')->label(__('صورة المشاركة الافتراضية'))->image()->disk('public')->directory('site')->maxSize((int) config('masar.media.max_upload_kb'))->acceptedFileTypes(config('masar.media.accepted'))->rules([new \App\Rules\SafeImage])
+                ->helperText(__('تُستخدم عندما لا تحدد المادة صورتها الخاصة.')),
         ])->columns(2);
     }
 
     private function contactTab(): Tab
     {
-        return Tab::make('التواصل')->id('contact')->schema([
-            TextInput::make('contact__editorial_email')->label('بريد التحرير')->email()
+        return Tab::make(__('التواصل'))->id('contact')->schema([
+            TextInput::make('contact__editorial_email')->label(__('بريد التحرير'))->email()
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
-            TextInput::make('contact__advertising_email')->label('بريد الإعلانات')->email()
+            TextInput::make('contact__advertising_email')->label(__('بريد الإعلانات'))->email()
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
-            TextInput::make('contact__careers_email')->label('بريد التوظيف')->email()
+            TextInput::make('contact__careers_email')->label(__('بريد التوظيف'))->email()
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
-            TextInput::make('contact__general_email')->label('بريد عام')->email()
+            TextInput::make('contact__general_email')->label(__('بريد عام'))->email()
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
             KeyValue::make('contact__social')
-                ->label('حسابات التواصل')
-                ->keyLabel('المنصة')
-                ->valueLabel('الرابط')
+                ->label(__('حسابات التواصل'))
+                ->keyLabel(__('المنصة'))
+                ->valueLabel(__('الرابط'))
                 ->columnSpanFull(),
         ])->columns(2);
     }
 
     private function editorialTab(): Tab
     {
-        return Tab::make('التحرير')->id('editorial')->schema([
+        return Tab::make(__('التحرير'))->id('editorial')->schema([
             Select::make('editorial__default_locale')
-                ->label('اللغة الافتراضية')
+                ->label(__('اللغة الافتراضية'))
                 ->options(fn (): array => collect(config('masar.locales'))->map(fn (array $l): string => $l['name'])->all())
                 ->required(),
-            TextInput::make('editorial__articles_per_page')->label('عدد المواد في الصفحة')
+            TextInput::make('editorial__articles_per_page')->label(__('عدد المواد في الصفحة'))
                 ->numeric()->minValue(4)->maxValue(60)->required(),
-            TextInput::make('editorial__reading_speed_wpm')->label('سرعة القراءة (كلمة/دقيقة)')
+            TextInput::make('editorial__reading_speed_wpm')->label(__('سرعة القراءة (كلمة/دقيقة)'))
                 ->numeric()->minValue(80)->maxValue(400)->required()
-                ->helperText('العربية أبطأ من اللاتينية؛ الافتراضي 180.'),
+                ->helperText(__('العربية أبطأ من اللاتينية؛ الافتراضي 180.')),
         ])->columns(2);
     }
 
@@ -162,20 +165,18 @@ class ManageSettings extends Page implements HasSchemas
             // The one switch. Placed first and above robots.txt on purpose:
             // while it is on, the field below it does nothing.
             Toggle::make('site__demo_mode')
-                ->label('وضع النسخة التجريبية')
-                ->helperText('عند تفعيله: لا يُفهرس الموقع إطلاقًا (noindex, nofollow)، '
-                    .'ويمنع robots.txt كل الزواحف، ولا تُنشر خرائط الموقع، ويظهر شريط «نسخة تجريبية» للقارئ. '
-                    .'أوقفه فقط بعد نشر محتوى تحريري حقيقي — فهرسة محتوى تجريبي تحت اسم مسار لا يمكن التراجع عنها.')
+                ->label(__('وضع النسخة التجريبية'))
+                ->helperText(__('عند تفعيله: لا يُفهرس الموقع إطلاقًا (noindex, nofollow)، ويمنع robots.txt كل الزواحف، ولا تُنشر خرائط الموقع، ويظهر شريط «نسخة تجريبية» للقارئ. أوقفه فقط بعد نشر محتوى تحريري حقيقي — فهرسة محتوى تجريبي تحت اسم مسار لا يمكن التراجع عنها.'))
                 ->columnSpanFull(),
 
-            TextInput::make('seo__title_template')->label('قالب العنوان')
-                ->helperText('استخدم :title موضعًا لعنوان الصفحة.')
+            TextInput::make('seo__title_template')->label(__('قالب العنوان'))
+                ->helperText(__('استخدم :title موضعًا لعنوان الصفحة.'))
                 ->columnSpanFull(),
             Textarea::make('seo__robots')->label('robots.txt')->rows(6)
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr'])
                 ->columnSpanFull(),
-            Textarea::make('seo__verification_tags')->label('وسوم التحقق')->rows(4)
-                ->helperText('وسوم meta الخاصة بأدوات مشرفي المواقع. تُخزّن مشفّرة.')
+            Textarea::make('seo__verification_tags')->label(__('وسوم التحقق'))->rows(4)
+                ->helperText(__('وسوم meta الخاصة بأدوات مشرفي المواقع. تُخزّن مشفّرة.'))
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr'])
                 ->columnSpanFull(),
         ]);
@@ -183,16 +184,14 @@ class ManageSettings extends Page implements HasSchemas
 
     private function integrationsTab(): Tab
     {
-        return Tab::make('التكاملات')->id('integrations')->schema([
+        return Tab::make(__('التكاملات'))->id('integrations')->schema([
             // Wired to nothing on purpose, pending the provider choice. The
             // helper text says so out loud: a filled-in key that nothing reads
             // would let an editor believe sending is configured when the only
             // thing that works today is collecting addresses.
-            TextInput::make('integrations__newsletter_key')->label('مفتاح مزوّد النشرة')
+            TextInput::make('integrations__newsletter_key')->label(__('مفتاح مزوّد النشرة'))
                 ->password()->revealable()
-                ->helperText('غير مستخدم حاليًا: لم يُختر مزوّد الإرسال بعد، ولا تُرسل النشرة من النظام. '
-                    .'الاشتراك والتأكيد وإلغاء الاشتراك تعمل، أما الإرسال فينتظر هذا القرار. '
-                    .'يُخزّن مشفّرًا ولا يظهر في سجل التدقيق.')
+                ->helperText(__('غير مستخدم حاليًا: لم يُختر مزوّد الإرسال بعد، ولا تُرسل النشرة من النظام. الاشتراك والتأكيد وإلغاء الاشتراك تعمل، أما الإرسال فينتظر هذا القرار. يُخزّن مشفّرًا ولا يظهر في سجل التدقيق.'))
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
         ])->columns(2);
     }
@@ -207,35 +206,35 @@ class ManageSettings extends Page implements HasSchemas
     private function marketTab(): Tab
     {
         $figure = fn (string $name, string $label): array => [
-            TextInput::make('label')->label('الاسم')->required(),
-            TextInput::make('value')->label('القيمة')->required()
-                ->helperText('كما تُنشر: 11,234.56 أو ‎+4.6%‎ أو "31 مليار ريال".')
+            TextInput::make('label')->label(__('الاسم'))->required(),
+            TextInput::make('value')->label(__('القيمة'))->required()
+                ->helperText(__('كما تُنشر: 11,234.56 أو ‎+4.6%‎ أو "31 مليار ريال".'))
                 ->extraInputAttributes(['dir' => 'auto']),
-            TextInput::make('change')->label('التغير %')->numeric()
-                ->helperText('موجب أو سالب. اتركه فارغًا إذا لم يُنشر تغير.')
+            TextInput::make('change')->label(__('التغير %'))->numeric()
+                ->helperText(__('موجب أو سالب. اتركه فارغًا إذا لم يُنشر تغير.'))
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
         ];
 
-        return Tab::make('الأسواق')->id('market')->schema([
+        return Tab::make(__('الأسواق'))->id('market')->schema([
             DateTimePicker::make('market__as_of')
-                ->label('صالحة حتى')
+                ->label(__('صالحة حتى'))
                 ->seconds(false)
-                ->helperText('مطلوب. بدون تاريخ لا يُعرض أي رقم — القارئ سيفترض أنها لحظية.')
+                ->helperText(__('مطلوب. بدون تاريخ لا يُعرض أي رقم — القارئ سيفترض أنها لحظية.'))
                 ->columnSpan(1),
 
             TextInput::make('market__source')
-                ->label('المصدر')
-                ->helperText('الجهة التي نشرت هذه الأرقام. يظهر بجانب التاريخ.')
+                ->label(__('المصدر'))
+                ->helperText(__('الجهة التي نشرت هذه الأرقام. يظهر بجانب التاريخ.'))
                 ->columnSpan(1),
 
             Repeater::make('market__ticker')
-                ->label('الشريط العلوي')
+                ->label(__('الشريط العلوي'))
                 ->schema([
-                    ...$figure('ticker', 'مؤشر'),
+                    ...$figure('ticker', __('مؤشر')),
                     Textarea::make('series')
-                        ->label('نقاط المنحنى')
+                        ->label(__('نقاط المنحنى'))
                         ->rows(2)
-                        ->helperText('١٠ إلى ١٤ رقمًا مفصولة بفواصل، في سطر واحد. شكل الحركة فقط — بلا محور قيمة. بدونها لا يُرسم منحنى.')
+                        ->helperText(__('10 إلى 14 رقمًا مفصولة بفواصل، في سطر واحد. شكل الحركة فقط — بلا محور قيمة. بدونها لا يُرسم منحنى.'))
                         ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr'])
                         ->columnSpanFull(),
                 ])
@@ -243,18 +242,18 @@ class ManageSettings extends Page implements HasSchemas
                 ->itemLabel(fn (array $state): ?string => $state['label'] ?? null)
                 ->columnSpanFull(),
 
-            Section::make('المؤشر الرئيسي')
-                ->description('المؤشر الذي يرسمه المخطط.')
+            Section::make(__('المؤشر الرئيسي'))
+                ->description(__('المؤشر الذي يرسمه المخطط.'))
                 ->schema([
-                    TextInput::make('market__index.label')->label('الاسم'),
-                    TextInput::make('market__index.value')->label('القيمة')
+                    TextInput::make('market__index.label')->label(__('الاسم')),
+                    TextInput::make('market__index.value')->label(__('القيمة'))
                         ->extraInputAttributes(['dir' => 'auto']),
-                    TextInput::make('market__index.change')->label('التغير %')->numeric()
+                    TextInput::make('market__index.change')->label(__('التغير %'))->numeric()
                         ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
                     Textarea::make('market__index.series')
-                        ->label('نقاط المخطط')
+                        ->label(__('نقاط المخطط'))
                         ->rows(2)
-                        ->helperText('أرقام مفصولة بفواصل. شكل الاتجاه فقط — يُرسم بلا محور قيمة.')
+                        ->helperText(__('أرقام مفصولة بفواصل. شكل الاتجاه فقط — يُرسم بلا محور قيمة.'))
                         ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr'])
                         ->columnSpanFull(),
                 ])
@@ -262,22 +261,22 @@ class ManageSettings extends Page implements HasSchemas
                 ->columnSpanFull(),
 
             Repeater::make('market__instruments')
-                ->label('أدوات مالية')
-                ->schema($figure('instruments', 'أداة'))
+                ->label(__('أدوات مالية'))
+                ->schema($figure('instruments', __('أداة')))
                 ->columns(3)->maxItems(4)->collapsed()
                 ->itemLabel(fn (array $state): ?string => $state['label'] ?? null)
                 ->columnSpanFull(),
 
             Repeater::make('market__pulse')
-                ->label('نبض المناطق')
-                ->schema($figure('pulse', 'منطقة'))
+                ->label(__('نبض المناطق'))
+                ->schema($figure('pulse', __('منطقة')))
                 ->columns(3)->maxItems(6)->collapsed()
                 ->itemLabel(fn (array $state): ?string => $state['label'] ?? null)
                 ->columnSpanFull(),
 
             Repeater::make('market__data')
-                ->label('لوحة البيانات')
-                ->schema($figure('data', 'مؤشر'))
+                ->label(__('لوحة البيانات'))
+                ->schema($figure('data', __('مؤشر')))
                 ->columns(3)->maxItems(4)->collapsed()
                 ->itemLabel(fn (array $state): ?string => $state['label'] ?? null)
                 ->columnSpanFull(),
@@ -286,14 +285,14 @@ class ManageSettings extends Page implements HasSchemas
 
     private function maintenanceTab(): Tab
     {
-        return Tab::make('الصيانة')->id('maintenance')->schema([
+        return Tab::make(__('الصيانة'))->id('maintenance')->schema([
             Toggle::make('maintenance__enabled')
-                ->label('وضع الصيانة')
-                ->helperText('يوقف الموقع العام عن الزوار. لوحة التحكم تبقى متاحة.'),
+                ->label(__('وضع الصيانة'))
+                ->helperText(__('يوقف الموقع العام عن الزوار. لوحة التحكم تبقى متاحة.')),
             TagsInput::make('maintenance__allowlist')
-                ->label('عناوين IP المسموح لها')
+                ->label(__('عناوين IP المسموح لها'))
                 ->placeholder('000.000.000.000')
-                ->helperText('تتجاوز وضع الصيانة. أضف عنوانك قبل التفعيل.')
+                ->helperText(__('تتجاوز وضع الصيانة. أضف عنوانك قبل التفعيل.'))
                 ->columnSpanFull(),
         ]);
     }
@@ -339,6 +338,6 @@ class ManageSettings extends Page implements HasSchemas
 
         $settings->setMany($values);
 
-        Notification::make()->success()->title('حُفظت الإعدادات')->send();
+        Notification::make()->success()->title(__('حُفظت الإعدادات'))->send();
     }
 }

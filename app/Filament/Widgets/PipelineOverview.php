@@ -22,7 +22,10 @@ class PipelineOverview extends StatsOverviewWidget
 
     protected int|string|array $columnSpan = 'full';
 
-    protected ?string $heading = 'مسار التحرير';
+    protected function getHeading(): ?string
+    {
+        return __('مسار التحرير');
+    }
 
     /**
      * The stages worth a tile. Terminal states are not pipeline.

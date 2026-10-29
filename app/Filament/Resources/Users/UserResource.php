@@ -31,23 +31,26 @@ class UserResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
 
-    protected static string|UnitEnum|null $navigationGroup = 'النظام';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('النظام');
+    }
 
     protected static ?int $navigationSort = 1;
 
     public static function getModelLabel(): string
     {
-        return 'مستخدم';
+        return __('مستخدم');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'المستخدمون';
+        return __('المستخدمون');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'المستخدمون';
+        return __('المستخدمون');
     }
 
     public static function canViewAny(): bool
@@ -58,10 +61,10 @@ class UserResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            TextInput::make('name')->label('الاسم')->required(),
+            TextInput::make('name')->label(__('الاسم'))->required(),
 
             TextInput::make('email')
-                ->label('البريد')
+                ->label(__('البريد'))
                 ->email()
                 ->required()
                 ->unique(ignoreRecord: true)
@@ -73,21 +76,21 @@ class UserResource extends Resource
              * the password-reset flow. Nobody types a colleague's password.
              */
             TextInput::make('password')
-                ->label('كلمة المرور')
+                ->label(__('كلمة المرور'))
                 ->password()
                 ->revealable()
                 ->dehydrated(fn (?string $state): bool => filled($state))
                 ->dehydrateStateUsing(fn (string $state): string => Hash::make($state))
-                ->helperText('اتركها فارغة لإنشاء كلمة مرور عشوائية ودعوة المستخدم عبر رابط استعادة.')
+                ->helperText(__('اتركها فارغة لإنشاء كلمة مرور عشوائية ودعوة المستخدم عبر رابط استعادة.'))
                 ->visibleOn('create'),
 
             Select::make('roles')
-                ->label('الأدوار')
+                ->label(__('الأدوار'))
                 ->relationship('roles', 'name')
                 ->multiple()
                 ->preload()
                 ->required()
-                ->helperText('الصلاحيات تأتي من الأدوار. لا تُمنح فرديًا.'),
+                ->helperText(__('الصلاحيات تأتي من الأدوار. لا تُمنح فرديًا.')),
         ])->columns(2);
     }
 
@@ -97,13 +100,13 @@ class UserResource extends Resource
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with('roles'))
             ->defaultSort('name')
             ->columns([
-                TextColumn::make('name')->label('الاسم')->searchable()->sortable(),
+                TextColumn::make('name')->label(__('الاسم'))->searchable()->sortable(),
                 TextColumn::make('email')
-                    ->label('البريد')
+                    ->label(__('البريد'))
                     ->searchable()
                     ->copyable()
                     ->extraAttributes(['class' => 'masar-ltr']),
-                TextColumn::make('roles.name')->label('الأدوار')->badge(),
+                TextColumn::make('roles.name')->label(__('الأدوار'))->badge(),
 
                 /*
                  * 2FA status is a column, not a detail page field: the question
@@ -111,27 +114,27 @@ class UserResource extends Resource
                  * at a glance.
                  */
                 IconColumn::make('two_factor')
-                    ->label('تحقق ثنائي')
-                    ->getStateUsing(fn (User $r): bool => $r->hasTwoFactorEnabled())
+                    ->label(__('تحقق ثنائي'))
+                    ->getStateUsing(fn (User $record): bool => $record->hasTwoFactorEnabled())
                     ->boolean()
                     ->trueIcon('heroicon-o-lock-closed')
                     ->falseIcon('heroicon-o-lock-open')
                     ->trueColor('success')
                     ->falseColor(fn (User $r): string => $r->requiresTwoFactor() ? 'danger' : 'gray')
-                    ->tooltip(fn (User $r): string => $r->requiresTwoFactor() && ! $r->hasTwoFactorEnabled()
-                        ? 'مطلوب: هذا المستخدم يملك صلاحية النشر'
+                    ->tooltip(fn (User $record): string => $record->requiresTwoFactor() && ! $record->hasTwoFactorEnabled()
+                        ? __('مطلوب: هذا المستخدم يملك صلاحية النشر')
                         : ''),
             ])
             ->filters([
-                SelectFilter::make('roles')->label('الدور')->relationship('roles', 'name')->multiple()->preload(),
+                SelectFilter::make('roles')->label(__('الدور'))->relationship('roles', 'name')->multiple()->preload(),
                 TernaryFilter::make('two_factor')
-                    ->label('تحقق ثنائي مفعّل')
+                    ->label(__('تحقق ثنائي مفعّل'))
                     ->queries(
                         true: fn (Builder $query): Builder => $query->whereNotNull('app_authentication_secret'),
                         false: fn (Builder $query): Builder => $query->whereNull('app_authentication_secret'),
                     ),
             ])
-            ->recordActions([EditAction::make()->label('تحرير')]);
+            ->recordActions([EditAction::make()->label(__('تحرير'))]);
     }
 
     /**

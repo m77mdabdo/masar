@@ -43,7 +43,10 @@ class NotFoundLog extends Page implements HasSchemas, HasTable
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-link-slash';
 
-    protected static string|UnitEnum|null $navigationGroup = 'النظام';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('النظام');
+    }
 
     protected static ?int $navigationSort = 7;
 
@@ -53,12 +56,12 @@ class NotFoundLog extends Page implements HasSchemas, HasTable
 
     public static function getNavigationLabel(): string
     {
-        return 'روابط مكسورة';
+        return __('روابط مكسورة');
     }
 
     public function getTitle(): string
     {
-        return 'الروابط المكسورة (404)';
+        return __('الروابط المكسورة (404)');
     }
 
     public static function canAccess(): bool
@@ -78,34 +81,34 @@ class NotFoundLog extends Page implements HasSchemas, HasTable
         return $table
             ->query(fn (): Builder => NotFound::query())
             ->defaultSort('hits', 'desc')
-            ->emptyStateHeading('لا روابط مكسورة')
-            ->emptyStateDescription('لم يصل أي زائر إلى صفحة غير موجودة بعد.')
+            ->emptyStateHeading(__('لا روابط مكسورة'))
+            ->emptyStateDescription(__('لم يصل أي زائر إلى صفحة غير موجودة بعد.'))
             ->columns([
                 TextColumn::make('path')
-                    ->label('المسار')
+                    ->label(__('المسار'))
                     ->searchable()
                     ->wrap()
                     ->extraAttributes(['class' => 'masar-ltr']),
 
                 TextColumn::make('hits')
-                    ->label('عدد الزيارات')
+                    ->label(__('عدد الزيارات'))
                     ->numeric()
                     ->sortable()
                     ->color(fn (NotFound $record): string => $record->hits >= 10 ? 'danger' : 'gray'),
 
                 TextColumn::make('referrer')
-                    ->label('المصدر')
+                    ->label(__('المصدر'))
                     ->placeholder('—')
                     ->limit(40)
                     ->extraAttributes(['class' => 'masar-ltr'])
                     ->toggleable(),
 
-                TextColumn::make('last_seen_at')->label('آخر ظهور')->dateTime('Y-m-d H:i')->sortable(),
+                TextColumn::make('last_seen_at')->label(__('آخر ظهور'))->dateTime('Y-m-d H:i')->sortable(),
 
-                IconColumn::make('resolved')->label('عولج')->boolean(),
+                IconColumn::make('resolved')->label(__('عولج'))->boolean(),
             ])
             ->filters([
-                TernaryFilter::make('resolved')->label('عولج'),
+                TernaryFilter::make('resolved')->label(__('عولج')),
             ])
             ->recordActions([
                 $this->createRedirectAction(),
@@ -114,7 +117,7 @@ class NotFoundLog extends Page implements HasSchemas, HasTable
             ->toolbarActions([
                 BulkActionGroup::make([
                     BulkAction::make('markResolved')
-                        ->label('تعليم كمعالج')
+                        ->label(__('تعليم كمعالج'))
                         ->icon('heroicon-o-check')
                         ->action(fn (Collection $records) => $records->each->forceFill(['resolved' => true])->each->save())
                         ->deselectRecordsAfterCompletion(),
@@ -129,7 +132,7 @@ class NotFoundLog extends Page implements HasSchemas, HasTable
     private function createRedirectAction(): Action
     {
         return Action::make('createRedirect')
-            ->label('أنشئ تحويلًا')
+            ->label(__('أنشئ تحويلًا'))
             ->icon('heroicon-o-arrow-uturn-right')
             ->color('success')
             ->visible(fn (NotFound $record): bool => ! $record->resolved)
@@ -139,18 +142,18 @@ class NotFoundLog extends Page implements HasSchemas, HasTable
             ])
             ->schema([
                 TextInput::make('from_path')
-                    ->label('من')
+                    ->label(__('من'))
                     ->required()
                     ->readOnly()
                     ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
                 TextInput::make('to_path')
-                    ->label('إلى')
+                    ->label(__('إلى'))
                     ->required()
                     ->placeholder('/ar/...')
                     ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
                 Select::make('status_code')
-                    ->label('النوع')
-                    ->options([301 => '301 — دائم', 302 => '302 — مؤقت'])
+                    ->label(__('النوع'))
+                    ->options([301 => __('301 — دائم'), 302 => __('302 — مؤقت')])
                     ->default(301)
                     ->required(),
             ])
@@ -165,7 +168,7 @@ class NotFoundLog extends Page implements HasSchemas, HasTable
                 if ($problems !== []) {
                     Notification::make()
                         ->danger()
-                        ->title('تعذّر إنشاء التحويل')
+                        ->title(__('تعذّر إنشاء التحويل'))
                         ->body(implode("\n", $problems))
                         ->persistent()
                         ->send();
@@ -183,14 +186,14 @@ class NotFoundLog extends Page implements HasSchemas, HasTable
                 // Resolved only once the redirect actually exists.
                 $record->forceFill(['resolved' => true])->save();
 
-                Notification::make()->success()->title('أُنشئ التحويل')->send();
+                Notification::make()->success()->title(__('أُنشئ التحويل'))->send();
             });
     }
 
     private function ignoreAction(): Action
     {
         return Action::make('ignore')
-            ->label('تجاهل')
+            ->label(__('تجاهل'))
             ->icon('heroicon-o-eye-slash')
             ->color('gray')
             ->visible(fn (NotFound $record): bool => ! $record->resolved)

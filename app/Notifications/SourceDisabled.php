@@ -31,11 +31,11 @@ class SourceDisabled extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('توقّف مصدر: '.$this->source->name)
-            ->line($this->source->name.' فشل '.$this->source->consecutive_failures.' مرات متتالية وتم تعطيله.')
-            ->line('آخر خطأ: '.($this->source->error_message ?: 'غير معروف'))
-            ->line('آخر نجاح: '.($this->source->last_success_at?->diffForHumans() ?? 'لا يوجد'))
-            ->line('لن نرى أي خبر من هذا المصدر حتى يُعاد تفعيله.');
+            ->subject(__('توقّف مصدر: :name', ['name' => $this->source->name]))
+            ->line(__(':name فشل :count مرات متتالية وتم تعطيله.', ['name' => $this->source->name, 'count' => $this->source->consecutive_failures]))
+            ->line(__('آخر خطأ: :error', ['error' => $this->source->error_message ?: __('غير معروف')]))
+            ->line(__('آخر نجاح: :when', ['when' => $this->source->last_success_at?->diffForHumans() ?? __('لا يوجد')]))
+            ->line(__('لن نرى أي خبر من هذا المصدر حتى يُعاد تفعيله.'));
     }
 
     /** @return array<string, mixed> */

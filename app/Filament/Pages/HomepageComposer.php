@@ -40,7 +40,10 @@ class HomepageComposer extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-squares-2x2';
 
-    protected static string|UnitEnum|null $navigationGroup = 'المحتوى';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('المحتوى');
+    }
 
     protected static ?int $navigationSort = 5;
 
@@ -52,12 +55,12 @@ class HomepageComposer extends Page
 
     public static function getNavigationLabel(): string
     {
-        return 'الصفحة الرئيسية';
+        return __('الصفحة الرئيسية');
     }
 
     public function getTitle(): string
     {
-        return 'تركيب الصفحة الرئيسية';
+        return __('تركيب الصفحة الرئيسية');
     }
 
     public static function canAccess(): bool
@@ -144,7 +147,7 @@ class HomepageComposer extends Page
 
         Cache::tags('homepage')->flush();
 
-        Notification::make()->success()->title('أُعيد ترتيب الأقسام')->send();
+        Notification::make()->success()->title(__('أُعيد ترتيب الأقسام'))->send();
     }
 
     /**
@@ -216,7 +219,7 @@ class HomepageComposer extends Page
 
         Cache::tags('homepage')->flush();
 
-        Notification::make()->success()->title('حُذف القسم')->send();
+        Notification::make()->success()->title(__('حُذف القسم'))->send();
     }
 
     private function ownedSection(int $sectionId): ?HomepageSection
@@ -243,7 +246,7 @@ class HomepageComposer extends Page
     private function addSectionAction(): Action
     {
         return Action::make('addSection')
-            ->label('أضف قسمًا')
+            ->label(__('أضف قسمًا'))
             ->icon('heroicon-o-plus')
             ->schema($this->sectionSchema())
             ->action(function (array $data): void {
@@ -264,19 +267,19 @@ class HomepageComposer extends Page
 
                 Cache::tags('homepage')->flush();
 
-                Notification::make()->success()->title('أُضيف القسم')->send();
+                Notification::make()->success()->title(__('أُضيف القسم'))->send();
             });
     }
 
     private function editSectionAction(): Action
     {
         return Action::make('editSection')
-            ->label('تحرير قسم')
+            ->label(__('تحرير قسم'))
             ->icon('heroicon-o-pencil-square')
             ->color('gray')
             ->schema([
                 Select::make('section_id')
-                    ->label('القسم')
+                    ->label(__('القسم'))
                     ->options(fn (): array => $this->sections()
                         ->mapWithKeys(fn (HomepageSection $s): array => [
                             $s->id => ($s->title() ?? HomepageSectionType::tryFrom($s->type)?->label() ?? $s->type),
@@ -302,7 +305,7 @@ class HomepageComposer extends Page
 
                 Cache::tags('homepage')->flush();
 
-                Notification::make()->success()->title('حُدّث القسم')->send();
+                Notification::make()->success()->title(__('حُدّث القسم'))->send();
             });
     }
 
@@ -313,29 +316,29 @@ class HomepageComposer extends Page
     {
         return [
             Select::make('type')
-                ->label('نوع القسم')
+                ->label(__('نوع القسم'))
                 ->options(HomepageSectionType::options())
                 ->required()
                 ->live(),
 
             Select::make('source')
-                ->label('مصدر المحتوى')
+                ->label(__('مصدر المحتوى'))
                 ->options([
-                    'auto' => 'تلقائي (قاعدة)',
-                    'manual' => 'يدوي (اختيار المحرر)',
-                    'mixed' => 'مختلط (مثبّت ثم تلقائي)',
+                    'auto' => __('تلقائي (قاعدة)'),
+                    'manual' => __('يدوي (اختيار المحرر)'),
+                    'mixed' => __('مختلط (مثبّت ثم تلقائي)'),
                 ])
                 ->default('auto')
                 ->required()
                 ->live()
-                ->helperText('المختلط يملأ الخانات المتبقية تلقائيًا دون تكرار أي مادة على الصفحة.'),
+                ->helperText(__('المختلط يملأ الخانات المتبقية تلقائيًا دون تكرار أي مادة على الصفحة.')),
 
-            TextInput::make('title_ar')->label('العنوان (عربي)'),
-            TextInput::make('title_en')->label('العنوان (English)')
+            TextInput::make('title_ar')->label(__('العنوان (عربي)')),
+            TextInput::make('title_en')->label(__('العنوان (English)'))
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
 
             TextInput::make('limit')
-                ->label('عدد العناصر')
+                ->label(__('عدد العناصر'))
                 ->numeric()
                 ->minValue(0)
                 ->maxValue(20)
@@ -346,7 +349,7 @@ class HomepageComposer extends Page
              * pinning something that cannot go out is a trap, not a choice.
              */
             Select::make('article_ids')
-                ->label('المواد المثبّتة')
+                ->label(__('المواد المثبّتة'))
                 ->multiple()
                 ->searchable()
                 ->options(fn (): array => Article::query()
@@ -357,16 +360,16 @@ class HomepageComposer extends Page
                     ->mapWithKeys(fn (Article $a): array => [$a->id => $a->title])
                     ->all())
                 ->visible(fn (Get $get): bool => in_array($get('source'), ['manual', 'mixed'], true))
-                ->helperText('الترتيب هنا هو ترتيب العرض.'),
+                ->helperText(__('الترتيب هنا هو ترتيب العرض.')),
 
             Select::make('category_slug')
-                ->label('القسم التحريري')
+                ->label(__('القسم التحريري'))
                 ->options(fn (): array => Category::query()->with('translations')->get()
                     ->mapWithKeys(fn ($c): array => [$c->slug => $c->name ?? $c->slug])->all())
                 ->visible(fn (Get $get): bool => in_array($get('source'), ['auto', 'mixed'], true)),
 
             Toggle::make('only_featured')
-                ->label('المميزة فقط')
+                ->label(__('المميزة فقط'))
                 ->visible(fn (Get $get): bool => in_array($get('source'), ['auto', 'mixed'], true)),
         ];
     }
@@ -388,12 +391,12 @@ class HomepageComposer extends Page
     private function activateAction(): Action
     {
         return Action::make('activate')
-            ->label('تفعيل')
+            ->label(__('تفعيل'))
             ->icon('heroicon-o-check-badge')
             ->color('success')
             ->visible(fn (): bool => $this->currentLayout()?->is_active === false)
             ->requiresConfirmation()
-            ->modalDescription('سيصبح هذا التخطيط هو الصفحة الرئيسية، وتُعطّل بقية التخطيطات.')
+            ->modalDescription(__('سيصبح هذا التخطيط هو الصفحة الرئيسية، وتُعطّل بقية التخطيطات.'))
             ->action(function (): void {
                 $layout = $this->currentLayout();
 
@@ -403,17 +406,17 @@ class HomepageComposer extends Page
 
                 app(ActivateLayout::class)($layout);
 
-                Notification::make()->success()->title('فُعّل التخطيط')->send();
+                Notification::make()->success()->title(__('فُعّل التخطيط'))->send();
             });
     }
 
     private function duplicateAction(): Action
     {
         return Action::make('duplicate')
-            ->label('نسخ')
+            ->label(__('نسخ'))
             ->icon('heroicon-o-document-duplicate')
             ->color('gray')
-            ->schema([TextInput::make('name')->label('اسم النسخة')->required()])
+            ->schema([TextInput::make('name')->label(__('اسم النسخة'))->required()])
             ->action(function (array $data): void {
                 $layout = $this->currentLayout();
 
@@ -424,19 +427,19 @@ class HomepageComposer extends Page
                 $copy = app(DuplicateLayout::class)($layout, $data['name']);
                 $this->layoutId = $copy->getKey();
 
-                Notification::make()->success()->title('أُنشئت نسخة')->send();
+                Notification::make()->success()->title(__('أُنشئت نسخة'))->send();
             });
     }
 
     private function scheduleAction(): Action
     {
         return Action::make('schedule')
-            ->label('جدولة')
+            ->label(__('جدولة'))
             ->icon('heroicon-o-clock')
             ->color('gray')
             ->schema([
-                DateTimePicker::make('starts_at')->label('يبدأ')->seconds(false),
-                DateTimePicker::make('ends_at')->label('ينتهي')->seconds(false),
+                DateTimePicker::make('starts_at')->label(__('يبدأ'))->seconds(false),
+                DateTimePicker::make('ends_at')->label(__('ينتهي'))->seconds(false),
             ])
             ->action(function (array $data): void {
                 $layout = $this->currentLayout();
@@ -452,7 +455,7 @@ class HomepageComposer extends Page
 
                 Cache::tags('homepage')->flush();
 
-                Notification::make()->success()->title('حُدّثت الجدولة')->send();
+                Notification::make()->success()->title(__('حُدّثت الجدولة'))->send();
             });
     }
 
@@ -463,7 +466,7 @@ class HomepageComposer extends Page
     private function previewAction(): Action
     {
         return Action::make('preview')
-            ->label('معاينة')
+            ->label(__('معاينة'))
             ->icon('heroicon-o-eye')
             ->color('gray')
             ->url(fn (): string => route('admin.homepage.preview', ['layout' => $this->layoutId]))

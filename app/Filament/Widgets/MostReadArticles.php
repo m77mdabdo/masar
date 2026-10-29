@@ -25,9 +25,9 @@ class MostReadArticles extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            ->heading('الأكثر قراءة (7 أيام)')
-            ->emptyStateHeading('لا قراءات مسجّلة بعد')
-            ->emptyStateDescription('يظهر الترتيب حين تُسجَّل قراءات حقيقية. لا نرتّب على أرقام تجريبية.')
+            ->heading(__('الأكثر قراءة (7 أيام)'))
+            ->emptyStateHeading(__('لا قراءات مسجّلة بعد'))
+            ->emptyStateDescription(__('يظهر الترتيب حين تُسجَّل قراءات حقيقية. لا نرتّب على أرقام تجريبية.'))
             /*
              * Ranked on real reads in the window, not on `views_count`, which
              * was written by nothing and made this widget a ranking of seeded
@@ -50,19 +50,19 @@ class MostReadArticles extends TableWidget
             ->defaultPaginationPageOption(5)
             ->columns([
                 TextColumn::make('title')
-                    ->label('العنوان')
+                    ->label(__('العنوان'))
                     ->wrap()
                     ->limit(60)
                     ->url(fn (Article $record): string => ArticleResource::getUrl('edit', ['record' => $record])),
 
                 TextColumn::make('category.name')
-                    ->label('القسم')
+                    ->label(__('القسم'))
                     ->badge()
                     ->getStateUsing(fn (Article $record): ?string => $record->category?->name),
 
                 // The window's reads, not the lifetime total: the heading says
                 // seven days and the number must mean the same thing.
-                TextColumn::make('window_views')->label('قراءات هذا الأسبوع')->numeric(),
+                TextColumn::make('window_views')->label(__('قراءات هذا الأسبوع'))->numeric(),
             ])
             ->recordActions([]);
     }

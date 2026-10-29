@@ -3,11 +3,48 @@
 declare(strict_types=1);
 
 return [
+    'filepond' => [
+        'labelButtonAbortItemLoad' => 'Interrompre',
+        'labelButtonAbortItemProcessing' => 'Annuler',
+        'labelButtonProcessItem' => 'Téléverser',
+        'labelButtonRemoveItem' => 'Retirer',
+        'labelButtonRetryItemLoad' => 'Réessayer',
+        'labelButtonRetryItemProcessing' => 'Réessayer',
+        'labelButtonUndoItemProcessing' => 'Annuler',
+        'labelFileLoadError' => 'Erreur pendant le chargement',
+        'labelFileLoading' => 'Chargement',
+        'labelFileProcessing' => 'Téléversement',
+        'labelFileProcessingAborted' => 'Téléversement annulé',
+        'labelFileProcessingComplete' => 'Téléversement terminé',
+        'labelFileProcessingError' => 'Erreur pendant le téléversement',
+        'labelFileProcessingRevertError' => 'Erreur pendant l\'annulation',
+        'labelFileRemoveError' => 'Erreur pendant la suppression',
+        'labelFileSizeNotAvailable' => 'Taille non disponible',
+        'labelFileTypeNotAllowed' => 'Type de fichier non valide',
+        'labelFileWaitingForSize' => 'En attente de la taille',
+        'labelIdle' => 'Glissez-déposez vos fichiers ou <span class="filepond--label-action">parcourez</span>',
+        'labelInvalidField' => 'Le champ contient des fichiers non valides',
+        'labelMaxFileSize' => 'La taille maximale est de {filesize}',
+        'labelMaxFileSizeExceeded' => 'Le fichier est trop volumineux',
+        'labelMaxTotalFileSize' => 'La taille totale maximale est de {filesize}',
+        'labelMaxTotalFileSizeExceeded' => 'Taille totale maximale dépassée',
+        'labelTapToCancel' => 'touchez pour annuler',
+        'labelTapToRetry' => 'touchez pour réessayer',
+        'labelTapToUndo' => 'touchez pour annuler',
+    ],
     'gate' => [
         'translation_unreviewed' => 'Cette traduction n’a pas été relue. Une traduction n’est publiée qu’après validation par une personne autre que son traducteur.',
     ],
     'language' => [
         'menu' => 'Langue du panneau',
+        'names' => [
+            'ar' => 'Arabe',
+            'en' => 'Anglais',
+            'fr' => 'Français',
+            'hi' => 'Hindi',
+            'ur-pk' => 'Ourdou',
+            'zh-hans' => 'Chinois simplifié',
+        ],
     ],
     'translation' => [
         'action_retry' => 'Relancer la traduction',

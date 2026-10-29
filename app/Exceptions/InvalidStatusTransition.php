@@ -39,7 +39,7 @@ class InvalidStatusTransition extends DomainException
     public function forEditor(): string
     {
         return sprintf(
-            'لا يمكن نقل المادة من "%s" إلى "%s".',
+            __('لا يمكن نقل المادة من "%s" إلى "%s".'),
             $this->from->label(),
             $this->to->label(),
         );

@@ -33,80 +33,83 @@ class OpportunityResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFlag;
 
-    protected static string|UnitEnum|null $navigationGroup = 'المنتجات';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('المنتجات');
+    }
 
     protected static ?int $navigationSort = 1;
 
     public static function getModelLabel(): string
     {
-        return 'فرصة';
+        return __('فرصة');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'الفرص';
+        return __('الفرص');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'الفرص';
+        return __('الفرص');
     }
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            TextInput::make('title')->label('العنوان')->required()->columnSpanFull(),
+            TextInput::make('title')->label(__('العنوان'))->required()->columnSpanFull(),
 
             TextInput::make('slug')
-                ->label('المسار')
+                ->label(__('المسار'))
                 ->required()
                 ->rules(['regex:/^[a-z0-9-]+$/'])
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
 
             Select::make('locale')
-                ->label('اللغة')
+                ->label(__('اللغة'))
                 ->options(fn (): array => collect(config('masar.locales'))->map(fn (array $l): string => $l['name'])->all())
                 ->default(config('masar.default_locale'))
                 ->required(),
 
-            Textarea::make('summary')->label('الملخص')->rows(3)->required()->columnSpanFull(),
+            Textarea::make('summary')->label(__('الملخص'))->rows(3)->required()->columnSpanFull(),
 
             Select::make('opportunity_type')
-                ->label('النوع')
+                ->label(__('النوع'))
                 ->options([
-                    'tender' => 'مناقصة',
-                    'licence' => 'ترخيص',
-                    'funding' => 'تمويل',
-                    'partnership' => 'شراكة',
-                    'market_entry' => 'دخول سوق',
-                    'concession' => 'امتياز',
+                    'tender' => __('مناقصة'),
+                    'licence' => __('ترخيص'),
+                    'funding' => __('تمويل'),
+                    'partnership' => __('شراكة'),
+                    'market_entry' => __('دخول سوق'),
+                    'concession' => __('امتياز'),
                 ])
                 ->required(),
 
             Select::make('potential')
-                ->label('حجم الفرصة')
+                ->label(__('حجم الفرصة'))
                 ->options(OpportunityPotential::options())
                 ->default(OpportunityPotential::Medium->value)
                 ->required()
-                ->helperText('تقدير تحريري. تضخيمه يُفقد بقية الفرص قيمتها.'),
+                ->helperText(__('تقدير تحريري. تضخيمه يُفقد بقية الفرص قيمتها.')),
 
             Select::make('industry_id')
-                ->label('القطاع')
+                ->label(__('القطاع'))
                 ->relationship('industry', 'slug')
-                ->getOptionLabelFromRecordUsing(fn ($r): string => $r->name ?? $r->slug)
+                ->getOptionLabelFromRecordUsing(fn ($record): string => $record->name ?? $record->slug)
                 ->searchable()->preload(),
 
             Select::make('country_id')
-                ->label('الدولة')
+                ->label(__('الدولة'))
                 ->relationship('country', 'slug')
-                ->getOptionLabelFromRecordUsing(fn ($r): string => $r->name ?? $r->slug)
+                ->getOptionLabelFromRecordUsing(fn ($record): string => $record->name ?? $record->slug)
                 ->searchable()->preload(),
 
-            DatePicker::make('deadline')->label('آخر موعد'),
+            DatePicker::make('deadline')->label(__('آخر موعد')),
 
             Select::make('status')
-                ->label('الحالة')
-                ->options(['open' => 'مفتوحة', 'closed' => 'مغلقة'])
+                ->label(__('الحالة'))
+                ->options(['open' => __('مفتوحة'), 'closed' => __('مغلقة')])
                 ->default('open')
                 ->required(),
 
@@ -115,21 +118,21 @@ class OpportunityResource extends Resource
              * and MASAR does not publish rumours.
              */
             TextInput::make('official_source_url')
-                ->label('المصدر الرسمي')
+                ->label(__('المصدر الرسمي'))
                 ->url()
                 ->required()
-                ->helperText('رابط رسمي يمكن التحقق منه. بدونه هذه إشاعة، لا فرصة.')
+                ->helperText(__('رابط رسمي يمكن التحقق منه. بدونه هذه إشاعة، لا فرصة.'))
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr'])
                 ->columnSpanFull(),
 
             Repeater::make('requirements')
-                ->label('المتطلبات')
-                ->simple(TextInput::make('requirement')->label('متطلب')->required())
+                ->label(__('المتطلبات'))
+                ->simple(TextInput::make('requirement')->label(__('متطلب'))->required())
                 ->defaultItems(0)
-                ->addActionLabel('أضف متطلبًا')
+                ->addActionLabel(__('أضف متطلبًا'))
                 ->columnSpanFull(),
 
-            DateTimePicker::make('published_at')->label('تاريخ النشر')->seconds(false),
+            DateTimePicker::make('published_at')->label(__('تاريخ النشر'))->seconds(false),
         ])->columns(2);
     }
 
@@ -139,47 +142,47 @@ class OpportunityResource extends Resource
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['industry.translations', 'country.translations']))
             ->defaultSort('published_at', 'desc')
             ->columns([
-                TextColumn::make('title')->label('العنوان')->searchable()->wrap()->limit(80),
+                TextColumn::make('title')->label(__('العنوان'))->searchable()->wrap()->limit(80),
                 TextColumn::make('potential')
-                    ->label('الحجم')
+                    ->label(__('الحجم'))
                     ->badge()
-                    ->formatStateUsing(fn (OpportunityPotential $s): string => $s->label())
+                    ->formatStateUsing(fn (OpportunityPotential $state): string => $state->label())
                     // Brand token → Filament palette slot.
-                    ->color(fn (OpportunityPotential $s): string => match ($s->colour()) {
+                    ->color(fn (OpportunityPotential $state): string => match ($state->colour()) {
                         'mint' => 'success',
                         'gold' => 'warning',
                         default => 'gray',
                     }),
-                TextColumn::make('opportunity_type')->label('النوع')->badge(),
+                TextColumn::make('opportunity_type')->label(__('النوع'))->badge(),
                 TextColumn::make('industry.name')
-                    ->label('القطاع')
-                    ->getStateUsing(fn (Opportunity $r): ?string => $r->industry?->name)
+                    ->label(__('القطاع'))
+                    ->getStateUsing(fn (Opportunity $record): ?string => $record->industry?->name)
                     ->placeholder('—'),
                 TextColumn::make('deadline')
-                    ->label('آخر موعد')
+                    ->label(__('آخر موعد'))
                     ->date('Y-m-d')
                     ->placeholder('—')
                     ->sortable()
-                    ->color(fn (Opportunity $r): ?string => $r->deadline?->isPast() ? 'danger' : null),
+                    ->color(fn (Opportunity $record): ?string => $record->deadline?->isPast() ? 'danger' : null),
                 TextColumn::make('status')
-                    ->label('الحالة')
+                    ->label(__('الحالة'))
                     ->badge()
-                    ->formatStateUsing(fn (string $s): string => $s === 'open' ? 'مفتوحة' : 'مغلقة')
-                    ->color(fn (string $s): string => $s === 'open' ? 'success' : 'gray'),
-                TextColumn::make('published_at')->label('النشر')->dateTime('Y-m-d')->placeholder('—')->sortable(),
+                    ->formatStateUsing(fn (string $state): string => $state === 'open' ? __('مفتوحة') : __('مغلقة'))
+                    ->color(fn (string $state): string => $state === 'open' ? 'success' : 'gray'),
+                TextColumn::make('published_at')->label(__('النشر'))->dateTime('Y-m-d')->placeholder('—')->sortable(),
             ])
             ->filters([
-                SelectFilter::make('potential')->label('الحجم')->options(OpportunityPotential::options())->multiple(),
-                SelectFilter::make('status')->label('الحالة')->options(['open' => 'مفتوحة', 'closed' => 'مغلقة']),
-                SelectFilter::make('industry')->label('القطاع')->relationship('industry', 'slug')->searchable()->preload(),
+                SelectFilter::make('potential')->label(__('الحجم'))->options(OpportunityPotential::options())->multiple(),
+                SelectFilter::make('status')->label(__('الحالة'))->options(['open' => __('مفتوحة'), 'closed' => __('مغلقة')]),
+                SelectFilter::make('industry')->label(__('القطاع'))->relationship('industry', 'slug')->searchable()->preload(),
                 Filter::make('expiring')
-                    ->label('ينتهي خلال 30 يومًا')
+                    ->label(__('ينتهي خلال 30 يومًا'))
                     ->toggle()
                     ->query(fn (Builder $query): Builder => $query
                         ->whereNotNull('deadline')
                         ->whereBetween('deadline', [now(), now()->addDays(30)])),
             ])
-            ->recordActions([EditAction::make()->label('تحرير')]);
+            ->recordActions([EditAction::make()->label(__('تحرير'))]);
     }
 
     public static function getPages(): array

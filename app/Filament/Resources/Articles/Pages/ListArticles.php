@@ -18,7 +18,7 @@ class ListArticles extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->label('مادة جديدة'),
+            CreateAction::make()->label(__('مادة جديدة')),
         ];
     }
 
@@ -28,25 +28,25 @@ class ListArticles extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make('الكل'),
+            'all' => Tab::make(__('الكل')),
 
-            'mine' => Tab::make('موادي')
+            'mine' => Tab::make(__('موادي'))
                 ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('author_id', auth()->id())),
 
-            'in_progress' => Tab::make('قيد العمل')
+            'in_progress' => Tab::make(__('قيد العمل'))
                 ->modifyQueryUsing(fn (Builder $query): Builder => $query->whereNotIn('status', [
                     ArticleStatus::Published->value,
                     ArticleStatus::Archived->value,
                     ArticleStatus::Rejected->value,
                 ])),
 
-            'ready' => Tab::make('جاهزة')
+            'ready' => Tab::make(__('جاهزة'))
                 ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('status', ArticleStatus::Ready->value)),
 
-            'scheduled' => Tab::make('مجدولة')
+            'scheduled' => Tab::make(__('مجدولة'))
                 ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('status', ArticleStatus::Scheduled->value)),
 
-            'published' => Tab::make('منشورة')
+            'published' => Tab::make(__('منشورة'))
                 ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('status', ArticleStatus::Published->value)),
         ];
     }

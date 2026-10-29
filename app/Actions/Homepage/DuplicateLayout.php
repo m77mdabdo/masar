@@ -20,7 +20,7 @@ class DuplicateLayout
     {
         return DB::transaction(function () use ($layout, $name): HomepageLayout {
             $copy = HomepageLayout::query()->create([
-                'name' => $name ?? $layout->name.' (نسخة)',
+                'name' => $name ?? __(':name (نسخة)', ['name' => $layout->name]),
                 'is_active' => false,
                 'starts_at' => null,
                 'ends_at' => null,

@@ -32,23 +32,23 @@ class RecentActivity extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            ->heading('آخر النشاط')
-            ->emptyStateHeading('لا نشاط بعد')
+            ->heading(__('آخر النشاط'))
+            ->emptyStateHeading(__('لا نشاط بعد'))
             ->query(fn (): Builder => $this->scopedActivity())
             ->paginated(false)
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('created_at')
-                    ->label('التوقيت')
+                    ->label(__('التوقيت'))
                     ->since()
                     ->tooltip(fn (Activity $record): string => $record->created_at?->format('Y-m-d H:i') ?? ''),
 
-                TextColumn::make('description')->label('الحدث')->wrap()->limit(50),
+                TextColumn::make('description')->label(__('الحدث'))->wrap()->limit(50),
 
-                TextColumn::make('causer.name')->label('المستخدم')->placeholder('النظام'),
+                TextColumn::make('causer.name')->label(__('المستخدم'))->placeholder(__('النظام')),
 
                 TextColumn::make('subject.title')
-                    ->label('المادة')
+                    ->label(__('المادة'))
                     ->wrap()
                     ->limit(45)
                     ->placeholder('—'),

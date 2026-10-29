@@ -53,7 +53,7 @@ class CreateDraftFromIntelligenceItem
     public function __invoke(IntelligenceItem $item, User $actor): Article
     {
         if ($item->article_id !== null) {
-            throw new RuntimeException('لهذا العنصر مسودة بالفعل.');
+            throw new RuntimeException(__('لهذا العنصر مسودة بالفعل.'));
         }
 
         return DB::transaction(function () use ($item, $actor): Article {

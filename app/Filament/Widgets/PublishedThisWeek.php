@@ -13,7 +13,10 @@ class PublishedThisWeek extends StatsOverviewWidget
 {
     protected static ?int $sort = 3;
 
-    protected ?string $heading = 'النشر';
+    protected function getHeading(): ?string
+    {
+        return __('النشر');
+    }
 
     public static function canView(): bool
     {
@@ -33,10 +36,10 @@ class PublishedThisWeek extends StatsOverviewWidget
         $delta = $thisWeek - $lastWeek;
 
         return [
-            Stat::make('منشور هذا الأسبوع', (string) $thisWeek)
+            Stat::make(__('منشور هذا الأسبوع'), (string) $thisWeek)
                 ->description($delta === 0
-                    ? 'كما الأسبوع الماضي'
-                    : ($delta > 0 ? "+{$delta} عن الأسبوع الماضي" : "{$delta} عن الأسبوع الماضي"))
+                    ? __('كما الأسبوع الماضي')
+                    : __(':delta عن الأسبوع الماضي', ['delta' => $delta > 0 ? '+'.$delta : (string) $delta]))
                 ->descriptionIcon($delta >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($delta >= 0 ? 'success' : 'danger')
                 ->chart($daily),

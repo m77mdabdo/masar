@@ -36,29 +36,29 @@ class ValidateRedirect
         $problems = [];
 
         if ($from === $to) {
-            $problems[] = 'المسار المصدر والوجهة متطابقان.';
+            $problems[] = __('المسار المصدر والوجهة متطابقان.');
 
             return $problems;
         }
 
         if ($from === '/') {
-            $problems[] = 'لا يمكن تحويل الصفحة الرئيسية.';
+            $problems[] = __('لا يمكن تحويل الصفحة الرئيسية.');
         }
 
         if ($this->shadowsLiveContent($from)) {
-            $problems[] = 'هذا المسار يخدم محتوى منشورًا بالفعل — التحويل سيخفيه عن القراء.';
+            $problems[] = __('هذا المسار يخدم محتوى منشورًا بالفعل — التحويل سيخفيه عن القراء.');
         }
 
         if ($this->duplicates($from, $ignoreId)) {
-            $problems[] = 'يوجد تحويل بهذا المسار المصدر.';
+            $problems[] = __('يوجد تحويل بهذا المسار المصدر.');
         }
 
         if ($this->createsLoop($from, $to, $ignoreId)) {
-            $problems[] = 'هذا التحويل يُنشئ حلقة مغلقة.';
+            $problems[] = __('هذا التحويل يُنشئ حلقة مغلقة.');
         }
 
         if ($this->extendsChain($to, $ignoreId)) {
-            $problems[] = 'الوجهة نفسها محوّلة — السلسلة يجب ألا تتجاوز خطوة واحدة.';
+            $problems[] = __('الوجهة نفسها محوّلة — السلسلة يجب ألا تتجاوز خطوة واحدة.');
         }
 
         return $problems;

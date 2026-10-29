@@ -20,7 +20,7 @@
             >
                 {{ $layout->name }}
                 @if ($layout->is_active)
-                    <span class="ms-1 rounded bg-[#7FB69A] px-1.5 py-0.5 text-[10px] text-[#0E2A1C]">نشط</span>
+                    <span class="ms-1 rounded bg-[#7FB69A] px-1.5 py-0.5 text-[10px] text-[#0E2A1C]">{{ __('نشط') }}</span>
                 @endif
                 <span class="ms-1 opacity-60">({{ $layout->sections_count }})</span>
             </button>
@@ -29,15 +29,15 @@
 
     @if ($current?->starts_at || $current?->ends_at)
         <div class="rounded-lg border border-[#C9A063]/40 bg-[#C9A063]/10 px-3 py-2 text-sm">
-            مجدول:
-            {{ $current->starts_at?->format('Y-m-d H:i') ?? 'الآن' }}
+            {{ __('مجدول:') }}
+            {{ $current->starts_at?->format('Y-m-d H:i') ?? __('الآن') }}
             →
-            {{ $current->ends_at?->format('Y-m-d H:i') ?? 'بلا نهاية' }}
+            {{ $current->ends_at?->format('Y-m-d H:i') ?? __('بلا نهاية') }}
         </div>
     @endif
 
     @if ($sections->isEmpty())
-        <p class="py-10 text-center text-sm text-gray-400">لا توجد أقسام في هذا التخطيط بعد.</p>
+        <p class="py-10 text-center text-sm text-gray-400">{{ __('لا توجد أقسام في هذا التخطيط بعد.') }}</p>
     @else
         <div
             class="space-y-3"
@@ -91,7 +91,7 @@
                             'bg-gray-200 text-gray-700 dark:bg-white/10 dark:text-gray-300' => $section->source === 'auto',
                             'bg-[#C9A063]/25 text-[#14181A]' => $section->source === 'mixed',
                         ])>
-                            {{ ['manual' => 'يدوي', 'auto' => 'تلقائي', 'mixed' => 'مختلط'][$section->source] ?? $section->source }}
+                            {{ ['manual' => __('يدوي'), 'auto' => __('تلقائي'), 'mixed' => __('مختلط')][$section->source] ?? $section->source }}
                         </span>
 
                         <span class="text-[11px] text-[#7C848A]">
@@ -99,7 +99,7 @@
                         </span>
 
                         @if ($items->count() < ($resolved['limit'] ?? 0) && ! ($type?->isStatic()))
-                            <span class="rounded bg-red-100 px-1.5 py-0.5 text-[10px] text-red-700">غير مكتمل</span>
+                            <span class="rounded bg-red-100 px-1.5 py-0.5 text-[10px] text-red-700">{{ __('غير مكتمل') }}</span>
                         @endif
 
                         <div class="ms-auto flex items-center gap-1">
@@ -107,13 +107,13 @@
                                  same reorder from a keyboard. --}}
                             <button type="button" wire:click="moveSection({{ $section->id }}, -1)"
                                     @disabled($loop->first)
-                                    aria-label="نقل {{ $section->title(app()->getLocale()) ?? $section->type }} لأعلى"
+                                    aria-label="{{ __('نقل :section لأعلى', ['section' => $section->title(app()->getLocale()) ?? $section->type]) }}"
                                     class="rounded p-1 hover:bg-gray-100 disabled:opacity-30 dark:hover:bg-white/10">
                                 <x-filament::icon icon="heroicon-o-arrow-up" class="h-4 w-4 text-gray-500" />
                             </button>
                             <button type="button" wire:click="moveSection({{ $section->id }}, 1)"
                                     @disabled($loop->last)
-                                    aria-label="نقل {{ $section->title(app()->getLocale()) ?? $section->type }} لأسفل"
+                                    aria-label="{{ __('نقل :section لأسفل', ['section' => $section->title(app()->getLocale()) ?? $section->type]) }}"
                                     class="rounded p-1 hover:bg-gray-100 disabled:opacity-30 dark:hover:bg-white/10">
                                 <x-filament::icon icon="heroicon-o-arrow-down" class="h-4 w-4 text-gray-500" />
                             </button>
@@ -123,7 +123,7 @@
                                                   class="h-4 w-4 text-gray-500" />
                             </button>
                             <button type="button" wire:click="deleteSection({{ $section->id }})"
-                                    wire:confirm="حذف هذا القسم؟"
+                                    wire:confirm="{{ __('حذف هذا القسم؟') }}"
                                     class="rounded p-1 hover:bg-red-50 dark:hover:bg-red-500/10">
                                 <x-filament::icon icon="heroicon-o-trash" class="h-4 w-4 text-red-500" />
                             </button>
@@ -132,9 +132,9 @@
 
                     {{-- The resolved content, not just the rule that produced it. --}}
                     @if ($type?->isStatic())
-                        <p class="text-xs text-[#7C848A]">قسم ثابت بلا محتوى ديناميكي.</p>
+                        <p class="text-xs text-[#7C848A]">{{ __('قسم ثابت بلا محتوى ديناميكي.') }}</p>
                     @elseif ($items->isEmpty())
-                        <p class="text-xs text-red-600">لا يوجد محتوى مطابق — سيظهر القسم فارغًا للقارئ.</p>
+                        <p class="text-xs text-red-600">{{ __('لا يوجد محتوى مطابق — سيظهر القسم فارغًا للقارئ.') }}</p>
                     @else
                         <ul class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                             @foreach ($items as $item)
@@ -147,10 +147,10 @@
                                             <span>{{ $item->category?->name }}</span>
                                             <span dir="ltr" class="masar-ltr">{{ $item->published_at?->format('Y-m-d') }}</span>
                                             @if ($item->hero_media_id === null)
-                                                <span class="text-red-600">بلا غلاف</span>
+                                                <span class="text-red-600">{{ __('بلا غلاف') }}</span>
                                             @endif
                                         @else
-                                            <span>فرصة</span>
+                                            <span>{{ __('فرصة') }}</span>
                                         @endif
                                     </div>
                                 </li>

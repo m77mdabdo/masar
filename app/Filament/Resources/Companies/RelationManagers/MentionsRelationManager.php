@@ -26,7 +26,10 @@ class MentionsRelationManager extends RelationManager
 {
     protected static string $relationship = 'mentions';
 
-    protected static ?string $title = 'المحتوى المرتبط';
+    public static function getTitle(\Illuminate\Database\Eloquent\Model $ownerRecord, string $pageClass): string
+    {
+        return __('المحتوى المرتبط');
+    }
 
     public function form(Schema $schema): Schema
     {
@@ -38,14 +41,14 @@ class MentionsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->heading('المحتوى المرتبط')
-            ->description('كل ما نُشر وأشار إلى هذه الشركة، بترتيب النشر.')
+            ->heading(__('المحتوى المرتبط'))
+            ->description(__('كل ما نُشر وأشار إلى هذه الشركة، بترتيب النشر.'))
             ->modifyQueryUsing(fn (Builder $query): Builder => EntityContentQuery::for($this->getOwnerRecord())
                 ->applyTo($query))
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('mentionable.title')
-                    ->label('العنوان')
+                    ->label(__('العنوان'))
                     ->wrap()
                     ->limit(90)
                     ->url(fn (EntityMention $record): ?string => match (true) {
@@ -54,16 +57,16 @@ class MentionsRelationManager extends RelationManager
                     }),
 
                 TextColumn::make('mentionable_type')
-                    ->label('النوع')
+                    ->label(__('النوع'))
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'article' => 'مادة',
-                        'opportunity' => 'فرصة',
+                        'article' => __('مادة'),
+                        'opportunity' => __('فرصة'),
                         default => $state,
                     }),
 
                 TextColumn::make('role')
-                    ->label('الدور')
+                    ->label(__('الدور'))
                     ->badge()
                     ->formatStateUsing(fn (EntityRole $state): string => $state->label())
                     ->color(fn (EntityRole $state): string => match ($state) {
@@ -72,10 +75,10 @@ class MentionsRelationManager extends RelationManager
                         EntityRole::Mentioned => 'gray',
                     }),
 
-                TextColumn::make('prominence')->label('الأهمية')->numeric()->sortable(),
+                TextColumn::make('prominence')->label(__('الأهمية'))->numeric()->sortable(),
 
                 TextColumn::make('created_at')
-                    ->label('تاريخ النشر')
+                    ->label(__('تاريخ النشر'))
                     ->dateTime('Y-m-d')
                     ->sortable(),
             ])

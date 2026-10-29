@@ -28,7 +28,10 @@ class RoleResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedKey;
 
-    protected static string|UnitEnum|null $navigationGroup = 'النظام';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('النظام');
+    }
 
     protected static ?int $navigationSort = 2;
 
@@ -50,17 +53,17 @@ class RoleResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return 'دور';
+        return __('دور');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'الأدوار';
+        return __('الأدوار');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'الأدوار';
+        return __('الأدوار');
     }
 
     public static function canViewAny(): bool
@@ -72,7 +75,7 @@ class RoleResource extends Resource
     {
         return $schema->components([
             TextInput::make('name')
-                ->label('الاسم')
+                ->label(__('الاسم'))
                 ->required()
                 ->unique(ignoreRecord: true)
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr'])
@@ -81,7 +84,7 @@ class RoleResource extends Resource
             // Grouped by area rather than one flat list of seventeen checkboxes:
             // "what can an editor do with articles" is the question being asked.
             ...collect(self::AREAS)
-                ->map(fn (string $label, string $area) => Section::make($label)
+                ->map(fn (string $label, string $area) => Section::make(__($label))
                     ->schema([
                         CheckboxList::make('permissions')
                             ->label('')
@@ -115,25 +118,25 @@ class RoleResource extends Resource
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->withCount(['permissions', 'users']))
             ->defaultSort('name')
             ->columns([
-                TextColumn::make('name')->label('الاسم')->searchable()->extraAttributes(['class' => 'masar-ltr']),
-                TextColumn::make('permissions_count')->label('عدد الصلاحيات')->numeric(),
-                TextColumn::make('users_count')->label('عدد المستخدمين')->numeric(),
+                TextColumn::make('name')->label(__('الاسم'))->searchable()->extraAttributes(['class' => 'masar-ltr']),
+                TextColumn::make('permissions_count')->label(__('عدد الصلاحيات'))->numeric(),
+                TextColumn::make('users_count')->label(__('عدد المستخدمين'))->numeric(),
             ])
-            ->recordActions([EditAction::make()->label('تحرير')]);
+            ->recordActions([EditAction::make()->label(__('تحرير'))]);
     }
 
     private static function describe(string $permission): string
     {
         return match ($permission) {
-            'article.view' => 'عرض المواد',
-            'article.create' => 'إنشاء مادة',
-            'article.update.own' => 'تحرير موادّه فقط',
-            'article.update.any' => 'تحرير أي مادة',
-            'article.delete' => 'حذف المواد',
-            'article.transition' => 'نقل المادة في مسار التحرير',
-            'article.publish' => 'النشر (يتطلب تحققًا ثنائيًا)',
-            'article.factcheck' => 'تدقيق المعلومات',
-            'article.seo' => 'تحسين محركات البحث',
+            'article.view' => __('عرض المواد'),
+            'article.create' => __('إنشاء مادة'),
+            'article.update.own' => __('تحرير موادّه فقط'),
+            'article.update.any' => __('تحرير أي مادة'),
+            'article.delete' => __('حذف المواد'),
+            'article.transition' => __('نقل المادة في مسار التحرير'),
+            'article.publish' => __('النشر (يتطلب تحققًا ثنائيًا)'),
+            'article.factcheck' => __('تدقيق المعلومات'),
+            'article.seo' => __('تحسين محركات البحث'),
             default => $permission,
         };
     }

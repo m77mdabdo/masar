@@ -39,7 +39,7 @@ class ValidateMenuTree
     private function walk(array $nodes, int $depth, array &$problems, array &$seen, array $ancestors): void
     {
         if ($depth > self::MAX_DEPTH) {
-            $problems[] = sprintf('العمق الأقصى للقائمة %d مستويات.', self::MAX_DEPTH);
+            $problems[] = sprintf(__('العمق الأقصى للقائمة %d مستويات.'), self::MAX_DEPTH);
 
             return;
         }
@@ -48,7 +48,7 @@ class ValidateMenuTree
             $id = $node['id'] ?? null;
 
             if ($id === null) {
-                $problems[] = 'عنصر بلا معرّف في الشجرة.';
+                $problems[] = __('عنصر بلا معرّف في الشجرة.');
 
                 continue;
             }
@@ -57,7 +57,7 @@ class ValidateMenuTree
             // "duplicate" would be a technically-true but useless thing to tell
             // the person who just dragged a parent into its own child.
             if (in_array($id, $ancestors, true)) {
-                $problems[] = 'لا يمكن أن يكون العنصر أبًا لنفسه.';
+                $problems[] = __('لا يمكن أن يكون العنصر أبًا لنفسه.');
 
                 continue;
             }
@@ -65,7 +65,7 @@ class ValidateMenuTree
             // Otherwise a repeated id means the tree is a graph, and a renderer
             // walking it either duplicates the item or never terminates.
             if (isset($seen[$id])) {
-                $problems[] = 'عنصر مكرر في الشجرة — لا يمكن أن يظهر العنصر في مكانين.';
+                $problems[] = __('عنصر مكرر في الشجرة — لا يمكن أن يظهر العنصر في مكانين.');
 
                 continue;
             }

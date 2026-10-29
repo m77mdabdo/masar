@@ -27,7 +27,15 @@ final class SyncTranslationReviews
         $rows = [];
 
         foreach (Locales::codes() as $locale) {
-            $files = array_merge(glob(lang_path("{$locale}/*.php")) ?: [], is_file(lang_path("{$locale}.json")) ? [lang_path("{$locale}.json")] : []);
+            // The edition's own groups and framework JSON, the admin panel's
+            // catalogue, and the Filament keys we supply where the package
+            // has none (filed under the package's code for ur-pk and zh-hans).
+            $vendor = \App\Support\EditionTranslationLoader::VENDOR[$locale] ?? $locale;
+            $files = array_merge(
+                glob(lang_path("{$locale}/*.php")) ?: [],
+                array_values(array_filter([lang_path("{$locale}.json"), lang_path("admin/{$locale}.json")], 'is_file')),
+                $this->vendorFiles(lang_path('vendor'), $vendor),
+            );
 
             foreach ($files as $file) {
                 $rows[] = $this->record($locale, $file);
@@ -35,6 +43,22 @@ final class SyncTranslationReviews
         }
 
         return $rows;
+    }
+
+    /** @return list<string> */
+    private function vendorFiles(string $root, string $code): array
+    {
+        $files = [];
+        foreach (glob("{$root}/*/{$code}", GLOB_ONLYDIR) ?: [] as $dir) {
+            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS)) as $file) {
+                if ($file->getExtension() === 'php') {
+                    $files[] = $file->getPathname();
+                }
+            }
+        }
+        sort($files);
+
+        return $files;
     }
 
     private function record(string $locale, string $file): TranslationReview

@@ -16,7 +16,7 @@ use Illuminate\Translation\FileLoader;
  */
 final class EditionTranslationLoader extends FileLoader
 {
-    private const VENDOR = ['ur-pk' => 'ur', 'zh-hans' => 'zh_CN'];
+    public const VENDOR = ['ur-pk' => 'ur', 'zh-hans' => 'zh_CN'];
 
     public function load($locale, $group, $namespace = null): array
     {

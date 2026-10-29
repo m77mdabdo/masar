@@ -19,13 +19,13 @@
                     <span class="truncate text-sm font-medium text-gray-900 dark:text-gray-100">{{ $node['label'] }}</span>
 
                     @if ($node['is_entity_link'])
-                        <span class="rounded bg-[#7FB69A]/25 px-1.5 py-0.5 text-[10px] text-[#0E2A1C]" title="يتتبع تغيّر المسار">كيان</span>
+                        <span class="rounded bg-[#7FB69A]/25 px-1.5 py-0.5 text-[10px] text-[#0E2A1C]" title="{{ __('يتتبع تغيّر المسار') }}">{{ __('كيان') }}</span>
                     @else
-                        <span class="rounded bg-[#C9A063]/25 px-1.5 py-0.5 text-[10px] text-[#14181A]" title="لا يتتبع تغيّر المسار">رابط يدوي</span>
+                        <span class="rounded bg-[#C9A063]/25 px-1.5 py-0.5 text-[10px] text-[#14181A]" title="{{ __('لا يتتبع تغيّر المسار') }}">{{ __('رابط يدوي') }}</span>
                     @endif
 
                     @if ($node['is_mega'])
-                        <span class="rounded bg-gray-200 px-1.5 py-0.5 text-[10px] dark:bg-white/10">ضخمة</span>
+                        <span class="rounded bg-gray-200 px-1.5 py-0.5 text-[10px] dark:bg-white/10">{{ __('ضخمة') }}</span>
                     @endif
 
                     @if ($node['scheduled'])
@@ -38,10 +38,10 @@
 
             <div class="flex shrink-0 items-center gap-1">
                 @unless ($node['show_desktop'])
-                    <x-filament::icon icon="heroicon-o-computer-desktop" class="h-3.5 w-3.5 text-gray-300" title="مخفي على سطح المكتب" />
+                    <x-filament::icon icon="heroicon-o-computer-desktop" class="h-3.5 w-3.5 text-gray-300" title="{{ __('مخفي على سطح المكتب') }}" />
                 @endunless
                 @unless ($node['show_mobile'])
-                    <x-filament::icon icon="heroicon-o-device-phone-mobile" class="h-3.5 w-3.5 text-gray-300" title="مخفي على الجوال" />
+                    <x-filament::icon icon="heroicon-o-device-phone-mobile" class="h-3.5 w-3.5 text-gray-300" title="{{ __('مخفي على الجوال') }}" />
                 @endunless
 
                 <button type="button" wire:click="toggleItem({{ $node['id'] }})" class="rounded p-1 hover:bg-gray-100 dark:hover:bg-white/10">
@@ -49,7 +49,7 @@
                 </button>
 
                 <button type="button" wire:click="deleteItem({{ $node['id'] }})"
-                        wire:confirm="حذف هذا العنصر وكل ما تحته؟"
+                        wire:confirm="{{ __('حذف هذا العنصر وكل ما تحته؟') }}"
                         class="rounded p-1 hover:bg-red-50 dark:hover:bg-red-500/10">
                     <x-filament::icon icon="heroicon-o-trash" class="h-4 w-4 text-red-500" />
                 </button>

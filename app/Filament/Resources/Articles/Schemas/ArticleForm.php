@@ -74,18 +74,18 @@ class ArticleForm
 
     private static function storyTab(): Tab
     {
-        return Tab::make('القصة')
+        return Tab::make(__('القصة'))
             ->id('story')
             ->icon(Heroicon::OutlinedNewspaper)
             ->schema([
                 TextInput::make('title')
-                    ->label('العنوان')
+                    ->label(__('العنوان'))
                     ->required()
                     ->maxLength(255)
                     ->columnSpanFull(),
 
                 TextInput::make('subtitle')
-                    ->label('العنوان الفرعي')
+                    ->label(__('العنوان الفرعي'))
                     ->maxLength(255)
                     ->columnSpanFull(),
 
@@ -95,16 +95,16 @@ class ArticleForm
                  * changing it silently would break every link already shared.
                  */
                 TextInput::make('slug')
-                    ->label('المسار (slug)')
+                    ->label(__('المسار (slug)'))
                     ->required()
                     ->maxLength(255)
-                    ->helperText('حروف لاتينية فقط. تغييره بعد النشر يكسر الروابط المنشورة.')
+                    ->helperText(__('حروف لاتينية فقط. تغييره بعد النشر يكسر الروابط المنشورة.'))
                     ->rules(['regex:/^[a-z0-9-]+$/'])
-                    ->validationMessages(['regex' => 'يُسمح بالحروف اللاتينية الصغيرة والأرقام والشرطة فقط.'])
+                    ->validationMessages(['regex' => __('يُسمح بالحروف اللاتينية الصغيرة والأرقام والشرطة فقط.')])
                     ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr'])
                     ->suffixAction(
                         Action::make('suggestSlug')
-                            ->label('اقترح')
+                            ->label(__('اقترح'))
                             ->icon(Heroicon::OutlinedSparkles)
                             ->action(function (Get $get, Set $set, ?Article $record): void {
                                 $title = (string) $get('title');
@@ -124,7 +124,7 @@ class ArticleForm
                     ->columnSpanFull(),
 
                 Select::make('category_id')
-                    ->label('القسم')
+                    ->label(__('القسم'))
                     ->relationship('category', 'slug')
                     ->getOptionLabelFromRecordUsing(fn ($record): string => $record->name ?? $record->slug)
                     ->searchable()
@@ -132,14 +132,14 @@ class ArticleForm
                     ->required(),
 
                 Select::make('content_type')
-                    ->label('نوع المحتوى')
+                    ->label(__('نوع المحتوى'))
                     ->options(ContentType::options())
                     ->default(ContentType::News->value)
                     ->required()
                     ->live(),
 
                 Select::make('locale')
-                    ->label('اللغة')
+                    ->label(__('اللغة'))
                     ->options(fn (): array => collect(config('masar.locales'))
                         ->map(fn (array $l): string => $l['name'])
                         ->all())
@@ -153,40 +153,40 @@ class ArticleForm
                  * field is not dehydrated, so the stored value survives the save.
                  */
                 Toggle::make('is_sponsored')
-                    ->label('محتوى مدفوع')
+                    ->label(__('محتوى مدفوع'))
                     ->live()
                     ->disabled(fn (?Article $record): bool => (bool) $record?->is_sponsored
                         && $record->status === ArticleStatus::Published)
                     ->helperText(fn (?Article $record): string => ((bool) $record?->is_sponsored
                         && $record->status === ArticleStatus::Published)
-                        ? 'لا يمكن إزالة الوسم عن مادة منشورة. أعِد المادة إلى المسودة أولًا.'
-                        : 'يجب الإفصاح عنه للقارئ.'),
+                        ? __('لا يمكن إزالة الوسم عن مادة منشورة. أعِد المادة إلى المسودة أولًا.')
+                        : __('يجب الإفصاح عنه للقارئ.')),
 
                 TextInput::make('sponsor_name')
-                    ->label('اسم الجهة الراعية')
+                    ->label(__('اسم الجهة الراعية'))
                     ->maxLength(255)
                     ->visible(fn (Get $get): bool => (bool) $get('is_sponsored'))
                     ->required(fn (Get $get): bool => (bool) $get('is_sponsored')),
 
                 SpatieMediaLibraryFileUpload::make('hero')
-                    ->label('صورة الغلاف')
+                    ->label(__('صورة الغلاف'))
                     ->collection('hero')
                     ->image()
                     ->imageEditor()
                     ->maxSize((int) config('masar.media.max_upload_kb'))
                     ->acceptedFileTypes(config('masar.media.accepted'))
                     ->rules([new \App\Rules\SafeImage])
-                    ->helperText('مطلوبة للنشر — كل بطاقات العرض والقوائم تعتمد عليها.')
+                    ->helperText(__('مطلوبة للنشر — كل بطاقات العرض والقوائم تعتمد عليها.'))
                     ->columnSpanFull(),
 
                 TextInput::make('hero_alt')
-                    ->label('النص البديل للغلاف')
+                    ->label(__('النص البديل للغلاف'))
                     ->maxLength(255)
-                    ->helperText('صِف الصورة لقارئ لا يراها. مطلوب للنشر.')
+                    ->helperText(__('صِف الصورة لقارئ لا يراها. مطلوب للنشر.'))
                     ->columnSpanFull(),
 
                 TextInput::make('hero_credit')
-                    ->label('حقوق الصورة')
+                    ->label(__('حقوق الصورة'))
                     ->maxLength(255)
                     ->columnSpanFull(),
 
@@ -195,10 +195,10 @@ class ArticleForm
                  * the form can never disagree about what "enough" means.
                  */
                 Repeater::make('summary')
-                    ->label('ملخص الثلاثين ثانية')
+                    ->label(__('ملخص الثلاثين ثانية'))
                     ->simple(
                         TextInput::make('point')
-                            ->label('نقطة')
+                            ->label(__('نقطة'))
                             ->required()
                             ->maxLength(300),
                     )
@@ -207,7 +207,7 @@ class ArticleForm
                     ->defaultItems(2)
                     ->reorderable()
                     ->helperText(fn (Get $get): string => sprintf(
-                        'المطلوب من %d إلى %d نقاط. الحالي: %d.',
+                        __('المطلوب من %d إلى %d نقاط. الحالي: %d.'),
                         (int) config('masar.publish_gate.min_summary_points'),
                         (int) config('masar.publish_gate.max_summary_points'),
                         count((array) ($get('summary') ?? [])),
@@ -220,13 +220,13 @@ class ArticleForm
 
     private static function bodyTab(): Tab
     {
-        return Tab::make('المتن')
+        return Tab::make(__('المتن'))
             ->id('body')
             ->icon(Heroicon::OutlinedBars3BottomRight)
             ->schema([
                 BlockBuilder::make('blocks')
-                    ->label('كتل المحتوى')
-                    ->addActionLabel('أضف كتلة')
+                    ->label(__('كتل المحتوى'))
+                    ->addActionLabel(__('أضف كتلة'))
                     ->collapsible()
                     ->collapsed()
                     ->cloneable()
@@ -238,35 +238,35 @@ class ArticleForm
 
     private static function differentiationTab(): Tab
     {
-        return Tab::make('التمايز')
+        return Tab::make(__('التمايز'))
             ->id('differentiation')
             ->icon(Heroicon::OutlinedLightBulb)
             ->badge(fn (Get $get): ?string => blank($get('why_it_matters')) ? '!' : null)
             ->badgeColor('danger')
             ->schema([
                 Textarea::make('what_happened')
-                    ->label('ما الذي حدث؟')
+                    ->label(__('ما الذي حدث؟'))
                     ->rows(4)
-                    ->helperText('الواقعة نفسها في فقرة واحدة: ماذا حدث، ومتى، ومن أعلنه.')
+                    ->helperText(__('الواقعة نفسها في فقرة واحدة: ماذا حدث، ومتى، ومن أعلنه.'))
                     ->columnSpanFull(),
 
                 Textarea::make('why_it_matters')
-                    ->label('لماذا يهم هذا؟')
+                    ->label(__('لماذا يهم هذا؟'))
                     ->required()
                     ->rows(4)
-                    ->helperText('ما الذي تغيّر فعليًا، ولمن. هذه هي المسافة بين مسار وبين وكالة أنباء — وهي مطلوبة للنشر.')
+                    ->helperText(__('ما الذي تغيّر فعليًا، ولمن. هذه هي المسافة بين مسار وبين وكالة أنباء — وهي مطلوبة للنشر.'))
                     ->columnSpanFull(),
 
                 Textarea::make('business_impact')
-                    ->label('الأثر على الأعمال')
+                    ->label(__('الأثر على الأعمال'))
                     ->rows(4)
-                    ->helperText('من المتأثر: أي قطاع، أي حجم شركة، وبأي اتجاه.')
+                    ->helperText(__('من المتأثر: أي قطاع، أي حجم شركة، وبأي اتجاه.'))
                     ->columnSpanFull(),
 
                 Textarea::make('opportunity')
-                    ->label('أين الفرصة؟')
+                    ->label(__('أين الفرصة؟'))
                     ->rows(4)
-                    ->helperText('خطوة قابلة للتنفيذ لقارئ في موقع القرار. لا نصيحة استثمارية.')
+                    ->helperText(__('خطوة قابلة للتنفيذ لقارئ في موقع القرار. لا نصيحة استثمارية.'))
                     ->columnSpanFull(),
 
                 /*
@@ -276,46 +276,46 @@ class ArticleForm
                  * — worse than refusing it, because the refusal is invisible.
                  */
                 Repeater::make('key_numbers')
-                    ->label('أرقام مفتاحية')
+                    ->label(__('أرقام مفتاحية'))
                     ->schema([
                         TextInput::make('value')
-                            ->label('القيمة')
+                            ->label(__('القيمة'))
                             ->required()
                             ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
                         TextInput::make('label')
-                            ->label('الوصف')
+                            ->label(__('الوصف'))
                             ->required()
-                            ->helperText('يجب أن يطابق وحدة القيمة: نسبة مع نسبة، مبلغ مع مبلغ، عدد مع عدد.'),
+                            ->helperText(__('يجب أن يطابق وحدة القيمة: نسبة مع نسبة، مبلغ مع مبلغ، عدد مع عدد.')),
                         TextInput::make('source')
-                            ->label('المصدر')
+                            ->label(__('المصدر'))
                             ->required()
                             ->maxLength(120)
-                            ->helperText('الجهة التي نشرت الرقم. لا يُنشر رقم بلا جهة.'),
+                            ->helperText(__('الجهة التي نشرت الرقم. لا يُنشر رقم بلا جهة.')),
                         TextInput::make('as_of')
-                            ->label('تاريخ الرقم')
+                            ->label(__('تاريخ الرقم'))
                             ->required()
                             ->placeholder('2026-03')
                             ->rule('regex:/^\d{4}-(0[1-9]|1[0-2])$/')
                             ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr'])
-                            ->helperText('سنة وشهر. رقم بلا تاريخ يقرأه القارئ كأنه اليوم.'),
+                            ->helperText(__('سنة وشهر. رقم بلا تاريخ يقرأه القارئ كأنه اليوم.')),
                     ])
                     ->columns(2)
                     ->maxItems(6)
                     ->defaultItems(0)
-                    ->addActionLabel('أضف رقمًا')
-                    ->helperText('أرقام بصيغة غربية (0-9) دائمًا. كل رقم يحمل مصدرًا وتاريخًا، وإلا لا يظهر للقارئ.')
+                    ->addActionLabel(__('أضف رقمًا'))
+                    ->helperText(__('أرقام بصيغة غربية (0-9) دائمًا. كل رقم يحمل مصدرًا وتاريخًا، وإلا لا يظهر للقارئ.'))
                     ->columnSpanFull(),
             ]);
     }
 
     private static function entitiesTab(): Tab
     {
-        return Tab::make('الكيانات')
+        return Tab::make(__('الكيانات'))
             ->id('entities')
             ->icon(Heroicon::OutlinedShare)
             ->schema([
                 Select::make('topic_ids')
-                    ->label('المواضيع')
+                    ->label(__('المواضيع'))
                     ->multiple()
                     ->searchable()
                     ->preload()
@@ -324,7 +324,7 @@ class ArticleForm
                         ->get()
                         ->mapWithKeys(fn ($t): array => [$t->id => $t->name ?? $t->slug])
                         ->all())
-                    ->helperText('المواضيع تغذّي صفحات SEO وعدّاداتها.')
+                    ->helperText(__('المواضيع تغذّي صفحات SEO وعدّاداتها.'))
                     ->columnSpanFull(),
 
                 ...ArticleEntityFields::selectors(),
@@ -333,46 +333,46 @@ class ArticleForm
 
     private static function sourcesTab(): Tab
     {
-        return Tab::make('المصادر')
+        return Tab::make(__('المصادر'))
             ->id('sources')
             ->icon(Heroicon::OutlinedShieldCheck)
             ->badge(fn (Get $get): ?string => ($c = count((array) ($get('sources') ?? []))) > 0 ? (string) $c : null)
             ->schema([
                 Repeater::make('sources')
-                    ->label('المصادر')
+                    ->label(__('المصادر'))
                     ->relationship('sources')
                     ->orderColumn('sort_order')
-                    ->addActionLabel('أضف مصدرًا')
+                    ->addActionLabel(__('أضف مصدرًا'))
                     ->defaultItems(0)
                     ->live()
                     ->itemLabel(fn (array $state): ?string => $state['title'] ?? null)
                     ->collapsible()
                     ->schema([
                         TextInput::make('title')
-                            ->label('العنوان')
+                            ->label(__('العنوان'))
                             ->required()
                             ->columnSpan(2),
                         TextInput::make('url')
-                            ->label('الرابط')
+                            ->label(__('الرابط'))
                             ->url()
-                            ->helperText('مطلوب مصدر واحد على الأقل برابط قابل للتحقق.')
+                            ->helperText(__('مطلوب مصدر واحد على الأقل برابط قابل للتحقق.'))
                             ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr'])
                             ->columnSpan(2),
                         TextInput::make('publisher')
-                            ->label('الناشر'),
+                            ->label(__('الناشر')),
                         Select::make('source_type')
-                            ->label('النوع')
+                            ->label(__('النوع'))
                             ->options([
-                                'official_document' => 'وثيقة رسمية',
-                                'press_release' => 'بيان صحفي',
-                                'interview' => 'مقابلة',
-                                'report' => 'تقرير',
-                                'data' => 'بيانات',
+                                'official_document' => __('وثيقة رسمية'),
+                                'press_release' => __('بيان صحفي'),
+                                'interview' => __('مقابلة'),
+                                'report' => __('تقرير'),
+                                'data' => __('بيانات'),
                             ])
                             ->default('official_document')
                             ->required(),
                         DatePicker::make('accessed_at')
-                            ->label('تاريخ الاطلاع')
+                            ->label(__('تاريخ الاطلاع'))
                             ->default(now()),
                     ])
                     ->columns(2)
@@ -399,22 +399,22 @@ class ArticleForm
                 : auth()->user()?->can('seo', $record) === true)
             ->schema([
                 TextInput::make('meta_title')
-                    ->label('عنوان الميتا')
+                    ->label(__('عنوان الميتا'))
                     ->maxLength(60)
                     ->live(onBlur: true)
                     ->helperText(fn (Get $get): string => sprintf(
-                        '%d / 60 حرفًا. يُفضّل بين 50 و60.',
+                        __('%d / 60 حرفًا. يُفضّل بين 50 و60.'),
                         mb_strlen((string) ($get('meta_title') ?: $get('title'))),
                     ))
                     ->columnSpanFull(),
 
                 Textarea::make('meta_description')
-                    ->label('وصف الميتا')
+                    ->label(__('وصف الميتا'))
                     ->rows(3)
                     ->maxLength(160)
                     ->live(onBlur: true)
                     ->helperText(fn (Get $get): string => sprintf(
-                        '%d / 160 حرفًا.',
+                        __('%d / 160 حرفًا.'),
                         mb_strlen((string) $get('meta_description')),
                     ))
                     ->columnSpanFull(),
@@ -424,25 +424,25 @@ class ArticleForm
                     ->columnSpanFull(),
 
                 TextInput::make('canonical_url')
-                    ->label('الرابط الأساسي (canonical)')
+                    ->label(__('الرابط الأساسي (canonical)'))
                     ->url()
                     ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr'])
                     ->columnSpanFull(),
 
                 TextInput::make('og_image_path')
-                    ->label('صورة المشاركة (OG)')
+                    ->label(__('صورة المشاركة (OG)'))
                     ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr'])
                     ->columnSpanFull(),
 
                 Toggle::make('noindex')
-                    ->label('منع الأرشفة (noindex)')
-                    ->helperText('استخدمه للصفحات المكررة أو المؤقتة فقط.'),
+                    ->label(__('منع الأرشفة (noindex)'))
+                    ->helperText(__('استخدمه للصفحات المكررة أو المؤقتة فقط.')),
             ]);
     }
 
     private static function distributionTab(): Tab
     {
-        return Tab::make('التوزيع')
+        return Tab::make(__('التوزيع'))
             ->id('distribution')
             ->icon(Heroicon::OutlinedMegaphone)
             ->schema([
@@ -471,14 +471,14 @@ class ArticleForm
                     ->columnSpanFull(),
 
                 TextInput::make('distribution.newsletter')
-                    ->label('عنوان النشرة البريدية')
+                    ->label(__('عنوان النشرة البريدية'))
                     ->maxLength(90)
                     ->live(onBlur: true)
                     ->helperText(fn (Get $get): string => self::counter($get('distribution.newsletter'), 90))
                     ->columnSpanFull(),
 
                 TextInput::make('distribution.push')
-                    ->label('نص الإشعار')
+                    ->label(__('نص الإشعار'))
                     ->maxLength(120)
                     ->live(onBlur: true)
                     ->helperText(fn (Get $get): string => self::counter($get('distribution.push'), 120))
@@ -488,6 +488,6 @@ class ArticleForm
 
     private static function counter(mixed $value, int $limit): string
     {
-        return sprintf('%d / %d حرفًا.', mb_strlen((string) $value), $limit);
+        return sprintf(__('%d / %d حرفًا.'), mb_strlen((string) $value), $limit);
     }
 }

@@ -31,57 +31,60 @@ class CategoryResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSquares2x2;
 
-    protected static string|UnitEnum|null $navigationGroup = 'المحتوى';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('المحتوى');
+    }
 
     protected static ?int $navigationSort = 3;
 
     public static function getModelLabel(): string
     {
-        return 'قسم';
+        return __('قسم');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'الأقسام';
+        return __('الأقسام');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'الأقسام';
+        return __('الأقسام');
     }
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
             TextInput::make('slug')
-                ->label('المسار')
+                ->label(__('المسار'))
                 ->required()
                 ->unique(ignoreRecord: true)
                 ->rules(['regex:/^[a-z0-9-]+$/'])
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
 
             Select::make('parent_id')
-                ->label('القسم الأب')
+                ->label(__('القسم الأب'))
                 ->relationship('parent', 'slug')
                 ->searchable()
                 ->preload(),
 
             // The order is an editorial statement: 1-3 are the launch pillars.
             TextInput::make('sort_order')
-                ->label('الترتيب')
+                ->label(__('الترتيب'))
                 ->numeric()
                 ->default(0)
                 ->required(),
 
-            ColorPicker::make('color')->label('اللون'),
+            ColorPicker::make('color')->label(__('اللون')),
 
-            Toggle::make('is_active')->label('مفعّل')->default(true),
+            Toggle::make('is_active')->label(__('مفعّل'))->default(true),
 
             TranslationsField::make([
-                TextInput::make('name')->label('الاسم')->required(),
-                Textarea::make('description')->label('الوصف')->rows(2),
-                TextInput::make('meta_title')->label('عنوان الميتا'),
-                TextInput::make('meta_description')->label('وصف الميتا'),
+                TextInput::make('name')->label(__('الاسم'))->required(),
+                Textarea::make('description')->label(__('الوصف'))->rows(2),
+                TextInput::make('meta_title')->label(__('عنوان الميتا')),
+                TextInput::make('meta_description')->label(__('وصف الميتا')),
             ]),
         ])->columns(2);
     }
@@ -94,18 +97,18 @@ class CategoryResource extends Resource
             ->reorderable('sort_order')
             ->columns([
                 TextColumn::make('name')
-                    ->label('الاسم')
-                    ->getStateUsing(fn (Category $r): ?string => $r->name)
+                    ->label(__('الاسم'))
+                    ->getStateUsing(fn (Category $record): ?string => $record->name)
                     ->searchable(query: fn (Builder $query, string $search): Builder => $query->whereHas(
                         'translations',
                         fn (Builder $t) => $t->where('name', 'like', "%{$search}%"),
                     )),
-                TextColumn::make('slug')->label('المسار')->badge()->color('gray'),
-                TextColumn::make('sort_order')->label('الترتيب')->sortable(),
-                TextColumn::make('articles_count')->label('عدد المواد')->numeric()->sortable(),
-                IconColumn::make('is_active')->label('مفعّل')->boolean(),
+                TextColumn::make('slug')->label(__('المسار'))->badge()->color('gray'),
+                TextColumn::make('sort_order')->label(__('الترتيب'))->sortable(),
+                TextColumn::make('articles_count')->label(__('عدد المواد'))->numeric()->sortable(),
+                IconColumn::make('is_active')->label(__('مفعّل'))->boolean(),
             ])
-            ->recordActions([EditAction::make()->label('تحرير')]);
+            ->recordActions([EditAction::make()->label(__('تحرير'))]);
     }
 
     public static function getPages(): array

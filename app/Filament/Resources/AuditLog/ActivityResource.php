@@ -32,23 +32,26 @@ class ActivityResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 
-    protected static string|UnitEnum|null $navigationGroup = 'النظام';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('النظام');
+    }
 
     protected static ?int $navigationSort = 4;
 
     public static function getModelLabel(): string
     {
-        return 'سجل';
+        return __('سجل');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'سجل التدقيق';
+        return __('سجل التدقيق');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'سجل التدقيق';
+        return __('سجل التدقيق');
     }
 
     public static function canViewAny(): bool
@@ -82,44 +85,44 @@ class ActivityResource extends Resource
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['causer', 'subject']))
             ->defaultSort('created_at', 'desc')
             ->columns([
-                TextColumn::make('created_at')->label('التوقيت')->dateTime('Y-m-d H:i')->sortable(),
+                TextColumn::make('created_at')->label(__('التوقيت'))->dateTime('Y-m-d H:i')->sortable(),
 
                 TextColumn::make('log_name')
-                    ->label('النوع')
+                    ->label(__('النوع'))
                     ->badge()
-                    ->formatStateUsing(fn (?string $s): string => match ($s) {
-                        'article.status' => 'نقل مادة',
-                        'article.published' => 'نشر',
-                        default => $s ?? 'عام',
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'article.status' => __('نقل مادة'),
+                        'article.published' => __('نشر'),
+                        default => $state ?? __('عام'),
                     })
-                    ->color(fn (?string $s): string => $s === 'article.published' ? 'success' : 'gray'),
+                    ->color(fn (?string $state): string => $state === 'article.published' ? 'success' : 'gray'),
 
-                TextColumn::make('description')->label('الوصف')->wrap()->limit(60),
+                TextColumn::make('description')->label(__('الوصف'))->wrap()->limit(60)
+                    ->formatStateUsing(fn (Activity $record): string => \App\Support\AuditDescription::present($record)),
 
-                TextColumn::make('causer.name')->label('المستخدم')->placeholder('النظام'),
+                TextColumn::make('causer.name')->label(__('المستخدم'))->placeholder(__('النظام')),
 
                 TextColumn::make('subject_type')
-                    ->label('الكيان')
+                    ->label(__('الكيان'))
                     ->badge()
-                    ->formatStateUsing(fn (?string $s): string => match ($s) {
-                        'article' => 'مادة',
-                        'company' => 'شركة',
-                        'menu_item' => 'عنصر قائمة',
-                        'setting' => 'إعداد',
-                        default => $s ?? '—',
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'article' => __('مادة'),
+                        'company' => __('شركة'),
+                        'menu_item' => __('عنصر قائمة'),
+                        'setting' => __('إعداد'),
+                        default => $state ?? '—',
                     }),
 
                 TextColumn::make('properties')
-                    ->label('التفاصيل')
+                    ->label(__('التفاصيل'))
                     ->wrap()
                     ->limit(80)
                     ->formatStateUsing(function ($state): string {
                         $props = $state instanceof Collection ? $state->all() : (array) $state;
 
-                        if (isset($props['from'], $props['to'])) {
-                            $line = "{$props['from']} ← {$props['to']}";
-
-                            return filled($props['note'] ?? null) ? $line.' · '.$props['note'] : $line;
+                        $transition = \App\Support\AuditDescription::transition($props);
+                        if ($transition !== null) {
+                            return $transition;
                         }
 
                         return json_encode($props, JSON_UNESCAPED_UNICODE) ?: '';
@@ -128,7 +131,7 @@ class ActivityResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('log_name')
-                    ->label('النوع')
+                    ->label(__('النوع'))
                     ->options(fn (): array => Activity::query()
                         ->whereNotNull('log_name')
                         ->distinct()
@@ -136,12 +139,12 @@ class ActivityResource extends Resource
                         ->all()),
 
                 SelectFilter::make('causer_id')
-                    ->label('المستخدم')
+                    ->label(__('المستخدم'))
                     ->options(fn (): array => User::query()->pluck('name', 'id')->all())
                     ->searchable(),
 
                 SelectFilter::make('subject_type')
-                    ->label('الكيان')
+                    ->label(__('الكيان'))
                     ->options(fn (): array => Activity::query()
                         ->whereNotNull('subject_type')
                         ->distinct()
@@ -149,10 +152,10 @@ class ActivityResource extends Resource
                         ->all()),
 
                 Filter::make('logged_between')
-                    ->label('الفترة')
+                    ->label(__('الفترة'))
                     ->schema([
-                        DatePicker::make('from')->label('من'),
-                        DatePicker::make('until')->label('إلى'),
+                        DatePicker::make('from')->label(__('من')),
+                        DatePicker::make('until')->label(__('إلى')),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => $query
                         ->when($data['from'] ?? null, fn (Builder $b, $d): Builder => $b->whereDate('created_at', '>=', $d))

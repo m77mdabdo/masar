@@ -37,10 +37,10 @@ class BlockedByGate extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            ->heading('محجوبة ببوابة النشر')
-            ->description('مواد أُعلن اكتمالها ولا يمكن نشرها بعد.')
-            ->emptyStateHeading('لا شيء محجوب')
-            ->emptyStateDescription('كل المواد الجاهزة تستوفي شروط النشر.')
+            ->heading(__('محجوبة ببوابة النشر'))
+            ->description(__('مواد أُعلن اكتمالها ولا يمكن نشرها بعد.'))
+            ->emptyStateHeading(__('لا شيء محجوب'))
+            ->emptyStateDescription(__('كل المواد الجاهزة تستوفي شروط النشر.'))
             ->query(fn (): Builder => ScopedArticles::for(auth()->user())
                 ->whereIn('status', [ArticleStatus::Ready->value, ArticleStatus::Scheduled->value])
                 ->where('gate_failures_count', '>', 0)
@@ -49,19 +49,19 @@ class BlockedByGate extends TableWidget
             ->paginated([5, 10])
             ->columns([
                 TextColumn::make('title')
-                    ->label('العنوان')
+                    ->label(__('العنوان'))
                     ->wrap()
                     ->limit(70)
                     ->url(fn (Article $record): string => ArticleResource::getUrl('edit', ['record' => $record])),
 
                 TextColumn::make('gate')
-                    ->label('الناقص')
+                    ->label(__('الناقص'))
                     ->badge()
                     ->color('danger')
                     ->getStateUsing(fn (Article $record): array => $record->isPublishable())
                     ->wrap(),
 
-                TextColumn::make('author.name')->label('الكاتب')->placeholder('—'),
+                TextColumn::make('author.name')->label(__('الكاتب'))->placeholder('—'),
             ])
             ->recordActions([]);
     }

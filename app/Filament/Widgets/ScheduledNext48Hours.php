@@ -32,8 +32,8 @@ class ScheduledNext48Hours extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            ->heading('مجدول خلال 48 ساعة')
-            ->emptyStateHeading('لا شيء مجدول')
+            ->heading(__('مجدول خلال 48 ساعة'))
+            ->emptyStateHeading(__('لا شيء مجدول'))
             ->query(fn (): Builder => ScopedArticles::for(auth()->user())
                 ->where('status', ArticleStatus::Scheduled->value)
                 ->whereBetween('scheduled_for', [now(), now()->addHours(48)])
@@ -42,22 +42,22 @@ class ScheduledNext48Hours extends TableWidget
             ->paginated(false)
             ->columns([
                 TextColumn::make('scheduled_for')
-                    ->label('الموعد')
+                    ->label(__('الموعد'))
                     ->dateTime('Y-m-d H:i')
                     ->description(fn (Article $record): string => $record->scheduled_for?->diffForHumans() ?? ''),
 
                 TextColumn::make('title')
-                    ->label('العنوان')
+                    ->label(__('العنوان'))
                     ->wrap()
                     ->limit(60)
                     ->url(fn (Article $record): string => ArticleResource::getUrl('edit', ['record' => $record])),
 
                 TextColumn::make('gate')
-                    ->label('الجاهزية')
+                    ->label(__('الجاهزية'))
                     ->badge()
                     ->getStateUsing(fn (Article $record): string => $record->isPublishable() === []
-                        ? 'جاهزة'
-                        : count($record->isPublishable()).' متطلب ناقص')
+                        ? __('جاهزة')
+                        : __(':count متطلب ناقص', ['count' => count($record->isPublishable())]))
                     ->color(fn (Article $record): string => $record->isPublishable() === [] ? 'success' : 'danger'),
             ])
             ->recordActions([]);

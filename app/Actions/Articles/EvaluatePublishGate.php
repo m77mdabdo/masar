@@ -77,19 +77,19 @@ class EvaluatePublishGate
         $count = count($points);
 
         if ($count === 0) {
-            $failures[] = ['rule' => 'summary', 'message' => "أضف ملخص الثلاثين ثانية ({$min} نقاط على الأقل)."];
+            $failures[] = ['rule' => 'summary', 'message' => __('أضف ملخص الثلاثين ثانية (:min نقاط على الأقل).', ['min' => $min])];
 
             return;
         }
 
         if ($count < $min) {
-            $failures[] = ['rule' => 'summary', 'message' => "أضف نقاطًا إلى ملخص الثلاثين ثانية: المطلوب {$min} على الأقل والحالي {$count}."];
+            $failures[] = ['rule' => 'summary', 'message' => __('أضف نقاطًا إلى ملخص الثلاثين ثانية: المطلوب :min على الأقل والحالي :count.', ['min' => $min, 'count' => $count])];
 
             return;
         }
 
         if ($count > $max) {
-            $failures[] = ['rule' => 'summary', 'message' => "اختصر ملخص الثلاثين ثانية إلى {$max} نقاط كحد أقصى؛ الحالي {$count}."];
+            $failures[] = ['rule' => 'summary', 'message' => __('اختصر ملخص الثلاثين ثانية إلى :max نقاط كحد أقصى؛ الحالي :count.', ['max' => $max, 'count' => $count])];
         }
     }
 
@@ -108,7 +108,7 @@ class EvaluatePublishGate
             : $article->sources()->whereNotNull('url')->where('url', '!=', '')->count();
 
         if ($withUrl === 0) {
-            $failures[] = ['rule' => 'source', 'message' => 'أضف مصدرًا واحدًا على الأقل مع رابط يمكن التحقق منه.'];
+            $failures[] = ['rule' => 'source', 'message' => __('أضف مصدرًا واحدًا على الأقل مع رابط يمكن التحقق منه.')];
         }
     }
 
@@ -126,11 +126,11 @@ class EvaluatePublishGate
     private function checkHero(Article $article, array $gate, array &$failures): void
     {
         if (($gate['require_hero_image'] ?? true) && $article->hero_media_id === null) {
-            $failures[] = ['rule' => 'hero_image', 'message' => 'أضف صورة غلاف للمادة؛ كل بطاقات العرض والقوائم تعتمد عليها.'];
+            $failures[] = ['rule' => 'hero_image', 'message' => __('أضف صورة غلاف للمادة؛ كل بطاقات العرض والقوائم تعتمد عليها.')];
         }
 
         if (($gate['require_hero_alt'] ?? true) && blank($article->hero_alt)) {
-            $failures[] = ['rule' => 'hero_alt', 'message' => 'اكتب نصًا بديلًا يصف صورة الغلاف لقارئ لا يراها.'];
+            $failures[] = ['rule' => 'hero_alt', 'message' => __('اكتب نصًا بديلًا يصف صورة الغلاف لقارئ لا يراها.')];
         }
     }
 
@@ -145,7 +145,7 @@ class EvaluatePublishGate
         }
 
         if ($article->fact_checked_at === null) {
-            $failures[] = ['rule' => 'fact_check', 'message' => 'مرّر المادة على مرحلة تدقيق المعلومات قبل النشر.'];
+            $failures[] = ['rule' => 'fact_check', 'message' => __('مرّر المادة على مرحلة تدقيق المعلومات قبل النشر.')];
         }
     }
 
@@ -163,7 +163,7 @@ class EvaluatePublishGate
         }
 
         if (blank($article->why_it_matters)) {
-            $failures[] = ['rule' => 'why_it_matters', 'message' => 'اكتب فقرة "لماذا يهم هذا؟" — هي وعد المنصة للقارئ وليست حقلًا اختياريًا.'];
+            $failures[] = ['rule' => 'why_it_matters', 'message' => __('اكتب فقرة "لماذا يهم هذا؟" — هي وعد المنصة للقارئ وليست حقلًا اختياريًا.')];
         }
     }
 
@@ -178,7 +178,7 @@ class EvaluatePublishGate
         }
 
         if ($article->is_sponsored && blank($article->sponsor_name)) {
-            $failures[] = ['rule' => 'sponsor_name', 'message' => 'حدّد اسم الجهة الراعية؛ المحتوى المدفوع يجب أن يُفصح عنه للقارئ.'];
+            $failures[] = ['rule' => 'sponsor_name', 'message' => __('حدّد اسم الجهة الراعية؛ المحتوى المدفوع يجب أن يُفصح عنه للقارئ.')];
         }
     }
 

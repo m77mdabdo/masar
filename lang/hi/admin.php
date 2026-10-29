@@ -3,11 +3,48 @@
 declare(strict_types=1);
 
 return [
+    'filepond' => [
+        'labelButtonAbortItemLoad' => 'रोकें',
+        'labelButtonAbortItemProcessing' => 'रद्द करें',
+        'labelButtonProcessItem' => 'अपलोड करें',
+        'labelButtonRemoveItem' => 'हटाएँ',
+        'labelButtonRetryItemLoad' => 'फिर से कोशिश करें',
+        'labelButtonRetryItemProcessing' => 'फिर से कोशिश करें',
+        'labelButtonUndoItemProcessing' => 'पूर्ववत करें',
+        'labelFileLoadError' => 'लोड करते समय त्रुटि',
+        'labelFileLoading' => 'लोड हो रहा है',
+        'labelFileProcessing' => 'अपलोड हो रहा है',
+        'labelFileProcessingAborted' => 'अपलोड रद्द किया गया',
+        'labelFileProcessingComplete' => 'अपलोड पूरा हुआ',
+        'labelFileProcessingError' => 'अपलोड करते समय त्रुटि',
+        'labelFileProcessingRevertError' => 'वापस लेते समय त्रुटि',
+        'labelFileRemoveError' => 'हटाते समय त्रुटि',
+        'labelFileSizeNotAvailable' => 'आकार उपलब्ध नहीं',
+        'labelFileTypeNotAllowed' => 'अमान्य प्रकार की फ़ाइल',
+        'labelFileWaitingForSize' => 'आकार की प्रतीक्षा',
+        'labelIdle' => 'अपनी फ़ाइलें खींचकर छोड़ें या <span class="filepond--label-action">ब्राउज़ करें</span>',
+        'labelInvalidField' => 'फ़ील्ड में अमान्य फ़ाइलें हैं',
+        'labelMaxFileSize' => 'अधिकतम फ़ाइल आकार {filesize} है',
+        'labelMaxFileSizeExceeded' => 'फ़ाइल बहुत बड़ी है',
+        'labelMaxTotalFileSize' => 'अधिकतम कुल फ़ाइल आकार {filesize} है',
+        'labelMaxTotalFileSizeExceeded' => 'अधिकतम कुल आकार पार हो गया',
+        'labelTapToCancel' => 'रद्द करने के लिए टैप करें',
+        'labelTapToRetry' => 'फिर से कोशिश करने के लिए टैप करें',
+        'labelTapToUndo' => 'पूर्ववत करने के लिए टैप करें',
+    ],
     'gate' => [
         'translation_unreviewed' => 'इस अनुवाद की समीक्षा नहीं हुई है। अनुवादक के अलावा कोई और इसे मंज़ूरी दे, तब तक अनुवाद प्रकाशित नहीं होता।',
     ],
     'language' => [
         'menu' => 'पैनल की भाषा',
+        'names' => [
+            'ar' => 'अरबी',
+            'en' => 'अंग्रेज़ी',
+            'fr' => 'फ़्रेंच',
+            'hi' => 'हिन्दी',
+            'ur-pk' => 'उर्दू',
+            'zh-hans' => 'सरलीकृत चीनी',
+        ],
     ],
     'translation' => [
         'action_retry' => 'अनुवाद दोबारा चलाएँ',

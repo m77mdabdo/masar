@@ -163,3 +163,36 @@ it('puts every resource in a navigation group', function (): void {
 
     expect($ungrouped)->toBe([]);
 });
+
+/*
+ * The same trap for a record closure: `getOptionLabelFromRecordUsing(fn ($r) …)`
+ * receives null, because Filament resolves the parameter by name. The smoke
+ * test above cannot see it — with no related rows the closure never runs —
+ * and three resources returned 500 on real data until the admin browser audit
+ * of 2026-10-29 loaded them.
+ */
+it('names every filament-evaluated closure parameter with a name filament injects', function (): void {
+    // A typed enum or model parameter under an unknown name is resolved from
+    // the container instead: an enum throws "not instantiable", a model
+    // arrives empty. /admin/companies and /admin/opportunities returned 500
+    // on real data this way, past every smoke test.
+    $injected = ['record', 'state', 'query', 'get', 'set', 'livewire', 'component', 'column', 'operation', 'model', 'data', 'value', 'search', 'rule', 'records', 'action', 'arguments', 'table', 'context'];
+    $methods = 'getOptionLabelFromRecordUsing|getStateUsing|recordUrl|formatStateUsing|color|icon|iconColor|description|tooltip|badge|visible|hidden|url|disabled|label|helperText|hint|placeholder|default|afterStateUpdated|dehydrateStateUsing|formatStateUsing|getSearchResultsUsing|options';
+    $offenders = [];
+    foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(app_path('Filament'))) as $file) {
+        if ($file->getExtension() !== 'php') {
+            continue;
+        }
+        preg_match_all('/->('.$methods.')\s*\(\s*(?:static\s+)?fn\s*\(([^)]*)\)/', (string) file_get_contents($file->getPathname()), $matches, PREG_SET_ORDER);
+        foreach ($matches as $match) {
+            preg_match_all('/\$(\w+)/', $match[2], $params);
+            foreach ($params[1] as $name) {
+                if (! in_array($name, $injected, true)) {
+                    $offenders[] = basename($file->getPathname()).' '.$match[1].' → $'.$name;
+                }
+            }
+        }
+    }
+
+    expect($offenders)->toBe([]);
+});

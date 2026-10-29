@@ -42,7 +42,7 @@ class ArticlesTable
             ->defaultSort('updated_at', 'desc')
             ->columns([
                 TextColumn::make('title')
-                    ->label('العنوان')
+                    ->label(__('العنوان'))
                     ->searchable()
                     ->sortable()
                     ->wrap()
@@ -50,13 +50,13 @@ class ArticlesTable
                     ->description(fn (Article $record): ?string => $record->subtitle),
 
                 TextColumn::make('category.name')
-                    ->label('القسم')
+                    ->label(__('القسم'))
                     ->badge()
                     ->getStateUsing(fn (Article $record): ?string => $record->category?->name)
                     ->sortable(query: fn (Builder $query, string $direction): Builder => $query->orderBy('category_id', $direction)),
 
                 TextColumn::make('status')
-                    ->label('الحالة')
+                    ->label(__('الحالة'))
                     ->badge()
                     ->formatStateUsing(fn (ArticleStatus $state): string => $state->label())
                     ->color(fn (ArticleStatus $state): string => match ($state) {
@@ -70,18 +70,18 @@ class ArticlesTable
                     ->sortable(),
 
                 TextColumn::make('author.name')
-                    ->label('الكاتب')
+                    ->label(__('الكاتب'))
                     ->sortable()
                     ->toggleable(),
 
                 TextColumn::make('published_at')
-                    ->label('تاريخ النشر')
+                    ->label(__('تاريخ النشر'))
                     ->dateTime('Y-m-d H:i')
                     ->placeholder('—')
                     ->sortable(),
 
                 TextColumn::make('views_count')
-                    ->label('المشاهدات')
+                    ->label(__('المشاهدات'))
                     ->numeric()
                     ->sortable()
                     ->toggleable(),
@@ -94,7 +94,7 @@ class ArticlesTable
                 // How many of the six editions carry this story, published. A
                 // subquery in the list query, so it costs nothing per row.
                 TextColumn::make('editions_published')
-                    ->label('النسخ المنشورة')
+                    ->label(__('النسخ المنشورة'))
                     ->state(fn (\App\Models\Article $record): string => ((int) $record->editions_published).'/'.count(\App\Support\Locales::codes()))
                     ->badge()
                     ->color(fn (\App\Models\Article $record): string => (int) $record->editions_published >= count(\App\Support\Locales::codes()) ? 'success' : 'warning')
@@ -116,35 +116,35 @@ class ArticlesTable
                     ->toggleable(),
 
                 IconColumn::make('is_featured')
-                    ->label('مميزة')
+                    ->label(__('مميزة'))
                     ->boolean()
                     ->toggleable(),
 
                 IconColumn::make('is_sponsored')
-                    ->label('مدفوعة')
+                    ->label(__('مدفوعة'))
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('status')
-                    ->label('الحالة')
+                    ->label(__('الحالة'))
                     ->options(ArticleStatus::options())
                     ->multiple(),
 
                 SelectFilter::make('category')
-                    ->label('القسم')
+                    ->label(__('القسم'))
                     ->relationship('category', 'slug')
                     ->searchable()
                     ->preload(),
 
                 SelectFilter::make('author')
-                    ->label('الكاتب')
+                    ->label(__('الكاتب'))
                     ->relationship('author', 'name')
                     ->searchable()
                     ->preload(),
 
                 SelectFilter::make('locale')
-                    ->label('اللغة')
+                    ->label(__('اللغة'))
                     ->options(fn (): array => collect(\App\Support\Locales::codes())
                         ->mapWithKeys(fn (string $c): array => [$c => \App\Support\Locales::name($c)])
                         ->all()),
@@ -154,18 +154,18 @@ class ArticlesTable
                     ->options(\App\Enums\TranslationStatus::options()),
 
                 SelectFilter::make('content_type')
-                    ->label('نوع المحتوى')
+                    ->label(__('نوع المحتوى'))
                     ->options(ContentType::options())
                     ->multiple(),
 
-                TernaryFilter::make('is_featured')->label('مميزة'),
-                TernaryFilter::make('is_sponsored')->label('مدفوعة'),
+                TernaryFilter::make('is_featured')->label(__('مميزة')),
+                TernaryFilter::make('is_sponsored')->label(__('مدفوعة')),
 
                 Filter::make('published_between')
-                    ->label('تاريخ النشر')
+                    ->label(__('تاريخ النشر'))
                     ->schema([
-                        DatePicker::make('from')->label('من'),
-                        DatePicker::make('until')->label('إلى'),
+                        DatePicker::make('from')->label(__('من')),
+                        DatePicker::make('until')->label(__('إلى')),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => $query
                         ->when($data['from'] ?? null, fn (Builder $q, $d): Builder => $q->whereDate('published_at', '>=', $d))
@@ -179,7 +179,7 @@ class ArticlesTable
                  * masar:recount is what turns NULLs into real numbers.
                  */
                 Filter::make('blocked_by_gate')
-                    ->label('محجوبة ببوابة النشر')
+                    ->label(__('محجوبة ببوابة النشر'))
                     ->toggle()
                     ->query(fn (Builder $query): Builder => $query
                         ->where('gate_failures_count', '>', 0)
@@ -190,18 +190,18 @@ class ArticlesTable
                         ])),
             ])
             ->recordActions([
-                EditAction::make()->label('تحرير'),
+                EditAction::make()->label(__('تحرير')),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     BulkAction::make('feature')
-                        ->label('تمييز')
+                        ->label(__('تمييز'))
                         ->icon('heroicon-o-star')
                         ->action(fn (Collection $records) => $records->each->forceFill(['is_featured' => true])->each->save())
                         ->deselectRecordsAfterCompletion(),
 
                     BulkAction::make('unfeature')
-                        ->label('إلغاء التمييز')
+                        ->label(__('إلغاء التمييز'))
                         ->icon('heroicon-o-star')
                         ->action(fn (Collection $records) => $records->each->forceFill(['is_featured' => false])->each->save())
                         ->deselectRecordsAfterCompletion(),
@@ -215,7 +215,7 @@ class ArticlesTable
                      * per-article decision with a gate behind it.
                      */
                     BulkAction::make('archive')
-                        ->label('أرشفة')
+                        ->label(__('أرشفة'))
                         ->icon('heroicon-o-archive-box')
                         ->requiresConfirmation()
                         ->action(function (Collection $records): void {
@@ -228,7 +228,7 @@ class ArticlesTable
                                 }
 
                                 try {
-                                    $transition($record, ArticleStatus::Archived, auth()->user(), 'أرشفة جماعية');
+                                    $transition($record, ArticleStatus::Archived, auth()->user(), __('أرشفة جماعية'));
                                     $done++;
                                 } catch (\Throwable) {
                                     // Reported in the summary below rather than
@@ -238,7 +238,7 @@ class ArticlesTable
 
                             Notification::make()
                                 ->success()
-                                ->title("تمت أرشفة {$done} من {$records->count()}")
+                                ->title(__('تمت أرشفة :done من :total', ['done' => $done, 'total' => $records->count()]))
                                 ->send();
                         })
                         ->deselectRecordsAfterCompletion(),

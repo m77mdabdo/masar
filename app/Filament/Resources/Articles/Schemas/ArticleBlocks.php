@@ -57,9 +57,9 @@ class ArticleBlocks
     private static function sectionField(): Select
     {
         return Select::make('section')
-            ->label('القسم')
+            ->label(__('القسم'))
             ->options(ArticleSection::options())
-            ->placeholder('بلا قسم — يظهر في المتن العام')
+            ->placeholder(__('بلا قسم — يظهر في المتن العام'))
             ->native(false)
             ->columnSpanFull();
     }
@@ -77,38 +77,38 @@ class ArticleBlocks
     private static function paragraph(): Block
     {
         return Block::make('paragraph')
-            ->label('فقرة')
+            ->label(__('فقرة'))
             ->icon('heroicon-o-bars-3-bottom-right')
             ->schema([
                 self::sectionField(),
-                Textarea::make('text')->label('النص')->rows(5)->required(),
+                Textarea::make('text')->label(__('النص'))->rows(5)->required(),
             ])
-            ->label(fn (?array $state): string => self::preview($state['text'] ?? null, 'فقرة'));
+            ->label(fn (?array $state): string => self::preview($state['text'] ?? null, __('فقرة')));
     }
 
     private static function heading(): Block
     {
         return Block::make('heading')
-            ->label('عنوان فرعي')
+            ->label(__('عنوان فرعي'))
             ->icon('heroicon-o-hashtag')
             ->schema([
                 self::sectionField(),
-                Select::make('level')->label('المستوى')->options([2 => 'H2', 3 => 'H3', 4 => 'H4'])->default(2)->required(),
-                TextInput::make('text')->label('النص')->required(),
+                Select::make('level')->label(__('المستوى'))->options([2 => 'H2', 3 => 'H3', 4 => 'H4'])->default(2)->required(),
+                TextInput::make('text')->label(__('النص'))->required(),
             ])
             ->columns(2)
-            ->label(fn (?array $state): string => 'عنوان · '.self::preview($state['text'] ?? null, '—', 40));
+            ->label(fn (?array $state): string => __('عنوان').' · '.self::preview($state['text'] ?? null, '—', 40));
     }
 
     private static function image(): Block
     {
         return Block::make('image')
-            ->label('صورة')
+            ->label(__('صورة'))
             ->icon('heroicon-o-photo')
             ->schema([
                 self::sectionField(),
                 FileUpload::make('path')
-                    ->label('الصورة')
+                    ->label(__('الصورة'))
                     ->image()
                     ->disk('public')
                     ->directory('articles/blocks')
@@ -116,161 +116,161 @@ class ArticleBlocks
                     ->acceptedFileTypes(config('masar.media.accepted'))
                     ->rules([new \App\Rules\SafeImage])
                     ->required(),
-                TextInput::make('alt')->label('النص البديل')->required()
-                    ->helperText('مطلوب لكل صورة، بلا استثناء.'),
-                TextInput::make('caption')->label('التعليق'),
-                TextInput::make('credit')->label('الحقوق'),
+                TextInput::make('alt')->label(__('النص البديل'))->required()
+                    ->helperText(__('مطلوب لكل صورة، بلا استثناء.')),
+                TextInput::make('caption')->label(__('التعليق')),
+                TextInput::make('credit')->label(__('الحقوق')),
             ])
             ->columns(2)
-            ->label(fn (?array $state): string => 'صورة · '.self::preview($state['caption'] ?? $state['alt'] ?? null, '—', 40));
+            ->label(fn (?array $state): string => __('صورة').' · '.self::preview($state['caption'] ?? $state['alt'] ?? null, '—', 40));
     }
 
     private static function quote(): Block
     {
         return Block::make('quote')
-            ->label('اقتباس')
+            ->label(__('اقتباس'))
             ->icon('heroicon-o-chat-bubble-bottom-center-text')
             ->schema([
                 self::sectionField(),
-                Textarea::make('text')->label('نص الاقتباس')->rows(3)->required(),
-                TextInput::make('attribution')->label('القائل')
-                    ->helperText('شخص حقيقي وافق على النشر. لا تنسب اقتباسًا لم يُقل.'),
-                TextInput::make('role')->label('الصفة'),
+                Textarea::make('text')->label(__('نص الاقتباس'))->rows(3)->required(),
+                TextInput::make('attribution')->label(__('القائل'))
+                    ->helperText(__('شخص حقيقي وافق على النشر. لا تنسب اقتباسًا لم يُقل.')),
+                TextInput::make('role')->label(__('الصفة')),
             ])
-            ->label(fn (?array $state): string => 'اقتباس · '.self::preview($state['attribution'] ?? $state['text'] ?? null, '—', 40));
+            ->label(fn (?array $state): string => __('اقتباس').' · '.self::preview($state['attribution'] ?? $state['text'] ?? null, '—', 40));
     }
 
     private static function pullquote(): Block
     {
         return Block::make('pullquote')
-            ->label('اقتباس بارز')
+            ->label(__('اقتباس بارز'))
             ->icon('heroicon-o-sparkles')
             ->schema([
                 self::sectionField(),
-                Textarea::make('text')->label('النص')->rows(2)->required(),
+                Textarea::make('text')->label(__('النص'))->rows(2)->required(),
             ])
-            ->label(fn (?array $state): string => 'بارز · '.self::preview($state['text'] ?? null, '—', 40));
+            ->label(fn (?array $state): string => __('بارز').' · '.self::preview($state['text'] ?? null, '—', 40));
     }
 
     private static function numbers(): Block
     {
         return Block::make('numbers')
-            ->label('أرقام')
+            ->label(__('أرقام'))
             ->icon('heroicon-o-calculator')
             ->schema([
                 self::sectionField(),
                 Repeater::make('items')
-                    ->label('الأرقام')
+                    ->label(__('الأرقام'))
                     ->schema([
-                        TextInput::make('value')->label('القيمة')->required()
+                        TextInput::make('value')->label(__('القيمة'))->required()
                             ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
-                        TextInput::make('label')->label('الوصف')->required(),
+                        TextInput::make('label')->label(__('الوصف'))->required(),
                     ])
                     ->columns(2)
                     ->defaultItems(2),
             ])
-            ->label(fn (?array $state): string => 'أرقام · '.count($state['items'] ?? []).' عنصر');
+            ->label(fn (?array $state): string => __(__('أرقام').'').' · '.__(':count عنصر', ['count' => count($state['items'] ?? [])]));
     }
 
     private static function table(): Block
     {
         return Block::make('table')
-            ->label('جدول')
+            ->label(__('جدول'))
             ->icon('heroicon-o-table-cells')
             ->schema([
                 self::sectionField(),
-                TextInput::make('caption')->label('عنوان الجدول'),
-                Textarea::make('csv')->label('البيانات (CSV)')->rows(6)->required()
-                    ->helperText('صف لكل سطر، والأعمدة مفصولة بفاصلة.')
+                TextInput::make('caption')->label(__('عنوان الجدول')),
+                Textarea::make('csv')->label(__('البيانات (CSV)'))->rows(6)->required()
+                    ->helperText(__('صف لكل سطر، والأعمدة مفصولة بفاصلة.'))
                     ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
             ])
-            ->label(fn (?array $state): string => 'جدول · '.self::preview($state['caption'] ?? null, '—', 40));
+            ->label(fn (?array $state): string => __('جدول').' · '.self::preview($state['caption'] ?? null, '—', 40));
     }
 
     private static function embed(): Block
     {
         return Block::make('embed')
-            ->label('تضمين')
+            ->label(__('تضمين'))
             ->icon('heroicon-o-code-bracket')
             ->schema([
                 self::sectionField(),
-                TextInput::make('url')->label('الرابط')->url()->required()
+                TextInput::make('url')->label(__('الرابط'))->url()->required()
                     ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
-                TextInput::make('caption')->label('التعليق'),
+                TextInput::make('caption')->label(__('التعليق')),
             ])
-            ->label(fn (?array $state): string => 'تضمين · '.self::preview($state['url'] ?? null, '—', 40));
+            ->label(fn (?array $state): string => __('تضمين').' · '.self::preview($state['url'] ?? null, '—', 40));
     }
 
     private static function video(): Block
     {
         return Block::make('video')
-            ->label('فيديو')
+            ->label(__('فيديو'))
             ->icon('heroicon-o-play-circle')
             ->schema([
                 self::sectionField(),
-                TextInput::make('url')->label('الرابط')->url()->required()
+                TextInput::make('url')->label(__('الرابط'))->url()->required()
                     ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
-                TextInput::make('title')->label('العنوان'),
-                TextInput::make('duration')->label('المدة'),
+                TextInput::make('title')->label(__('العنوان')),
+                TextInput::make('duration')->label(__('المدة')),
             ])
             ->columns(2)
-            ->label(fn (?array $state): string => 'فيديو · '.self::preview($state['title'] ?? $state['url'] ?? null, '—', 40));
+            ->label(fn (?array $state): string => __('فيديو').' · '.self::preview($state['title'] ?? $state['url'] ?? null, '—', 40));
     }
 
     private static function callout(): Block
     {
         return Block::make('callout')
-            ->label('تنبيه')
+            ->label(__('تنبيه'))
             ->icon('heroicon-o-information-circle')
             ->schema([
                 self::sectionField(),
-                Select::make('tone')->label('النبرة')->options([
-                    'insight' => 'رؤية',
-                    'warning' => 'تحذير',
-                    'context' => 'سياق',
+                Select::make('tone')->label(__('النبرة'))->options([
+                    'insight' => __('رؤية'),
+                    'warning' => __('تحذير'),
+                    'context' => __('سياق'),
                 ])->default('insight')->required(),
-                Textarea::make('text')->label('النص')->rows(3)->required(),
+                Textarea::make('text')->label(__('النص'))->rows(3)->required(),
             ])
-            ->label(fn (?array $state): string => 'تنبيه · '.self::preview($state['text'] ?? null, '—', 40));
+            ->label(fn (?array $state): string => __('تنبيه').' · '.self::preview($state['text'] ?? null, '—', 40));
     }
 
     private static function opportunity(): Block
     {
         return Block::make('opportunity')
-            ->label('فرصة')
+            ->label(__('فرصة'))
             ->icon('heroicon-o-flag')
             ->schema([
                 self::sectionField(),
-                Textarea::make('text')->label('النص')->rows(3)->required(),
-                TextInput::make('cta_label')->label('نص الزر'),
-                TextInput::make('cta_url')->label('رابط الزر')->url()
+                Textarea::make('text')->label(__('النص'))->rows(3)->required(),
+                TextInput::make('cta_label')->label(__('نص الزر')),
+                TextInput::make('cta_url')->label(__('رابط الزر'))->url()
                     ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
             ])
-            ->label(fn (?array $state): string => 'فرصة · '.self::preview($state['text'] ?? null, '—', 40));
+            ->label(fn (?array $state): string => __('فرصة').' · '.self::preview($state['text'] ?? null, '—', 40));
     }
 
     private static function explainer(): Block
     {
         return Block::make('explainer')
-            ->label('شرح')
+            ->label(__('شرح'))
             ->icon('heroicon-o-academic-cap')
             ->schema([
                 self::sectionField(),
-                TextInput::make('term')->label('المصطلح')->required(),
-                Textarea::make('text')->label('الشرح')->rows(3)->required(),
+                TextInput::make('term')->label(__('المصطلح'))->required(),
+                Textarea::make('text')->label(__('الشرح'))->rows(3)->required(),
             ])
-            ->label(fn (?array $state): string => 'شرح · '.self::preview($state['term'] ?? null, '—', 40));
+            ->label(fn (?array $state): string => __('شرح').' · '.self::preview($state['term'] ?? null, '—', 40));
     }
 
     private static function divider(): Block
     {
         return Block::make('divider')
-            ->label('فاصل')
+            ->label(__('فاصل'))
             ->icon('heroicon-o-minus')
             ->schema([
                 self::sectionField(),
-                Toggle::make('spacious')->label('مسافة إضافية')->default(false),
+                Toggle::make('spacious')->label(__('مسافة إضافية'))->default(false),
             ])
-            ->label('فاصل');
+            ->label(__('فاصل'));
     }
 }

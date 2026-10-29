@@ -39,7 +39,10 @@ class NavigationManager extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-bars-3';
 
-    protected static string|UnitEnum|null $navigationGroup = 'النظام';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('النظام');
+    }
 
     protected static ?int $navigationSort = 5;
 
@@ -51,12 +54,12 @@ class NavigationManager extends Page
 
     public static function getNavigationLabel(): string
     {
-        return 'القوائم';
+        return __('القوائم');
     }
 
     public function getTitle(): string
     {
-        return 'إدارة القوائم';
+        return __('إدارة القوائم');
     }
 
     public static function canAccess(): bool
@@ -139,7 +142,7 @@ class NavigationManager extends Page
         $linkable = $item->linkable;
 
         return $linkable === null
-            ? 'هدف محذوف'
+            ? __('هدف محذوف')
             : ($linkable->name ?? $linkable->title ?? $linkable->slug ?? '—');
     }
 
@@ -171,11 +174,11 @@ class NavigationManager extends Page
         try {
             app(SaveMenuTree::class)($menu, $tree, auth()->user());
 
-            Notification::make()->success()->title('حُفظ ترتيب القائمة')->send();
+            Notification::make()->success()->title(__('حُفظ ترتيب القائمة'))->send();
         } catch (InvalidMenuTree $e) {
             Notification::make()
                 ->danger()
-                ->title('ترتيب غير صالح')
+                ->title(__('ترتيب غير صالح'))
                 ->body(implode("\n", $e->reasons()))
                 ->persistent()
                 ->send();
@@ -204,31 +207,31 @@ class NavigationManager extends Page
     private function addItemAction(): Action
     {
         return Action::make('addItem')
-            ->label('أضف عنصرًا')
+            ->label(__('أضف عنصرًا'))
             ->icon('heroicon-o-plus')
             ->schema([
-                TextInput::make('label_ar')->label('التسمية (عربي)')->required(),
-                TextInput::make('label_en')->label('التسمية (English)')
+                TextInput::make('label_ar')->label(__('التسمية (عربي)'))->required(),
+                TextInput::make('label_en')->label(__('التسمية (English)'))
                     ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
 
                 Select::make('link_mode')
-                    ->label('نوع الرابط')
+                    ->label(__('نوع الرابط'))
                     ->options([
-                        'entity' => 'ارتباط بكيان (مُستحسن)',
-                        'url' => 'رابط يدوي',
+                        'entity' => __('ارتباط بكيان (مُستحسن)'),
+                        'url' => __('رابط يدوي'),
                     ])
                     ->default('entity')
                     ->live()
                     ->required()
-                    ->helperText('الارتباط بكيان يتتبع تغيّر المسار تلقائيًا. الرابط اليدوي يتحول إلى 404 عند تغيّر مسار الوجهة.'),
+                    ->helperText(__('الارتباط بكيان يتتبع تغيّر المسار تلقائيًا. الرابط اليدوي يتحول إلى 404 عند تغيّر مسار الوجهة.')),
 
                 Select::make('linkable_type')
-                    ->label('نوع الكيان')
+                    ->label(__('نوع الكيان'))
                     ->options([
-                        'category' => 'قسم',
-                        'article' => 'مادة',
-                        'topic' => 'موضوع',
-                        'company' => 'شركة',
+                        'category' => __('قسم'),
+                        'article' => __('مادة'),
+                        'topic' => __('موضوع'),
+                        'company' => __('شركة'),
                     ])
                     ->default('category')
                     ->live()
@@ -236,32 +239,32 @@ class NavigationManager extends Page
                     ->required(fn (Get $get): bool => $get('link_mode') === 'entity'),
 
                 Select::make('linkable_id')
-                    ->label('الوجهة')
+                    ->label(__('الوجهة'))
                     ->options(fn (Get $get): array => $this->targetOptions($get('linkable_type')))
                     ->searchable()
                     ->visible(fn (Get $get): bool => $get('link_mode') === 'entity')
                     ->required(fn (Get $get): bool => $get('link_mode') === 'entity'),
 
                 TextInput::make('url')
-                    ->label('الرابط')
+                    ->label(__('الرابط'))
                     ->visible(fn (Get $get): bool => $get('link_mode') === 'url')
                     ->required(fn (Get $get): bool => $get('link_mode') === 'url')
                     ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
 
                 Select::make('parent_id')
-                    ->label('تحت')
+                    ->label(__('تحت'))
                     ->options(fn (): array => $this->parentOptions())
-                    ->placeholder('المستوى الأول')
-                    ->helperText('الحد الأقصى '.ValidateMenuTree::MAX_DEPTH.' مستويات.'),
+                    ->placeholder(__('المستوى الأول'))
+                    ->helperText(__('الحد الأقصى :max مستويات.', ['max' => ValidateMenuTree::MAX_DEPTH])),
 
-                Toggle::make('show_desktop')->label('يظهر على سطح المكتب')->default(true),
-                Toggle::make('show_mobile')->label('يظهر على الجوال')->default(true),
-                Toggle::make('is_mega')->label('قائمة ضخمة (للمستوى الأول فقط)')->default(false),
-                TextInput::make('column_group')->label('عمود التجميع')
-                    ->helperText('لتجميع الأبناء داخل قائمة ضخمة.'),
+                Toggle::make('show_desktop')->label(__('يظهر على سطح المكتب'))->default(true),
+                Toggle::make('show_mobile')->label(__('يظهر على الجوال'))->default(true),
+                Toggle::make('is_mega')->label(__('قائمة ضخمة (للمستوى الأول فقط)'))->default(false),
+                TextInput::make('column_group')->label(__('عمود التجميع'))
+                    ->helperText(__('لتجميع الأبناء داخل قائمة ضخمة.')),
 
-                DateTimePicker::make('starts_at')->label('يبدأ الظهور')->seconds(false),
-                DateTimePicker::make('ends_at')->label('ينتهي الظهور')->seconds(false),
+                DateTimePicker::make('starts_at')->label(__('يبدأ الظهور'))->seconds(false),
+                DateTimePicker::make('ends_at')->label(__('ينتهي الظهور'))->seconds(false),
             ])
             ->action(function (array $data): void {
                 Gate::authorize('create', MenuItem::class);
@@ -295,20 +298,20 @@ class NavigationManager extends Page
 
                 app(FlushNavigationCache::class)($menu);
 
-                Notification::make()->success()->title('أُضيف العنصر')->send();
+                Notification::make()->success()->title(__('أُضيف العنصر'))->send();
             });
     }
 
     private function flushCacheAction(): Action
     {
         return Action::make('flushCache')
-            ->label('تفريغ ذاكرة القوائم')
+            ->label(__('تفريغ ذاكرة القوائم'))
             ->icon('heroicon-o-arrow-path')
             ->color('gray')
             ->action(function (): void {
                 app(FlushNavigationCache::class)($this->currentMenu());
 
-                Notification::make()->success()->title('فُرّغت الذاكرة')->send();
+                Notification::make()->success()->title(__('فُرّغت الذاكرة'))->send();
             });
     }
 
@@ -345,7 +348,7 @@ class NavigationManager extends Page
 
         app(FlushNavigationCache::class)($this->currentMenu());
 
-        Notification::make()->success()->title('حُذف العنصر')->send();
+        Notification::make()->success()->title(__('حُذف العنصر'))->send();
     }
 
     /**

@@ -37,7 +37,7 @@ class EditArticle extends EditRecord
         return [
             ...ArticleTransitionActions::for($this->getRecord()),
             ...TranslationActions::for($this->getRecord()),
-            DeleteAction::make()->label('حذف'),
+            DeleteAction::make()->label(__('حذف')),
         ];
     }
 
@@ -66,7 +66,7 @@ class EditArticle extends EditRecord
             ->whereKeyNot($article->getKey())->get();
 
         return $versions->isEmpty() ? null : __('admin.translation.subheading_original', [
-            'versions' => $versions->map(fn (Article $v): string => $name($v).' ('.$state($v).')')->implode('، '),
+            'versions' => $versions->map(fn (Article $v): string => $name($v).' ('.$state($v).')')->implode(__('، ')),
         ]);
     }
 

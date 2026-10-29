@@ -31,11 +31,11 @@
                 x-data="masarMenuTree(@js($tree))"
             >
                 <p class="mb-3 text-xs text-gray-500 dark:text-gray-400">
-                    اسحب لإعادة الترتيب أو لتغيير الأب. الحد الأقصى {{ \App\Actions\Navigation\ValidateMenuTree::MAX_DEPTH }} مستويات.
+                    {{ __('اسحب لإعادة الترتيب أو لتغيير الأب. الحد الأقصى :max مستويات.', ['max' => \App\Actions\Navigation\ValidateMenuTree::MAX_DEPTH]) }}
                 </p>
 
                 @if ($tree === [])
-                    <p class="py-8 text-center text-sm text-gray-400">لا توجد عناصر في هذه القائمة بعد.</p>
+                    <p class="py-8 text-center text-sm text-gray-400">{{ __('لا توجد عناصر في هذه القائمة بعد.') }}</p>
                 @else
                     <ul class="space-y-1" x-ref="root">
                         @include('filament.pages.partials.menu-branch', ['nodes' => $tree, 'depth' => 1])
@@ -48,7 +48,7 @@
                             x-bind:disabled="! dirty"
                             class="rounded-lg bg-[#0E2A1C] px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
                         >
-                            حفظ الترتيب
+                            {{ __('حفظ الترتيب') }}
                         </button>
                     </div>
                 @endif
@@ -59,11 +59,11 @@
         <div>
             <div class="fi-section rounded-xl border border-gray-200 bg-[#F6F4EF] p-4 dark:border-white/10 dark:bg-gray-900">
                 <p class="mb-3 text-xs font-medium text-gray-500 dark:text-gray-400">
-                    معاينة مباشرة — كما سيراها القارئ
+                    {{ __('معاينة مباشرة — كما سيراها القارئ') }}
                 </p>
 
                 @if ($preview === [])
-                    <p class="py-6 text-center text-xs text-gray-400">لا شيء ظاهر للقارئ حاليًا.</p>
+                    <p class="py-6 text-center text-xs text-gray-400">{{ __('لا شيء ظاهر للقارئ حاليًا.') }}</p>
                 @else
                     <nav dir="rtl">
                         <ul class="space-y-2">
@@ -73,7 +73,7 @@
                                         {{ $node['label'] }}
                                     </span>
                                     @if ($node['is_mega'])
-                                        <span class="ms-1 rounded bg-[#7FB69A]/25 px-1.5 py-0.5 text-[10px]">ضخمة</span>
+                                        <span class="ms-1 rounded bg-[#7FB69A]/25 px-1.5 py-0.5 text-[10px]">{{ __('ضخمة') }}</span>
                                     @endif
                                     <div class="masar-ltr text-[11px] text-[#7C848A]" dir="ltr">{{ $node['url'] ?? '—' }}</div>
 

@@ -46,7 +46,7 @@ class SaveMenuTree
         // this, a crafted request could adopt another menu's items.
         foreach ($flat as $row) {
             if (! in_array($row['id'], $ownedIds, true)) {
-                throw new InvalidMenuTree(['عنصر لا ينتمي إلى هذه القائمة.']);
+                throw new InvalidMenuTree([__('عنصر لا ينتمي إلى هذه القائمة.')]);
             }
         }
 

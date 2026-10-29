@@ -48,23 +48,26 @@ class IntelligenceItemResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedInbox;
 
-    protected static string|UnitEnum|null $navigationGroup = 'المحتوى';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('المحتوى');
+    }
 
     protected static ?int $navigationSort = 3;
 
     public static function getModelLabel(): string
     {
-        return 'عنصر رصد';
+        return __('عنصر رصد');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'صندوق الرصد';
+        return __('صندوق الرصد');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'صندوق الرصد';
+        return __('صندوق الرصد');
     }
 
     /** The count an editor actually cares about: what is still untriaged. */
@@ -101,7 +104,7 @@ class IntelligenceItemResource extends Resource
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['source', 'duplicateOf', 'reviewer']))
             ->columns([
                 TextColumn::make('title')
-                    ->label('العنوان')
+                    ->label(__('العنوان'))
                     ->wrap()
                     ->searchable()
                     ->description(fn (IntelligenceItem $record): ?string => $record->summary)
@@ -109,19 +112,19 @@ class IntelligenceItemResource extends Resource
                     ->url(fn (IntelligenceItem $record): ?string => $record->url, shouldOpenInNewTab: true),
 
                 TextColumn::make('source.name')
-                    ->label('المصدر')
+                    ->label(__('المصدر'))
                     ->badge()
                     ->sortable(),
 
                 TextColumn::make('importance')
-                    ->label('الأهمية')
+                    ->label(__('الأهمية'))
                     ->badge()
                     ->sortable()
                     // The live score, not the stored one. The stored value is
                     // kept for audit — it is what we thought at ingest — but it
                     // is not what should rank the queue today.
                     ->state(fn (IntelligenceItem $record): int => $record->liveImportance())
-                    ->tooltip(fn (IntelligenceItem $record): string => 'عند الرصد: '.$record->importance)
+                    ->tooltip(fn (IntelligenceItem $record): string => __('عند الرصد: :value', ['value' => $record->importance]))
                     ->color(fn (int $state): string => match (true) {
                         $state >= 70 => 'danger',
                         $state >= 40 => 'warning',
@@ -129,18 +132,18 @@ class IntelligenceItemResource extends Resource
                     }),
 
                 TextColumn::make('document_type')
-                    ->label('النوع')
+                    ->label(__('النوع'))
                     ->badge()
                     ->formatStateUsing(fn (?DocumentType $state): string => $state?->label() ?? '—'),
 
                 TextColumn::make('classification_path')
-                    ->label('التصنيف')
+                    ->label(__('التصنيف'))
                     ->badge()
                     ->formatStateUsing(fn (?ClassificationPath $state): string => $state?->label() ?? '—')
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('review_state')
-                    ->label('الحالة')
+                    ->label(__('الحالة'))
                     ->badge()
                     ->formatStateUsing(fn (ReviewState $state): string => $state->label())
                     ->color(fn (ReviewState $state): string => $state->colour()),
@@ -149,28 +152,28 @@ class IntelligenceItemResource extends Resource
                 // known-weak, so an editor needs to see what an item was
                 // flagged against in order to judge the flag at all.
                 TextColumn::make('duplicateOf.title')
-                    ->label('مكرر عن')
+                    ->label(__('مكرر عن'))
                     ->placeholder('—')
                     ->wrap()
                     ->color('warning')
                     ->description(fn (IntelligenceItem $record): ?string => $record->duplicate_stage === null
                         ? null
-                        : 'مطابقة عبر: '.$record->duplicate_stage->label())
+                        : __('مطابقة عبر: :stage', ['stage' => $record->duplicate_stage->label()]))
                     ->url(fn (IntelligenceItem $record): ?string => $record->duplicateOf?->url, shouldOpenInNewTab: true),
 
                 TextColumn::make('published_at')
-                    ->label('النشر')
+                    ->label(__('النشر'))
                     ->dateTime('Y-m-d H:i')
                     ->placeholder('—')
                     ->sortable(),
 
                 TextColumn::make('reviewer.name')
-                    ->label('راجعه')
+                    ->label(__('راجعه'))
                     ->placeholder('—')
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('reviewed_at')
-                    ->label('تاريخ المراجعة')
+                    ->label(__('تاريخ المراجعة'))
                     ->dateTime('Y-m-d H:i')
                     ->placeholder('—')
                     ->toggleable(isToggledHiddenByDefault: true)
@@ -178,28 +181,28 @@ class IntelligenceItemResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('review_state')
-                    ->label('الحالة')
+                    ->label(__('الحالة'))
                     ->options(ReviewState::options())
                     ->multiple()
                     // The inbox opens as a queue to clear, not an archive.
                     ->default([ReviewState::New->value]),
 
                 SelectFilter::make('source_id')
-                    ->label('المصدر')
+                    ->label(__('المصدر'))
                     ->options(fn (): array => Source::query()->orderBy('name')->pluck('name', 'id')->all())
                     ->multiple(),
 
                 SelectFilter::make('document_type')
-                    ->label('النوع')
+                    ->label(__('النوع'))
                     ->options(fn (): array => collect(DocumentType::cases())
                         ->mapWithKeys(fn (DocumentType $case): array => [$case->value => $case->label()])
                         ->all()),
 
                 TernaryFilter::make('duplicate_of_id')
-                    ->label('المكرر')
-                    ->placeholder('الكل')
-                    ->trueLabel('المكرر فقط')
-                    ->falseLabel('بلا تكرار')
+                    ->label(__('المكرر'))
+                    ->placeholder(__('الكل'))
+                    ->trueLabel(__('المكرر فقط'))
+                    ->falseLabel(__('بلا تكرار'))
                     ->queries(
                         true: fn (Builder $query): Builder => $query->whereNotNull('duplicate_of_id'),
                         false: fn (Builder $query): Builder => $query->whereNull('duplicate_of_id'),
@@ -208,7 +211,7 @@ class IntelligenceItemResource extends Resource
             ])
             ->recordActions([
                 Action::make('createDraft')
-                    ->label('أنشئ مسودة')
+                    ->label(__('أنشئ مسودة'))
                     ->icon(Heroicon::OutlinedPencilSquare)
                     ->color('primary')
                     // Once an item has a draft it has one; the action is not a
@@ -218,24 +221,24 @@ class IntelligenceItemResource extends Resource
                         $article = app(CreateDraftFromIntelligenceItem::class)($record, auth()->user());
 
                         Notification::make()
-                            ->title('أُنشئت مسودة')
-                            ->body('المصدر مرفق كمرجع. العنوان والنص من كتابتك.')
+                            ->title(__('أُنشئت مسودة'))
+                            ->body(__('المصدر مرفق كمرجع. العنوان والنص من كتابتك.'))
                             ->success()
                             ->send();
 
                         return redirect(ArticleResource::getUrl('edit', ['record' => $article]));
                     }),
-                self::triageAction('approve', ReviewState::Approved, 'اعتماد', Heroicon::OutlinedCheckCircle, 'success'),
-                self::triageAction('save', ReviewState::Saved, 'حفظ لاحقًا', Heroicon::OutlinedBookmark, 'warning'),
+                self::triageAction('approve', ReviewState::Approved, __('اعتماد'), Heroicon::OutlinedCheckCircle, 'success'),
+                self::triageAction('save', ReviewState::Saved, __('حفظ لاحقًا'), Heroicon::OutlinedBookmark, 'warning'),
                 ActionGroup::make([
-                    self::triageAction('reject', ReviewState::Rejected, 'رفض', Heroicon::OutlinedXCircle, 'danger'),
-                    self::triageAction('ignore', ReviewState::Ignored, 'تجاهل', Heroicon::OutlinedEyeSlash, 'gray'),
+                    self::triageAction('reject', ReviewState::Rejected, __('رفض'), Heroicon::OutlinedXCircle, 'danger'),
+                    self::triageAction('ignore', ReviewState::Ignored, __('تجاهل'), Heroicon::OutlinedEyeSlash, 'gray'),
                     // The recovery half of the 30-day window: a dismissal made
                     // by mistake at 9am is undoable for the rest of the month.
-                    self::triageAction('restore', ReviewState::New, 'إعادة إلى الصندوق', Heroicon::OutlinedArrowUturnLeft, 'info')
+                    self::triageAction('restore', ReviewState::New, __('إعادة إلى الصندوق'), Heroicon::OutlinedArrowUturnLeft, 'info')
                         ->visible(fn (IntelligenceItem $record): bool => $record->review_state->isResolved()),
                     Action::make('notDuplicate')
-                        ->label('ليس مكررًا')
+                        ->label(__('ليس مكررًا'))
                         ->icon(Heroicon::OutlinedScissors)
                         ->color('warning')
                         ->visible(fn (IntelligenceItem $record): bool => $record->duplicate_of_id !== null)
@@ -243,17 +246,17 @@ class IntelligenceItemResource extends Resource
                             app(ClearDuplicateFlag::class)($record, auth()->user());
                         }),
                     Action::make('open')
-                        ->label('فتح المصدر')
+                        ->label(__('فتح المصدر'))
                         ->icon(Heroicon::OutlinedArrowTopRightOnSquare)
                         ->url(fn (IntelligenceItem $record): ?string => $record->url, shouldOpenInNewTab: true),
-                ])->label('المزيد'),
+                ])->label(__('المزيد')),
             ])
             ->toolbarActions([
-                self::bulkTriage('bulkReject', ReviewState::Rejected, 'رفض المحدد', 'danger'),
-                self::bulkTriage('bulkIgnore', ReviewState::Ignored, 'تجاهل المحدد', 'gray'),
+                self::bulkTriage('bulkReject', ReviewState::Rejected, __('رفض المحدد'), 'danger'),
+                self::bulkTriage('bulkIgnore', ReviewState::Ignored, __('تجاهل المحدد'), 'gray'),
             ])
-            ->emptyStateHeading('لا شيء في الصندوق')
-            ->emptyStateDescription('كل ما رصدته المصادر جرت مراجعته.');
+            ->emptyStateHeading(__('لا شيء في الصندوق'))
+            ->emptyStateDescription(__('كل ما رصدته المصادر جرت مراجعته.'));
     }
 
     private static function triageAction(

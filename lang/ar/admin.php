@@ -6,11 +6,48 @@ declare(strict_types=1);
 // (tests/Feature/I18n/TranslationParityTest.php).
 
 return [
+    'filepond' => [
+        'labelButtonAbortItemLoad' => 'إيقاف',
+        'labelButtonAbortItemProcessing' => 'إلغاء',
+        'labelButtonProcessItem' => 'رفع',
+        'labelButtonRemoveItem' => 'إزالة',
+        'labelButtonRetryItemLoad' => 'إعادة المحاولة',
+        'labelButtonRetryItemProcessing' => 'إعادة المحاولة',
+        'labelButtonUndoItemProcessing' => 'تراجع',
+        'labelFileLoadError' => 'خطأ أثناء التحميل',
+        'labelFileLoading' => 'جارٍ التحميل',
+        'labelFileProcessing' => 'جارٍ الرفع',
+        'labelFileProcessingAborted' => 'أُلغي الرفع',
+        'labelFileProcessingComplete' => 'اكتمل الرفع',
+        'labelFileProcessingError' => 'خطأ أثناء الرفع',
+        'labelFileProcessingRevertError' => 'خطأ أثناء التراجع',
+        'labelFileRemoveError' => 'خطأ أثناء الإزالة',
+        'labelFileSizeNotAvailable' => 'الحجم غير متاح',
+        'labelFileTypeNotAllowed' => 'نوع الملف غير مسموح',
+        'labelFileWaitingForSize' => 'بانتظار الحجم',
+        'labelIdle' => 'اسحب الملفات وأفلتها هنا أو <span class="filepond--label-action">تصفّح</span>',
+        'labelInvalidField' => 'الحقل يحتوي على ملفات غير صالحة',
+        'labelMaxFileSize' => 'أقصى حجم للملف {filesize}',
+        'labelMaxFileSizeExceeded' => 'الملف كبير جدًا',
+        'labelMaxTotalFileSize' => 'أقصى حجم إجمالي {filesize}',
+        'labelMaxTotalFileSizeExceeded' => 'تجاوز الحجم الإجمالي الأقصى',
+        'labelTapToCancel' => 'انقر للإلغاء',
+        'labelTapToRetry' => 'انقر لإعادة المحاولة',
+        'labelTapToUndo' => 'انقر للتراجع',
+    ],
     'gate' => [
         'translation_unreviewed' => 'هذه ترجمة لم يراجعها أحد بعد. لا تُنشر ترجمة قبل أن يعتمدها مراجع غير المترجم.',
     ],
     'language' => [
         'menu' => 'لغة اللوحة',
+        'names' => [
+            'ar' => 'العربية',
+            'en' => 'الإنجليزية',
+            'fr' => 'الفرنسية',
+            'hi' => 'الهندية',
+            'ur-pk' => 'الأردية',
+            'zh-hans' => 'الصينية المبسطة',
+        ],
     ],
     'translation' => [
         'action_retry' => 'إعادة الترجمة',

@@ -3,11 +3,48 @@
 declare(strict_types=1);
 
 return [
+    'filepond' => [
+        'labelButtonAbortItemLoad' => '中止',
+        'labelButtonAbortItemProcessing' => '取消',
+        'labelButtonProcessItem' => '上传',
+        'labelButtonRemoveItem' => '移除',
+        'labelButtonRetryItemLoad' => '重试',
+        'labelButtonRetryItemProcessing' => '重试',
+        'labelButtonUndoItemProcessing' => '撤销',
+        'labelFileLoadError' => '加载出错',
+        'labelFileLoading' => '正在加载',
+        'labelFileProcessing' => '正在上传',
+        'labelFileProcessingAborted' => '上传已取消',
+        'labelFileProcessingComplete' => '上传完成',
+        'labelFileProcessingError' => '上传出错',
+        'labelFileProcessingRevertError' => '撤销出错',
+        'labelFileRemoveError' => '移除出错',
+        'labelFileSizeNotAvailable' => '大小不可用',
+        'labelFileTypeNotAllowed' => '文件类型无效',
+        'labelFileWaitingForSize' => '正在等待大小',
+        'labelIdle' => '拖放文件，或<span class="filepond--label-action">浏览</span>',
+        'labelInvalidField' => '字段包含无效文件',
+        'labelMaxFileSize' => '最大文件大小为 {filesize}',
+        'labelMaxFileSizeExceeded' => '文件过大',
+        'labelMaxTotalFileSize' => '文件总大小上限为 {filesize}',
+        'labelMaxTotalFileSizeExceeded' => '超出总大小上限',
+        'labelTapToCancel' => '点按取消',
+        'labelTapToRetry' => '点按重试',
+        'labelTapToUndo' => '点按撤销',
+    ],
     'gate' => [
         'translation_unreviewed' => '该译文尚未审核。译文须经译者以外的人员审核通过后方可发布。',
     ],
     'language' => [
         'menu' => '后台语言',
+        'names' => [
+            'ar' => '阿拉伯语',
+            'en' => '英语',
+            'fr' => '法语',
+            'hi' => '印地语',
+            'ur-pk' => '乌尔都语',
+            'zh-hans' => '简体中文',
+        ],
     ],
     'translation' => [
         'action_retry' => '重新翻译',

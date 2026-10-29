@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Support;
 
+use App\Support\Locales;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -24,20 +25,20 @@ class TranslationsField
     public static function make(array $fields, int $columns = 1): Repeater
     {
         return Repeater::make('translations')
-            ->label('الترجمات')
+            ->label(__('الترجمات'))
             ->relationship('translations')
-            ->addActionLabel('أضف لغة')
+            ->addActionLabel(__('أضف لغة'))
             ->defaultItems(1)
             ->minItems(1)
             ->collapsible()
             ->itemLabel(fn (array $state): ?string => self::localeName($state['locale'] ?? null))
             ->schema([
                 Select::make('locale')
-                    ->label('اللغة')
-                    ->options(fn (): array => collect(config('masar.locales'))
-                        ->map(fn (array $l): string => $l['name'])
+                    ->label(__('اللغة'))
+                    ->options(fn (): array => collect(Locales::codes())
+                        ->mapWithKeys(fn (string $code): array => [$code => self::localeName($code)])
                         ->all())
-                    ->default(config('masar.default_locale'))
+                    ->default(Locales::default())
                     ->required()
                     ->distinct()
                     ->live(),
@@ -49,8 +50,8 @@ class TranslationsField
 
     private static function localeName(?string $locale): ?string
     {
-        return $locale === null
-            ? null
-            : (config("masar.locales.{$locale}.name") ?? $locale);
+        // The language's name in the panel's language ("Arabic", «الإنجليزية»),
+        // not its native name: a field label is read by the editor, not the reader.
+        return $locale === null ? null : __("admin.language.names.{$locale}");
     }
 }

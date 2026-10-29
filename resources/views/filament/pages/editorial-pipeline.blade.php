@@ -25,8 +25,8 @@
                 if (! (this.allowed[from] ?? []).includes(target)) {
                     new FilamentNotification()
                         .danger()
-                        .title('انتقال غير مسموح')
-                        .body('لا يسمح مسار التحرير بهذا الانتقال.')
+                        .title(@js(__('انتقال غير مسموح')))
+                        .body(@js(__('لا يسمح مسار التحرير بهذا الانتقال.')))
                         .send()
                     return
                 }
@@ -83,7 +83,7 @@
                                     <span>{{ $article->author?->name }}</span>
 
                                     @if ($article->is_sponsored)
-                                        <span class="rounded bg-amber-100 px-1.5 py-0.5 text-amber-800">مدفوع</span>
+                                        <span class="rounded bg-amber-100 px-1.5 py-0.5 text-amber-800">{{ __('مدفوع') }}</span>
                                     @endif
                                 </div>
 
@@ -91,17 +91,17 @@
                                     @php $failures = $article->isPublishable(); @endphp
                                     <div class="mt-2 text-xs">
                                         @if ($failures === [])
-                                            <span class="text-[#1E5E3F]">✓ جاهزة للنشر</span>
+                                            <span class="text-[#1E5E3F]">✓ {{ __('جاهزة للنشر') }}</span>
                                         @else
                                             <span class="text-[#B4522E]">
-                                                {{ count($failures) }} متطلب ناقص
+                                                {{ __(':count متطلب ناقص', ['count' => count($failures)]) }}
                                             </span>
                                         @endif
                                     </div>
                                 @endif
                             </div>
                         @empty
-                            <p class="px-1 py-6 text-center text-xs text-gray-400">لا توجد مواد</p>
+                            <p class="px-1 py-6 text-center text-xs text-gray-400">{{ __('لا توجد مواد') }}</p>
                         @endforelse
                     </div>
                 </div>

@@ -20,8 +20,7 @@ class DisclosureCannotBeWithdrawn extends RuntimeException
     public static function forArticle(): self
     {
         return new self(
-            'لا يمكن إزالة وسم «محتوى مدعوم» عن مادة منشورة. '
-            .'إن كان الوسم قد وُضع خطأً، أعِد المادة إلى المسودة أولًا.'
+            __('لا يمكن إزالة وسم «محتوى مدعوم» عن مادة منشورة. إن كان الوسم قد وُضع خطأً، أعِد المادة إلى المسودة أولًا.')
         );
     }
 }

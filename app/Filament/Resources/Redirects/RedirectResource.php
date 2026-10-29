@@ -31,23 +31,26 @@ class RedirectResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowUturnRight;
 
-    protected static string|UnitEnum|null $navigationGroup = 'النظام';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('النظام');
+    }
 
     protected static ?int $navigationSort = 6;
 
     public static function getModelLabel(): string
     {
-        return 'تحويل';
+        return __('تحويل');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'التحويلات';
+        return __('التحويلات');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'التحويلات';
+        return __('التحويلات');
     }
 
     public static function canViewAny(): bool
@@ -59,9 +62,9 @@ class RedirectResource extends Resource
     {
         return $schema->components([
             TextInput::make('from_path')
-                ->label('من')
+                ->label(__('من'))
                 ->required()
-                ->helperText('المسار القديم. يُوحَّد تلقائيًا: شرطة بادئة، بلا شرطة ختامية، بلا معاملات استعلام.')
+                ->helperText(__('المسار القديم. يُوحَّد تلقائيًا: شرطة بادئة، بلا شرطة ختامية، بلا معاملات استعلام.'))
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr'])
                 ->dehydrateStateUsing(fn (?string $state): string => app(NormalisePath::class)($state))
                 ->rule(static function (Get $get, ?Redirect $record): Closure {
@@ -80,23 +83,23 @@ class RedirectResource extends Resource
                 ->columnSpanFull(),
 
             TextInput::make('to_path')
-                ->label('إلى')
+                ->label(__('إلى'))
                 ->required()
-                ->helperText('الوجهة الجديدة.')
+                ->helperText(__('الوجهة الجديدة.'))
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr'])
                 ->dehydrateStateUsing(fn (?string $state): string => app(NormalisePath::class)($state))
                 ->live(onBlur: true)
                 ->columnSpanFull(),
 
             Select::make('status_code')
-                ->label('نوع التحويل')
+                ->label(__('نوع التحويل'))
                 ->options([
-                    301 => '301 — دائم',
-                    302 => '302 — مؤقت',
+                    301 => __('301 — دائم'),
+                    302 => __('302 — مؤقت'),
                 ])
                 ->default(301)
                 ->required()
-                ->helperText('استخدم 301 عند تغيّر المسار نهائيًا؛ محركات البحث تنقل التقييم معه.'),
+                ->helperText(__('استخدم 301 عند تغيّر المسار نهائيًا؛ محركات البحث تنقل التقييم معه.')),
         ])->columns(2);
     }
 
@@ -105,22 +108,22 @@ class RedirectResource extends Resource
         return $table
             ->defaultSort('hits', 'desc')
             ->columns([
-                TextColumn::make('from_path')->label('من')->searchable()
+                TextColumn::make('from_path')->label(__('من'))->searchable()
                     ->extraAttributes(['class' => 'masar-ltr'])->wrap(),
-                TextColumn::make('to_path')->label('إلى')->searchable()
+                TextColumn::make('to_path')->label(__('إلى'))->searchable()
                     ->extraAttributes(['class' => 'masar-ltr'])->wrap(),
-                TextColumn::make('status_code')->label('النوع')->badge()
+                TextColumn::make('status_code')->label(__('النوع'))->badge()
                     ->color(fn (int $state): string => $state === 301 ? 'success' : 'warning'),
-                TextColumn::make('hits')->label('الاستخدامات')->numeric()->sortable(),
-                TextColumn::make('last_hit_at')->label('آخر استخدام')->dateTime('Y-m-d H:i')
-                    ->placeholder('لم يُستخدم')->sortable(),
+                TextColumn::make('hits')->label(__('الاستخدامات'))->numeric()->sortable(),
+                TextColumn::make('last_hit_at')->label(__('آخر استخدام'))->dateTime('Y-m-d H:i')
+                    ->placeholder(__('لم يُستخدم'))->sortable(),
             ])
             ->filters([
-                SelectFilter::make('status_code')->label('النوع')->options([301 => '301', 302 => '302']),
+                SelectFilter::make('status_code')->label(__('النوع'))->options([301 => '301', 302 => '302']),
             ])
             ->recordActions([
-                EditAction::make()->label('تحرير'),
-                DeleteAction::make()->label('حذف'),
+                EditAction::make()->label(__('تحرير')),
+                DeleteAction::make()->label(__('حذف')),
             ]);
     }
 

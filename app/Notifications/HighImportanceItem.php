@@ -36,21 +36,21 @@ class HighImportanceItem extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('عنصر مهم في صندوق الرصد: '.mb_substr($this->item->title, 0, 60))
+            ->subject(__('عنصر مهم في صندوق الرصد: :title', ['title' => mb_substr($this->item->title, 0, 60)]))
             ->line($this->item->title)
-            ->line('المصدر: '.($this->item->source?->name ?? 'غير معروف'))
-            ->line('الأهمية: '.$this->item->liveImportance().' من 100')
-            ->action('افتح المصدر', (string) $this->item->url)
+            ->line(__('المصدر: :name', ['name' => $this->item->source?->name ?? __('غير معروف')]))
+            ->line(__('الأهمية: :score من 100', ['score' => $this->item->liveImportance()]))
+            ->action(__('افتح المصدر'), (string) $this->item->url)
             // The publisher's own page, not ours: the raw text is internal for
             // its whole life and does not travel into an email either.
-            ->line('صندوق الرصد يحمل بقية التفاصيل.');
+            ->line(__('صندوق الرصد يحمل بقية التفاصيل.'));
     }
 
     /** @return array<string, mixed> */
     public function toArray(object $notifiable): array
     {
         return [
-            'title' => 'عنصر مهم في صندوق الرصد',
+            'title' => __('عنصر مهم في صندوق الرصد'),
             'body' => mb_substr($this->item->title, 0, 140),
             'importance' => $this->item->liveImportance(),
             'source' => $this->item->source?->name,

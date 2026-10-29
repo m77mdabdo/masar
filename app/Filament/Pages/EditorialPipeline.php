@@ -31,7 +31,10 @@ class EditorialPipeline extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-view-columns';
 
-    protected static string|UnitEnum|null $navigationGroup = 'المحتوى';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('المحتوى');
+    }
 
     protected static ?int $navigationSort = 2;
 
@@ -61,12 +64,12 @@ class EditorialPipeline extends Page
 
     public static function getNavigationLabel(): string
     {
-        return 'مسار التحرير';
+        return __('مسار التحرير');
     }
 
     public function getTitle(): string
     {
-        return 'مسار التحرير';
+        return __('مسار التحرير');
     }
 
     public static function canAccess(): bool
@@ -133,7 +136,7 @@ class EditorialPipeline extends Page
         $article = ArticleResource::getEloquentQuery()->find($articleId);
 
         if ($article === null) {
-            Notification::make()->danger()->title('المادة غير موجودة')->send();
+            Notification::make()->danger()->title(__('المادة غير موجودة'))->send();
 
             return;
         }
@@ -141,24 +144,24 @@ class EditorialPipeline extends Page
         $to = ArticleStatus::tryFrom($target);
 
         if ($to === null) {
-            Notification::make()->danger()->title('حالة غير معروفة')->send();
+            Notification::make()->danger()->title(__('حالة غير معروفة'))->send();
 
             return;
         }
 
         try {
-            app(TransitionArticleStatus::class)($article, $to, auth()->user(), 'نُقلت من لوحة مسار التحرير');
+            app(TransitionArticleStatus::class)($article, $to, auth()->user(), __('نُقلت من لوحة مسار التحرير'));
 
             Notification::make()
                 ->success()
-                ->title("نُقلت إلى: {$to->label()}")
+                ->title(__('نُقلت إلى: :status', ['status' => $to->label()]))
                 ->send();
         } catch (InvalidStatusTransition $e) {
-            Notification::make()->danger()->title('انتقال غير مسموح')->body($e->forEditor())->persistent()->send();
+            Notification::make()->danger()->title(__('انتقال غير مسموح'))->body($e->forEditor())->persistent()->send();
         } catch (PublishGateFailed $e) {
-            Notification::make()->danger()->title('بوابة النشر رفضت المادة')->body(implode("\n", $e->reasons()))->persistent()->send();
+            Notification::make()->danger()->title(__('بوابة النشر رفضت المادة'))->body(implode("\n", $e->reasons()))->persistent()->send();
         } catch (AuthorizationException) {
-            Notification::make()->danger()->title('لا تملك صلاحية نقل هذه المادة')->send();
+            Notification::make()->danger()->title(__('لا تملك صلاحية نقل هذه المادة'))->send();
         }
     }
 

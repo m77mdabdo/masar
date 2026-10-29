@@ -63,10 +63,10 @@ class ArticleTransitionActions
             ->requiresConfirmation($needsNote)
             ->schema($needsNote ? [
                 Textarea::make('note')
-                    ->label('السبب')
+                    ->label(__('السبب'))
                     ->required()
                     ->rows(3)
-                    ->helperText('سيظهر في سجل التدقيق ولمن يستلم المادة بعدك.'),
+                    ->helperText(__('سيظهر في سجل التدقيق ولمن يستلم المادة بعدك.')),
             ] : [])
             ->action(function (array $data) use ($article, $to): void {
                 self::run(
@@ -101,22 +101,22 @@ class ArticleTransitionActions
         $permitted = $user?->can('article.publish') === true;
 
         return Action::make('publish')
-            ->label('نشر')
+            ->label(__('نشر'))
             ->color('success')
             ->icon('heroicon-o-rocket-launch')
             ->disabled(! $allowed)
             ->tooltip(match (true) {
                 $allowed => null,
-                ! $permitted => 'ليس لديك صلاحية النشر.',
-                default => 'لا يمكن النشر: '.implode(' · ', $failures),
+                ! $permitted => __('ليس لديك صلاحية النشر.'),
+                default => __('لا يمكن النشر: :reasons', ['reasons' => implode(' · ', $failures)]),
             })
             ->requiresConfirmation()
-            ->modalHeading('نشر المادة')
-            ->modalDescription('ستصبح المادة مرئية للقراء فورًا.')
+            ->modalHeading(__('نشر المادة'))
+            ->modalDescription(__('ستصبح المادة مرئية للقراء فورًا.'))
             ->action(function () use ($article): void {
                 self::run(
                     fn () => app(PublishArticle::class)($article, auth()->user()),
-                    'النشر',
+                    __('النشر'),
                 );
             });
     }
@@ -124,17 +124,17 @@ class ArticleTransitionActions
     private static function scheduleAction(Article $article): Action
     {
         return Action::make('schedule')
-            ->label('جدولة')
+            ->label(__('جدولة'))
             ->color('warning')
             ->icon('heroicon-o-clock')
             ->schema([
                 DateTimePicker::make('scheduled_for')
-                    ->label('موعد النشر')
+                    ->label(__('موعد النشر'))
                     ->required()
                     ->seconds(false)
                     ->minDate(now()->addMinute())
                     ->default(now()->addDay()->startOfHour())
-                    ->helperText('بتوقيت الرياض.'),
+                    ->helperText(__('بتوقيت الرياض.')),
             ])
             ->action(function (array $data) use ($article): void {
                 self::run(
@@ -143,7 +143,7 @@ class ArticleTransitionActions
                         $data['scheduled_for'],
                         auth()->user(),
                     ),
-                    'الجدولة',
+                    __('الجدولة'),
                 );
             });
     }
@@ -159,25 +159,25 @@ class ArticleTransitionActions
 
             Notification::make()
                 ->success()
-                ->title("تمت العملية: {$label}")
+                ->title(__('تمت العملية: :label', ['label' => $label]))
                 ->send();
         } catch (PublishGateFailed $e) {
             Notification::make()
                 ->danger()
-                ->title('بوابة النشر رفضت المادة')
+                ->title(__('بوابة النشر رفضت المادة'))
                 ->body(implode("\n", $e->reasons()))
                 ->persistent()
                 ->send();
         } catch (InvalidStatusTransition $e) {
             Notification::make()
                 ->danger()
-                ->title('انتقال غير مسموح')
+                ->title(__('انتقال غير مسموح'))
                 ->body($e->forEditor())
                 ->send();
         } catch (AuthorizationException) {
             Notification::make()
                 ->danger()
-                ->title('لا تملك صلاحية تنفيذ هذا الإجراء')
+                ->title(__('لا تملك صلاحية تنفيذ هذا الإجراء'))
                 ->send();
         }
     }

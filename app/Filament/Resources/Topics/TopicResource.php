@@ -34,40 +34,43 @@ class TopicResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTag;
 
-    protected static string|UnitEnum|null $navigationGroup = 'المحتوى';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('المحتوى');
+    }
 
     protected static ?int $navigationSort = 4;
 
     public static function getModelLabel(): string
     {
-        return 'موضوع';
+        return __('موضوع');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'المواضيع';
+        return __('المواضيع');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'المواضيع';
+        return __('المواضيع');
     }
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
             TextInput::make('slug')
-                ->label('المسار')
+                ->label(__('المسار'))
                 ->required()
                 ->unique(ignoreRecord: true)
                 ->rules(['regex:/^[a-z0-9-]+$/'])
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
 
-            Toggle::make('is_featured')->label('مميّز'),
+            Toggle::make('is_featured')->label(__('مميّز')),
 
             TranslationsField::make([
-                TextInput::make('name')->label('الاسم')->required(),
-                Textarea::make('description')->label('الوصف')->rows(2),
+                TextInput::make('name')->label(__('الاسم'))->required(),
+                Textarea::make('description')->label(__('الوصف'))->rows(2),
             ]),
         ])->columns(2);
     }
@@ -79,22 +82,22 @@ class TopicResource extends Resource
             ->defaultSort('articles_count', 'desc')
             ->columns([
                 TextColumn::make('name')
-                    ->label('الاسم')
-                    ->getStateUsing(fn (Topic $r): ?string => $r->name)
+                    ->label(__('الاسم'))
+                    ->getStateUsing(fn (Topic $record): ?string => $record->name)
                     ->searchable(query: fn (Builder $query, string $search): Builder => $query->whereHas(
                         'translations',
                         fn (Builder $t) => $t->where('name', 'like', "%{$search}%"),
                     )),
-                TextColumn::make('slug')->label('المسار')->badge()->color('gray')->searchable(),
+                TextColumn::make('slug')->label(__('المسار'))->badge()->color('gray')->searchable(),
                 TextColumn::make('articles_count')
-                    ->label('المواد المنشورة')
+                    ->label(__('المواد المنشورة'))
                     ->numeric()
                     ->sortable()
-                    ->tooltip('يحتسب المواد المنشورة فقط.'),
-                IconColumn::make('is_featured')->label('مميّز')->boolean(),
+                    ->tooltip(__('يحتسب المواد المنشورة فقط.')),
+                IconColumn::make('is_featured')->label(__('مميّز'))->boolean(),
             ])
             ->recordActions([
-                EditAction::make()->label('تحرير'),
+                EditAction::make()->label(__('تحرير')),
                 self::mergeAction(),
             ]);
     }
@@ -109,15 +112,15 @@ class TopicResource extends Resource
     private static function mergeAction(): Action
     {
         return Action::make('merge')
-            ->label('دمج')
+            ->label(__('دمج'))
             ->icon('heroicon-o-arrows-pointing-in')
             ->color('warning')
             ->requiresConfirmation()
-            ->modalHeading('دمج الموضوع')
-            ->modalDescription('ستُنقل كل المواد إلى الموضوع الباقي، ويُحذف هذا الموضوع.')
+            ->modalHeading(__('دمج الموضوع'))
+            ->modalDescription(__('ستُنقل كل المواد إلى الموضوع الباقي، ويُحذف هذا الموضوع.'))
             ->schema([
                 Select::make('survivor_id')
-                    ->label('الموضوع الباقي')
+                    ->label(__('الموضوع الباقي'))
                     ->options(fn (Topic $record): array => Topic::query()
                         ->whereKeyNot($record->getKey())
                         ->with('translations')
@@ -149,7 +152,7 @@ class TopicResource extends Resource
                     app(SyncArticleTopics::class)->recount([$survivorId]);
                 });
 
-                Notification::make()->success()->title('تم الدمج')->send();
+                Notification::make()->success()->title(__('تم الدمج'))->send();
             });
     }
 

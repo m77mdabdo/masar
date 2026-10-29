@@ -43,17 +43,26 @@ class SourceResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRss;
 
-    protected static string|UnitEnum|null $navigationGroup = 'الرصد';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('الرصد');
+    }
 
     protected static ?int $navigationSort = 1;
 
-    protected static ?string $modelLabel = 'مصدر';
+    public static function getModelLabel(): string
+    {
+        return __('مصدر');
+    }
 
-    protected static ?string $pluralModelLabel = 'المصادر';
+    public static function getPluralModelLabel(): string
+    {
+        return __('المصادر');
+    }
 
     public static function getNavigationLabel(): string
     {
-        return 'المصادر';
+        return __('المصادر');
     }
 
     /**
@@ -85,40 +94,40 @@ class SourceResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            TextInput::make('name')->label('الاسم')->required()->columnSpanFull(),
+            TextInput::make('name')->label(__('الاسم'))->required()->columnSpanFull(),
 
-            TextInput::make('url')->label('رابط الموقع')->url()->required()
+            TextInput::make('url')->label(__('رابط الموقع'))->url()->required()
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
 
-            TextInput::make('feed_url')->label('رابط التغذية')->url()
-                ->helperText('اتركه فارغًا إذا كان الرابط أعلاه هو التغذية نفسها.')
+            TextInput::make('feed_url')->label(__('رابط التغذية'))->url()
+                ->helperText(__('اتركه فارغًا إذا كان الرابط أعلاه هو التغذية نفسها.'))
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
 
-            Select::make('type')->label('النوع')->options(SourceType::options())->required()->native(false),
+            Select::make('type')->label(__('النوع'))->options(SourceType::options())->required()->native(false),
 
-            TextInput::make('category')->label('تصنيف المصدر')
-                ->helperText('اختياري. يُستخدم كقاعدة تصنيف احتياطية حين لا تطابق أي كلمة مفتاحية.'),
+            TextInput::make('category')->label(__('تصنيف المصدر'))
+                ->helperText(__('اختياري. يُستخدم كقاعدة تصنيف احتياطية حين لا تطابق أي كلمة مفتاحية.')),
 
-            Select::make('locale')->label('اللغة')
-                ->options(['ar' => 'العربية', 'en' => 'English'])->default('ar')->required()->native(false),
+            Select::make('locale')->label(__('اللغة'))
+                ->options(['ar' => __('العربية'), 'en' => 'English'])->default('ar')->required()->native(false),
 
-            Select::make('trust_level')->label('مستوى الثقة')
-                ->options([1 => '1 — ضعيف', 2 => '2', 3 => '3 — متوسط', 4 => '4', 5 => '5 — جهة رسمية'])
+            Select::make('trust_level')->label(__('مستوى الثقة'))
+                ->options([1 => __('1 — ضعيف'), 2 => '2', 3 => __('3 — متوسط'), 4 => '4', 5 => __('5 — جهة رسمية')])
                 ->default(3)->required()->native(false)
-                ->helperText('حكم على الناشر، لا على أي خبر بعينه. يدخل في ترتيب الأهمية.'),
+                ->helperText(__('حكم على الناشر، لا على أي خبر بعينه. يدخل في ترتيب الأهمية.')),
 
-            TextInput::make('poll_frequency_minutes')->label('كل كم دقيقة')
+            TextInput::make('poll_frequency_minutes')->label(__('كل كم دقيقة'))
                 ->numeric()->minValue(5)->maxValue(1440)->default(30)->required(),
 
-            Select::make('legal_mode')->label('ما يُسمح بحفظه')
+            Select::make('legal_mode')->label(__('ما يُسمح بحفظه'))
                 ->options(SourceLegalMode::options())
                 ->default(SourceLegalMode::Metadata->value)->required()->native(false)
-                ->helperText('الوضع الافتراضي لا يحفظ نص الناشر إطلاقًا. لا ترفعه إلا بإذن صريح.'),
+                ->helperText(__('الوضع الافتراضي لا يحفظ نص الناشر إطلاقًا. لا ترفعه إلا بإذن صريح.')),
 
-            Toggle::make('is_active')->label('نشط')->default(true),
+            Toggle::make('is_active')->label(__('نشط'))->default(true),
 
-            KeyValue::make('parser_config')->label('إعدادات المحلّل')
-                ->helperText('لمصادر الواجهات البرمجية: items_path ومسارات الحقول.')
+            KeyValue::make('parser_config')->label(__('إعدادات المحلّل'))
+                ->helperText(__('لمصادر الواجهات البرمجية: items_path ومسارات الحقول.'))
                 ->columnSpanFull(),
         ])->columns(2);
     }
@@ -127,19 +136,19 @@ class SourceResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')->label('المصدر')->searchable()
+                TextColumn::make('name')->label(__('المصدر'))->searchable()
                     ->description(fn (Source $record): string => $record->pollUrl()),
 
                 // Health first, because it is the question this table exists to
                 // answer.
-                TextColumn::make('health')->label('الحالة')
+                TextColumn::make('health')->label(__('الحالة'))
                     ->state(fn (Source $record): string => match ($record->healthState()) {
-                        'healthy' => 'سليم',
-                        'quiet' => 'صامت',
-                        'failing' => 'يفشل',
-                        'disabled' => 'معطّل تلقائيًا',
-                        'paused' => 'موقوف',
-                        default => 'لم يُفحص',
+                        'healthy' => __('سليم'),
+                        'quiet' => __('صامت'),
+                        'failing' => __('يفشل'),
+                        'disabled' => __('معطّل تلقائيًا'),
+                        'paused' => __('موقوف'),
+                        default => __('لم يُفحص'),
                     })
                     ->badge()
                     ->color(fn (Source $record): string => match ($record->healthState()) {
@@ -149,44 +158,44 @@ class SourceResource extends Resource
                         default => 'gray',
                     }),
 
-                TextColumn::make('last_success_at')->label('آخر نجاح')
-                    ->since()->placeholder('لا يوجد')->sortable(),
+                TextColumn::make('last_success_at')->label(__('آخر نجاح'))
+                    ->since()->placeholder(__('لا يوجد'))->sortable(),
 
-                TextColumn::make('consecutive_failures')->label('إخفاقات متتالية')
+                TextColumn::make('consecutive_failures')->label(__('إخفاقات متتالية'))
                     ->badge()
                     ->color(fn (int $state): string => $state === 0 ? 'gray' : 'danger')
                     ->formatStateUsing(fn (int $state, Source $record): string => $state.'/'.$record->failureThreshold()),
 
                 // The measure that catches a feed that has moved: answering
                 // 200 and producing nothing looks healthy by every other test.
-                TextColumn::make('recent_items')->label('آخر ٧ أيام')
+                TextColumn::make('recent_items')->label(__('آخر 7 أيام'))
                     ->state(fn (Source $record): int => $record->intelligenceItems()
                         ->where('detected_at', '>=', now()->subDays(7))->count())
                     ->badge()
                     ->color(fn (int $state): string => $state === 0 ? 'warning' : 'success'),
 
-                TextColumn::make('trust_level')->label('الثقة')->badge()->sortable(),
+                TextColumn::make('trust_level')->label(__('الثقة'))->badge()->sortable(),
 
-                TextColumn::make('error_message')->label('آخر خطأ')
+                TextColumn::make('error_message')->label(__('آخر خطأ'))
                     ->limit(40)->placeholder('—')->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('consecutive_failures', 'desc')
             ->filters([
-                TernaryFilter::make('is_active')->label('نشط'),
-                SelectFilter::make('type')->label('النوع')->options(SourceType::options()),
+                TernaryFilter::make('is_active')->label(__('نشط')),
+                SelectFilter::make('type')->label(__('النوع'))->options(SourceType::options()),
                 // The one an editor actually reaches for.
                 Filter::make('failing')
-                    ->label('يفشل حاليًا')
+                    ->label(__('يفشل حاليًا'))
                     ->query(fn ($query) => $query->where('consecutive_failures', '>', 0)),
             ])
             ->recordActions([
-                EditAction::make()->label('تحرير'),
+                EditAction::make()->label(__('تحرير')),
 
                 // Re-enabling clears the streak: leaving it at the threshold
                 // would disable the source again on its next failure, which
                 // looks like the fix did not work.
                 Action::make('reactivate')
-                    ->label('إعادة تفعيل')
+                    ->label(__('إعادة تفعيل'))
                     ->icon(Heroicon::OutlinedArrowPath)
                     ->visible(fn (Source $record): bool => ! $record->is_active)
                     ->requiresConfirmation()
@@ -198,11 +207,11 @@ class SourceResource extends Resource
                             'last_checked_at' => null,
                         ])->save();
 
-                        Notification::make()->success()->title('أُعيد تفعيل المصدر')->send();
+                        Notification::make()->success()->title(__('أُعيد تفعيل المصدر'))->send();
                     }),
 
                 Action::make('check')
-                    ->label('افحص الآن')
+                    ->label(__('افحص الآن'))
                     ->icon(Heroicon::OutlinedBolt)
                     ->action(function (Source $record): void {
                         CheckSourceJob::dispatchSync($record->getKey());
@@ -210,8 +219,8 @@ class SourceResource extends Resource
                         $record->refresh();
 
                         Notification::make()
-                            ->title($record->consecutive_failures === 0 ? 'تم الفحص' : 'فشل الفحص')
-                            ->body($record->error_message ?: 'المصدر يستجيب.')
+                            ->title($record->consecutive_failures === 0 ? __('تم الفحص') : __('فشل الفحص'))
+                            ->body($record->error_message ?: __('المصدر يستجيب.'))
                             ->status($record->consecutive_failures === 0 ? 'success' : 'danger')
                             ->send();
                     }),

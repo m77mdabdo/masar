@@ -38,8 +38,8 @@ class CreateUser extends CreateRecord
 
         Notification::make()
             ->success()
-            ->title('أُرسلت دعوة')
-            ->body('وصل رابط تعيين كلمة المرور إلى '.$this->getRecord()->email)
+            ->title(__('أُرسلت دعوة'))
+            ->body(__('وصل رابط تعيين كلمة المرور إلى :email', ['email' => $this->getRecord()->email]))
             ->send();
     }
 }

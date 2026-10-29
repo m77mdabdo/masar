@@ -61,7 +61,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->defaultThemeMode(ThemeMode::Light)
             ->viteTheme('resources/css/filament/admin/theme.css')
-            ->brandName('مسار')
+            ->brandName(fn (): string => app()->getLocale() === 'ar' ? __('مسار') : 'MASAR')
             ->brandLogo(fn () => view('filament.brand'))
             ->brandLogoHeight('2rem')
             ->favicon(asset('favicon.ico'))
@@ -79,11 +79,11 @@ class AdminPanelProvider extends PanelProvider
             ->databaseNotifications()
             ->databaseNotificationsPolling('60s')
             ->navigationGroups([
-                NavigationGroup::make('المحتوى'),
-                NavigationGroup::make('الكيانات'),
-                NavigationGroup::make('المنتجات'),
-                NavigationGroup::make('الجمهور'),
-                NavigationGroup::make('النظام'),
+                NavigationGroup::make(fn (): string => __('المحتوى')),
+                NavigationGroup::make(fn (): string => __('الكيانات')),
+                NavigationGroup::make(fn (): string => __('المنتجات')),
+                NavigationGroup::make(fn (): string => __('الجمهور')),
+                NavigationGroup::make(fn (): string => __('النظام')),
             ])
 
             ->pages([Dashboard::class])
@@ -102,19 +102,24 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
+            // Before Authenticate, so the login page is in the visitor's
+            // language too; once signed in it is the user's own. Persistent,
+            // because Livewire's update requests (validation errors, action
+            // notifications) only re-run persistent middleware: without it an
+            // English editor's errors came back in Arabic.
+            ->middleware([\App\Http\Middleware\SetAdminLocale::class], isPersistent: true)
             ->authMiddleware([
                 Authenticate::class,
                 EnforceAdminSessionLifetime::class,
-                // After Authenticate: the language is the signed-in user's.
-                \App\Http\Middleware\SetAdminLocale::class,
             ])
+            ->renderHook(\Filament\View\PanelsRenderHook::AUTH_LOGIN_FORM_AFTER, fn (): \Illuminate\Contracts\View\View => view('filament.auth.languages'))
             ->userMenuItems([
                 \Filament\Actions\Action::make('language')
                     ->label(fn (): string => __('admin.language.menu').': '.\App\Support\Locales::name(app()->getLocale()))
                     ->icon('heroicon-o-language')
                     ->schema([
                         \Filament\Forms\Components\Select::make('locale')
-                            ->label(__('admin.language.menu'))
+                            ->label(fn (): string => __('admin.language.menu'))
                             ->options(fn (): array => collect(\App\Support\Locales::codes())
                                 ->mapWithKeys(fn (string $c): array => [$c => \App\Support\Locales::name($c)])->all())
                             ->default(fn (): string => app()->getLocale())

@@ -46,10 +46,18 @@ class AppServiceProvider extends ServiceProvider
         // Package translations under our edition codes (ur-pk → ur, zh-hans →
         // zh_CN). extend(), not a binding: the translation provider is
         // deferred and would re-bind the loader after this one, silently.
-        $this->app->extend('translation.loader', fn ($loader, $app) => new \App\Support\EditionTranslationLoader(
-            $app['files'],
-            [base_path('vendor/laravel/framework/src/Illuminate/Translation/lang'), $app['path.lang']],
-        ));
+        $this->app->extend('translation.loader', function ($loader, $app) {
+            $edition = new \App\Support\EditionTranslationLoader(
+                $app['files'],
+                [base_path('vendor/laravel/framework/src/Illuminate/Translation/lang'), $app['path.lang']],
+            );
+
+            // The admin panel's text, keyed by its Arabic source so the code
+            // still reads in Arabic: lang/admin/{code}.json.
+            $edition->addJsonPath(lang_path('admin'));
+
+            return $edition;
+        });
 
         // No provider is selected. The null implementation ships so everything
         // downstream can be written and tested, and so the unclassified rate
@@ -69,6 +77,17 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // FilePond, inside Filament's file upload, ships no Hindi or Urdu and
+        // keys Chinese as zh_CN, so those three panels showed "Remove" and
+        // "Cancel" in English. FilePond reads its options from data-* on the
+        // input it is created from; these are ours, in every edition.
+        \Filament\Forms\Components\FileUpload::configureUsing(fn (\Filament\Forms\Components\FileUpload $upload) => $upload->extraInputAttributes(
+            fn (): array => collect((array) __('admin.filepond'))
+                ->mapWithKeys(fn (string $label, string $option): array => ['data-'.\Illuminate\Support\Str::kebab($option) => $label])
+                ->all(),
+            merge: true,
+        ));
+
         // Production is HTTPS only; generate every URL that way even when the
         // edge terminates TLS and forwards plain HTTP.
         if ($this->app->environment('production')) {

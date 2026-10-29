@@ -15,8 +15,7 @@ class IllustrativeMediaRejected extends RuntimeException
     public static function forArticle(): self
     {
         return new self(
-            'لا يمكن استخدام صورة تعبيرية في مادة تحريرية. '
-            .'الصور التعبيرية مسموحة فقط كخلفية في الصفحة الرئيسية.'
+            __('لا يمكن استخدام صورة تعبيرية في مادة تحريرية. الصور التعبيرية مسموحة فقط كخلفية في الصفحة الرئيسية.')
         );
     }
 }

@@ -32,39 +32,42 @@ class PersonResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
-    protected static string|UnitEnum|null $navigationGroup = 'الكيانات';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('الكيانات');
+    }
 
     protected static ?int $navigationSort = 2;
 
     public static function getModelLabel(): string
     {
-        return 'شخص';
+        return __('شخص');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'الأشخاص';
+        return __('الأشخاص');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'الأشخاص';
+        return __('الأشخاص');
     }
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
             TextInput::make('slug')
-                ->label('المسار')
+                ->label(__('المسار'))
                 ->required()
                 ->unique(ignoreRecord: true)
                 ->rules(['regex:/^[a-z0-9-]+$/'])
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
 
             Select::make('company_id')
-                ->label('الجهة')
+                ->label(__('الجهة'))
                 ->relationship('company', 'slug')
-                ->getOptionLabelFromRecordUsing(fn ($r): string => $r->name ?? $r->slug)
+                ->getOptionLabelFromRecordUsing(fn ($record): string => $record->name ?? $record->slug)
                 ->searchable()
                 ->preload(),
 
@@ -74,7 +77,7 @@ class PersonResource extends Resource
                 ->extraInputAttributes(['dir' => 'ltr', 'class' => 'masar-ltr']),
 
             FileUpload::make('photo_path')
-                ->label('الصورة')
+                ->label(__('الصورة'))
                 ->image()
                 ->disk('public')
                 ->directory('people')
@@ -87,13 +90,13 @@ class PersonResource extends Resource
              * platform could publish, so the helper text says so plainly.
              */
             Toggle::make('is_expert')
-                ->label('خبير')
-                ->helperText('فعّلها فقط لشخص حقيقي، معروف الهوية، وافق على الاقتباس منه.'),
+                ->label(__('خبير'))
+                ->helperText(__('فعّلها فقط لشخص حقيقي، معروف الهوية، وافق على الاقتباس منه.')),
 
             TranslationsField::make([
-                TextInput::make('name')->label('الاسم')->required(),
-                TextInput::make('title')->label('الصفة'),
-                Textarea::make('bio')->label('نبذة')->rows(3),
+                TextInput::make('name')->label(__('الاسم'))->required(),
+                TextInput::make('title')->label(__('الصفة')),
+                Textarea::make('bio')->label(__('نبذة'))->rows(3),
             ]),
         ])->columns(2);
     }
@@ -105,27 +108,27 @@ class PersonResource extends Resource
             ->defaultSort('mentions_count', 'desc')
             ->columns([
                 TextColumn::make('name')
-                    ->label('الاسم')
-                    ->getStateUsing(fn (Person $r): ?string => $r->name)
+                    ->label(__('الاسم'))
+                    ->getStateUsing(fn (Person $record): ?string => $record->name)
                     ->searchable(query: fn (Builder $query, string $search): Builder => $query->whereHas(
                         'translations',
                         fn (Builder $t) => $t->where('name', 'like', "%{$search}%"),
                     )),
                 TextColumn::make('title')
-                    ->label('الصفة')
-                    ->getStateUsing(fn (Person $r): ?string => $r->translate('title'))
+                    ->label(__('الصفة'))
+                    ->getStateUsing(fn (Person $record): ?string => $record->translate('title'))
                     ->placeholder('—'),
                 TextColumn::make('company.name')
-                    ->label('الجهة')
-                    ->getStateUsing(fn (Person $r): ?string => $r->company?->name)
+                    ->label(__('الجهة'))
+                    ->getStateUsing(fn (Person $record): ?string => $record->company?->name)
                     ->placeholder('—'),
-                TextColumn::make('mentions_count')->label('الإشارات')->numeric()->sortable(),
-                IconColumn::make('is_expert')->label('خبير')->boolean(),
+                TextColumn::make('mentions_count')->label(__('الإشارات'))->numeric()->sortable(),
+                IconColumn::make('is_expert')->label(__('خبير'))->boolean(),
             ])
             ->filters([
-                TernaryFilter::make('is_expert')->label('خبير'),
+                TernaryFilter::make('is_expert')->label(__('خبير')),
             ])
-            ->recordActions([EditAction::make()->label('تحرير')]);
+            ->recordActions([EditAction::make()->label(__('تحرير'))]);
     }
 
     public static function getPages(): array

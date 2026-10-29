@@ -24,7 +24,7 @@ class TriageIntelligenceItem
         if ($state === ReviewState::Drafted && $item->article_id === null) {
             // `Drafted` means an article exists. Setting it by hand would claim
             // a draft that nothing points at.
-            throw new RuntimeException('لا يمكن وضع الحالة «أُنشئت مسودة» دون مقال مرتبط.');
+            throw new RuntimeException(__('لا يمكن وضع الحالة «أُنشئت مسودة» دون مقال مرتبط.'));
         }
 
         $item->forceFill([

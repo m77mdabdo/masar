@@ -14,6 +14,6 @@ class ListSources extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [CreateAction::make()->label('مصدر جديد')];
+        return [CreateAction::make()->label(__('مصدر جديد'))];
     }
 }

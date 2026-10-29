@@ -129,5 +129,6 @@ Route::get('/', Web\RootRedirectController::class)->name('web.root');
  * see a scheduled front page before it goes live.
  */
 Route::get('/admin/homepage/preview/{layout}', Web\HomepagePreviewController::class)
-    ->middleware(['web', 'auth'])
+    // Outside the panel, so the panel's locale middleware is named here.
+    ->middleware(['web', 'auth', \App\Http\Middleware\SetAdminLocale::class])
     ->name('admin.homepage.preview');

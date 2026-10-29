@@ -3,11 +3,48 @@
 declare(strict_types=1);
 
 return [
+    'filepond' => [
+        'labelButtonAbortItemLoad' => 'Abort',
+        'labelButtonAbortItemProcessing' => 'Cancel',
+        'labelButtonProcessItem' => 'Upload',
+        'labelButtonRemoveItem' => 'Remove',
+        'labelButtonRetryItemLoad' => 'Retry',
+        'labelButtonRetryItemProcessing' => 'Retry',
+        'labelButtonUndoItemProcessing' => 'Undo',
+        'labelFileLoadError' => 'Error during load',
+        'labelFileLoading' => 'Loading',
+        'labelFileProcessing' => 'Uploading',
+        'labelFileProcessingAborted' => 'Upload cancelled',
+        'labelFileProcessingComplete' => 'Upload complete',
+        'labelFileProcessingError' => 'Error during upload',
+        'labelFileProcessingRevertError' => 'Error during revert',
+        'labelFileRemoveError' => 'Error during remove',
+        'labelFileSizeNotAvailable' => 'Size not available',
+        'labelFileTypeNotAllowed' => 'File of invalid type',
+        'labelFileWaitingForSize' => 'Waiting for size',
+        'labelIdle' => 'Drag & drop your files or <span class="filepond--label-action">browse</span>',
+        'labelInvalidField' => 'Field contains invalid files',
+        'labelMaxFileSize' => 'Maximum file size is {filesize}',
+        'labelMaxFileSizeExceeded' => 'File is too large',
+        'labelMaxTotalFileSize' => 'Maximum total file size is {filesize}',
+        'labelMaxTotalFileSizeExceeded' => 'Maximum total size exceeded',
+        'labelTapToCancel' => 'tap to cancel',
+        'labelTapToRetry' => 'tap to retry',
+        'labelTapToUndo' => 'tap to undo',
+    ],
     'gate' => [
         'translation_unreviewed' => 'This translation has not been reviewed. A translation is not published until someone other than its translator signs it off.',
     ],
     'language' => [
         'menu' => 'Panel language',
+        'names' => [
+            'ar' => 'Arabic',
+            'en' => 'English',
+            'fr' => 'French',
+            'hi' => 'Hindi',
+            'ur-pk' => 'Urdu',
+            'zh-hans' => 'Simplified Chinese',
+        ],
     ],
     'translation' => [
         'action_retry' => 'Re-run translation',

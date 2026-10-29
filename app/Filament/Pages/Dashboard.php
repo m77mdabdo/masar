@@ -33,12 +33,12 @@ class Dashboard extends BaseDashboard
 
     public function getTitle(): string
     {
-        return 'لوحة التحرير';
+        return __('لوحة التحرير');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'لوحة التحرير';
+        return __('لوحة التحرير');
     }
 
     public function getWidgets(): array

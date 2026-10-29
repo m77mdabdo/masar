@@ -76,15 +76,15 @@ class ArticleEntityFields
     private static function repeater(string $kind, array $config): Repeater
     {
         return Repeater::make("entities.{$kind}")
-            ->label($config['label'])
-            ->hint($config['hint'] ?: null)
-            ->addActionLabel('أضف')
+            ->label(__($config['label']))
+            ->hint($config['hint'] ? __($config['hint']) : null)
+            ->addActionLabel(__('أضف'))
             ->defaultItems(0)
             ->collapsible()
             ->itemLabel(fn (array $state): ?string => self::optionLabel($config['model'], $state['id'] ?? null))
             ->schema([
                 Select::make('id')
-                    ->label('الكيان')
+                    ->label(__('الكيان'))
                     ->options(fn (): array => self::options($config['model']))
                     ->searchable()
                     ->required()
@@ -92,7 +92,7 @@ class ArticleEntityFields
                     ->columnSpan(2),
 
                 Select::make('role')
-                    ->label('الدور')
+                    ->label(__('الدور'))
                     ->options(EntityRole::options())
                     ->default(EntityRole::Mentioned->value)
                     ->required(),
@@ -103,7 +103,7 @@ class ArticleEntityFields
                  * it is mentioned in passing.
                  */
                 Slider::make('prominence')
-                    ->label('الأهمية')
+                    ->label(__('الأهمية'))
                     ->minValue(0)
                     ->maxValue(100)
                     ->step(5)

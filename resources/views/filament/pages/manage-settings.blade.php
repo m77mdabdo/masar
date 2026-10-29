@@ -3,7 +3,7 @@
         {{ $this->form }}
 
         <div class="flex justify-end">
-            <x-filament::button type="submit">حفظ الإعدادات</x-filament::button>
+            <x-filament::button type="submit">{{ __('حفظ الإعدادات') }}</x-filament::button>
         </div>
     </form>
 </x-filament-panels::page>

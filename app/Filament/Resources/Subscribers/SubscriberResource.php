@@ -29,23 +29,26 @@ class SubscriberResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedEnvelope;
 
-    protected static string|UnitEnum|null $navigationGroup = 'الجمهور';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('الجمهور');
+    }
 
     protected static ?int $navigationSort = 1;
 
     public static function getModelLabel(): string
     {
-        return 'مشترك';
+        return __('مشترك');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'المشتركون';
+        return __('المشتركون');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'المشتركون';
+        return __('المشتركون');
     }
 
     public static function canCreate(): bool
@@ -64,12 +67,12 @@ class SubscriberResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('email')
-                    ->label('البريد')
+                    ->label(__('البريد'))
                     ->searchable()
                     ->copyable()
                     ->extraAttributes(['class' => 'masar-ltr']),
                 TextColumn::make('status')
-                    ->label('الحالة')
+                    ->label(__('الحالة'))
                     ->badge()
                     // `$state`, not a name of our own: evaluate() resolves by
                     // name first, and an unrecognised one silently resolves
@@ -80,21 +83,21 @@ class SubscriberResource extends Resource
                         SubscriberStatus::Pending => 'warning',
                         SubscriberStatus::Unsubscribed => 'gray',
                     }),
-                TextColumn::make('locale')->label('اللغة')->badge(),
-                TextColumn::make('source')->label('المصدر')->badge()->placeholder('—'),
-                TextColumn::make('verified_at')->label('تاريخ التأكيد')->dateTime('Y-m-d')->placeholder('—')->sortable(),
-                TextColumn::make('created_at')->label('الاشتراك')->dateTime('Y-m-d')->sortable(),
+                TextColumn::make('locale')->label(__('اللغة'))->badge(),
+                TextColumn::make('source')->label(__('المصدر'))->badge()->placeholder('—'),
+                TextColumn::make('verified_at')->label(__('تاريخ التأكيد'))->dateTime('Y-m-d')->placeholder('—')->sortable(),
+                TextColumn::make('created_at')->label(__('الاشتراك'))->dateTime('Y-m-d')->sortable(),
             ])
             ->filters([
-                SelectFilter::make('status')->label('الحالة')
+                SelectFilter::make('status')->label(__('الحالة'))
                     ->options(fn (): array => collect(SubscriberStatus::cases())
                         ->mapWithKeys(fn (SubscriberStatus $case): array => [$case->value => $case->label()])
                         ->all())
                     ->multiple(),
-                SelectFilter::make('locale')->label('اللغة')->options(
+                SelectFilter::make('locale')->label(__('اللغة'))->options(
                     fn (): array => collect(config('masar.locales'))->map(fn (array $l): string => $l['name'])->all(),
                 ),
-                SelectFilter::make('source')->label('المصدر')->options(fn (): array => Subscriber::query()
+                SelectFilter::make('source')->label(__('المصدر'))->options(fn (): array => Subscriber::query()
                     ->whereNotNull('source')
                     ->distinct()
                     ->pluck('source', 'source')
@@ -109,7 +112,7 @@ class SubscriberResource extends Resource
                      * is small enough that the editor should just get the file.
                      */
                     BulkAction::make('export')
-                        ->label('تصدير CSV')
+                        ->label(__('تصدير CSV'))
                         ->icon('heroicon-o-arrow-down-tray')
                         ->deselectRecordsAfterCompletion()
                         ->action(fn (Collection $records) => response()->streamDownload(
