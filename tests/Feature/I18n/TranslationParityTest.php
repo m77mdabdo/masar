@@ -23,7 +23,8 @@ function flatLang(string $code, string $group): array
 {
     $file = lang_path("{$code}/{$group}.php");
 
-    return is_file($file) ? Arr::dot(require $file) : [];
+    // An empty array (Laravel's `validation.attributes`) holds no string.
+    return is_file($file) ? array_filter(Arr::dot(require $file), fn ($v): bool => $v !== []) : [];
 }
 
 it('has a file for every group in every edition', function (): void {
