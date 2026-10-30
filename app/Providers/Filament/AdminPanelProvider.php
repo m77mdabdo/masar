@@ -64,6 +64,8 @@ class AdminPanelProvider extends PanelProvider
             ->brandName(fn (): string => app()->getLocale() === 'ar' ? __('مسار') : 'MASAR')
             ->brandLogo(fn () => view('filament.brand'))
             ->brandLogoHeight('2rem')
+            // Initials drawn locally: the default fetched ui-avatars.com with each staff name.
+            ->defaultAvatarProvider(\App\Filament\Support\InitialsAvatarProvider::class)
             ->favicon(asset('favicon.ico'))
 
             /*

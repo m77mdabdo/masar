@@ -223,3 +223,13 @@ it('sends the password-reset mail in the user’s language', function (string $c
         expect($message->getSubject())->not->toBe('Reset Password Notification');
     }
 })->with(['ar', 'en', 'fr', 'hi', 'ur-pk', 'zh-hans']);
+
+it('draws staff avatars locally, never sending a name to a third party', function (): void {
+    $user = User::factory()->create(['name' => 'Lama Harbi']);
+
+    $url = filament()->getUserAvatarUrl($user);
+
+    expect($url)->toStartWith('data:image/svg+xml;base64,')
+        ->and(base64_decode(substr($url, strlen('data:image/svg+xml;base64,'))))->toContain('>LH<')
+        ->and($url)->not->toContain('ui-avatars');
+});
