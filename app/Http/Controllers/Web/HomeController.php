@@ -43,9 +43,14 @@ class HomeController
             "homepage:chrome:{$locale}",
             (int) config('masar.cache.homepage'),
             fn (): array => [
+                // This edition's own, published and open: unfiltered it took the
+                // newest row of any edition, closed or draft.
                 'opportunityOfTheWeek' => Opportunity::query()
+                    ->published()
+                    ->open()
+                    ->forLocale($locale)
                     ->with('industry')
-                    ->orderByDesc('published_at')
+                    ->newestFirst()
                     ->first(),
 
                 // The tiles row is the site's map, so it takes the real
@@ -63,7 +68,7 @@ class HomeController
                             ->published()
                             ->where('category_id', $category->getKey())
                             ->whereNotNull('hero_media_id')
-                            ->latest('published_at')
+                            ->newestFirst()
                             ->with('heroMedia')
                             ->first()?->heroMedia,
                     ]),

@@ -106,9 +106,17 @@ class PublishedArticlesQuery
         return $this;
     }
 
+    /**
+     * Newest first; equal times break on the original story's id, which is
+     * the same in every edition. Breaking on the row's own id ordered stories
+     * published at the same moment differently per edition — translations got
+     * their ids in another order — so each edition's homepage drew different
+     * stories into the same sections, and one fell out of the pool entirely.
+     */
     public function latest(string $column = 'published_at'): self
     {
-        $this->query->orderByDesc($column)->orderByDesc('id');
+        $this->query->orderByDesc($column)
+            ->orderByRaw('COALESCE(source_article_id, id) DESC');
 
         return $this;
     }

@@ -274,6 +274,18 @@ class Article extends Model implements HasMedia
         return $this->belongsTo(User::class, 'translation_reviewed_by_id');
     }
 
+    /**
+     * Whose media collections hold this story's inline images and video. A
+     * photograph or a clip is not language: every edition shows the
+     * original's. Blocks keep their media_id across editions, but the media
+     * is attached to the original row, so a translation that looked in its
+     * own collections lost every inline image and video (2026-10-29).
+     */
+    public function mediaOwner(): self
+    {
+        return $this->isTranslation() ? ($this->source ?? $this) : $this;
+    }
+
     public function isTranslation(): bool
     {
         return $this->source_article_id !== null;
@@ -310,6 +322,16 @@ class Article extends Model implements HasMedia
      * Live content only. Status alone is not enough: a scheduled article flipped
      * to `published` with a future `published_at` must stay invisible.
      */
+    /**
+     * Newest first, with ties broken on the original story's id — the same
+     * in every edition — so equal-time stories line up identically across
+     * all six (a row's own id ordered them differently per edition).
+     */
+    public function scopeNewestFirst(Builder $query): Builder
+    {
+        return $query->orderByDesc('published_at')->orderByRaw('COALESCE(source_article_id, id) DESC');
+    }
+
     public function scopePublished(Builder $query): Builder
     {
         return $query->where('status', ArticleStatus::Published)

@@ -42,7 +42,7 @@ class OpportunityController
 
         return view('pages.opportunities', [
             'opportunities' => $query
-                ->orderByDesc('published_at')
+                ->newestFirst()
                 ->paginate(12)
                 ->withQueryString(),
             'potentials' => OpportunityPotential::cases(),

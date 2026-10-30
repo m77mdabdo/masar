@@ -71,6 +71,12 @@ class Opportunity extends Model
         return $this->morphMany(EntityMention::class, 'mentionable');
     }
 
+    /** Newest first; ties break on the translation group, the same in every edition. */
+    public function scopeNewestFirst(Builder $query): Builder
+    {
+        return $query->orderByDesc('published_at')->orderBy('translation_group_id');
+    }
+
     public function scopePublished(Builder $query): Builder
     {
         return $query->whereNotNull('published_at')

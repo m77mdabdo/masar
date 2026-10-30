@@ -23,7 +23,7 @@ class AuthorController
             ->forLocale($locale)
             ->builder()
             ->where('author_id', $author->getKey())
-            ->latest('published_at')
+            ->newestFirst()
             ->paginate((int) setting('editorial.articles_per_page'));
 
         return view('pages.author', [

@@ -95,15 +95,7 @@ class ComposeHomepage
             ->unique()
             ->values();
 
-        $manual = $manualIds->isEmpty()
-            ? collect()
-            : PublishedArticlesQuery::make()
-                ->forLocale($locale)
-                ->builder()
-                ->whereIn('id', $manualIds->all())
-                ->with('topics:id')
-                ->get()
-                ->keyBy('id');
+        $manual = $manualIds->isEmpty() ? collect() : $this->pinnedIn($manualIds, $locale);
 
         // One pool for every auto/mixed section. Sized from the layout's own
         // appetite so a page of many large sections still fills.
@@ -131,7 +123,7 @@ class ComposeHomepage
                 ->open()
                 ->forLocale($locale)
                 ->with(['industry.translations', 'country.translations'])
-                ->orderByDesc('published_at')
+                ->newestFirst()
                 ->limit(30)
                 ->get()
             : collect();
@@ -157,6 +149,42 @@ class ComposeHomepage
             'opportunities' => $opportunities,
             'companies' => $companies,
         ];
+    }
+
+    /**
+     * A pin names a story, not a row. An editor pins the story they see — in
+     * practice the Arabic original — and each edition shows its own published
+     * translation of it, found through the translation group. Fetching the
+     * pinned ids within the edition instead matched nothing outside Arabic:
+     * the big story, a `manual` section, resolved empty and the hero vanished
+     * from five editions. An edition without a published translation leaves
+     * that pin empty; it never falls back to another edition's text.
+     *
+     * Keyed by the pinned id, so claimPinned() reads it exactly as before.
+     *
+     * @param  Collection<int, int>  $ids
+     * @return Collection<int, Article>
+     */
+    private function pinnedIn(Collection $ids, string $locale): Collection
+    {
+        $groups = Article::query()->whereIn('id', $ids->all())->pluck('translation_group_id', 'id');
+
+        $editions = PublishedArticlesQuery::make()
+            ->forLocale($locale)
+            ->builder()
+            ->where(fn ($query) => $query
+                ->whereIn('translation_group_id', $groups->filter()->values()->all())
+                // A story with no group is its own only edition.
+                ->orWhereIn('id', $groups->filter(fn ($group): bool => $group === null)->keys()->all()))
+            ->with('topics:id')
+            ->get();
+
+        $byGroup = $editions->filter(fn (Article $a): bool => $a->translation_group_id !== null)->keyBy('translation_group_id');
+        $byId = $editions->keyBy('id');
+
+        return $ids
+            ->mapWithKeys(fn (int $id): array => [$id => $groups->get($id) !== null ? $byGroup->get($groups->get($id)) : $byId->get($id)])
+            ->filter();
     }
 
     /**

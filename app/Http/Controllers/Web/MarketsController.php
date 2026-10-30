@@ -25,7 +25,7 @@ class MarketsController
             ->forLocale($locale)
             ->builder()
             ->where('content_type', ContentType::Analysis->value)
-            ->latest('published_at')
+            ->newestFirst()
             ->first();
 
         return view('pages.markets', [
