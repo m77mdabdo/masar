@@ -47,7 +47,11 @@ class ArabicNormaliser
         $text = strtr($text, self::LETTERS);
         $text = mb_strtolower($text);
 
-        $words = preg_split('/[^\p{Arabic}\p{L}\p{N}]+/u', $text, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        // Marks belong inside a word: Devanagari's vowel signs and nukta are
+        // \p{M}, and splitting on them turned «ज़ैज़फ़ून» into four single
+        // letters, each matched on its own — a Hindi search returned nearly
+        // every story. Arabic diacritics were already removed above.
+        $words = preg_split('/[^\p{Arabic}\p{L}\p{M}\p{N}]+/u', $text, -1, PREG_SPLIT_NO_EMPTY) ?: [];
 
         $folded = array_map(fn (string $word): string => $this->stripArticle($word), $words);
 

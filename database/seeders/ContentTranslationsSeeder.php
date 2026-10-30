@@ -81,6 +81,7 @@ class ContentTranslationsSeeder extends Seeder
             $this->bylines($locale);
             $this->market($locale);
             $this->corrections($locale);
+            $this->mentions($locale);
         }
 
         foreach ($this->missing as $locale => $n) {
@@ -341,6 +342,40 @@ class ContentTranslationsSeeder extends Seeder
         }
         if ($changed) {
             $settings->set('market.translations', $map);
+        }
+    }
+
+    /**
+     * Entity pages list what mentions an entity, ordered by the mention's
+     * created_at, which PublishArticle aligns to the story's published_at. A
+     * translation published here never went through PublishArticle, so its
+     * mentions kept the import time and every edition ordered a company page
+     * differently. Opportunities were imported without their mentions at all,
+     * so no entity page outside Arabic listed them. Both repaired here;
+     * idempotent, and nothing an editor added is touched.
+     */
+    private function mentions(string $locale): void
+    {
+        DB::table('entity_mentions')
+            ->join('articles', fn ($j) => $j->on('articles.id', '=', 'entity_mentions.mentionable_id')->where('entity_mentions.mentionable_type', 'article'))
+            ->where('articles.locale', $locale)->whereNotNull('articles.source_article_id')->whereNotNull('articles.published_at')
+            ->whereColumn('entity_mentions.created_at', '!=', 'articles.published_at')
+            ->update(['entity_mentions.created_at' => DB::raw('articles.published_at')]);
+
+        foreach (DB::table('opportunities')->where('locale', $locale)->whereNotNull('translation_group_id')->get(['id', 'translation_group_id']) as $copy) {
+            $original = DB::table('opportunities')->where('translation_group_id', $copy->translation_group_id)->where('locale', Locales::default())->value('id');
+            if ($original === null) {
+                continue;
+            }
+            foreach (DB::table('entity_mentions')->where('mentionable_type', 'opportunity')->where('mentionable_id', $original)->get() as $mention) {
+                $exists = DB::table('entity_mentions')->where('mentionable_type', 'opportunity')->where('mentionable_id', $copy->id)
+                    ->where('entity_type', $mention->entity_type)->where('entity_id', $mention->entity_id)->exists();
+                if (! $exists) {
+                    $row = (array) $mention;
+                    unset($row['id']);
+                    DB::table('entity_mentions')->insert([...$row, 'mentionable_id' => $copy->id]);
+                }
+            }
         }
     }
 }

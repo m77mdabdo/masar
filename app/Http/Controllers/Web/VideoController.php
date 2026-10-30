@@ -16,8 +16,8 @@ class VideoController
             ->forLocale($locale)
             ->builder()
             ->whereHas('blocks', fn ($query) => $query->where('type', 'video'))
-            ->with(['blocks' => fn ($query) => $query->where('type', 'video')])
-            ->latest('published_at')
+            ->with(['blocks' => fn ($query) => $query->where('type', 'video'), 'source.media'])
+            ->newestFirst()
             ->paginate(12);
 
         return view('pages.video', [

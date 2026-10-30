@@ -18,7 +18,7 @@
                 // preferred: it is what carries the conversions, so a srcset
                 // exists instead of one full-size file for every viewport.
                 $blockMedia = isset($data['media_id'])
-                    ? $article?->getMedia('inline')->firstWhere('id', (int) $data['media_id'])
+                    ? $article?->mediaOwner()->getMedia('inline')->firstWhere('id', (int) $data['media_id'])
                     : null;
             @endphp
             <figure class="not-prose my-8">
@@ -92,12 +92,12 @@
 
         @case ('video')
             @if ($data['self_hosted'] ?? false)
-                @php $clip = $article?->getFirstMedia('video'); @endphp
+                @php $clip = $article?->mediaOwner()->getFirstMedia('video'); @endphp
                 @if ($clip)
                     <figure class="not-prose my-8">
                         <x-ui.video-player
                             :media="$clip"
-                            :poster="$article?->getFirstMedia('video_poster')"
+                            :poster="$article?->mediaOwner()->getFirstMedia('video_poster')"
                             :title="$data['title'] ?? $article?->title"
                             ratio="inline"
                         />

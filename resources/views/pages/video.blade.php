@@ -4,7 +4,7 @@
 
     // Self-hosted clips are ours to serve; anything else is a third-party embed
     // and only ever loads behind a click.
-    $featuredClip = $featured?->getFirstMedia('video');
+    $featuredClip = $featured?->mediaOwner()->getFirstMedia('video');
 @endphp
 
 <x-layout.public :title="__('pages.video.title')" :description="__('pages.video.description')">
@@ -19,7 +19,7 @@
                 @if ($featuredClip)
                     <x-ui.video-player
                         :media="$featuredClip"
-                        :poster="$featured->getFirstMedia('video_poster') ?? $featured->heroMedia"
+                        :poster="$featured->mediaOwner()->getFirstMedia('video_poster') ?? $featured->heroMedia"
                         :title="$featured->title"
                         ratio="hero"
                     />

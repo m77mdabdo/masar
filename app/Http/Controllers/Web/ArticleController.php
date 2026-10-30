@@ -30,7 +30,7 @@ class ArticleController
             ->where('slug', $slug)
             ->with([
                 'category.translations', 'author', 'heroMedia', 'blocks',
-                'sources', 'topics.translations', 'factChecker',
+                'sources', 'topics.translations', 'factChecker', 'source.media',
             ])
             ->first();
 
@@ -95,7 +95,7 @@ class ArticleController
                     ->whereKeyNot($article->getKey())
                     ->whereNotNull('hero_media_id')
                     ->whereHas('category', fn ($query) => $query->whereKeyNot($categoryId))
-                    ->latest('published_at')
+                    ->newestFirst()
                     ->with('heroMedia')
                     ->first()?->heroMedia,
 
@@ -113,7 +113,7 @@ class ArticleController
                     ->where('is_sponsored', true)
                     ->whereKeyNot($article->getKey())
                     ->with('category.translations')
-                    ->latest('published_at')
+                    ->newestFirst()
                     ->first(),
             ],
         );
