@@ -21,7 +21,7 @@
 
             <nav class="flex items-center gap-4" aria-label="{{ __('site.nav.quick_links') }}">
                 @foreach (collect($links)->take(4) as $link)
-                    <a href="{{ $link['url'] }}" class="hidden min-h-6 items-center text-ink transition hover:text-g-700 sm:inline-flex">{{ $link['label'] }}</a>
+                    <a href="{{ $link['url'] }}" class="hidden min-h-6 items-center whitespace-nowrap text-ink transition hover:text-g-700 sm:inline-flex">{{ $link['label'] }}</a>
                 @endforeach
 
                 <x-layout.language-switcher :locale="$locale" :alternates="$alternates" />

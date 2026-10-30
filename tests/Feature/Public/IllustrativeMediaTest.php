@@ -343,6 +343,8 @@ it('keeps the text halo off clamped text, where it would be cut into a box', fun
     // attribute selector above reaches it. A clamp written any other way
     // (a custom class, an inline style) would get the halo back.
     expect($html)->not->toContain('-webkit-line-clamp')
-        ->and(substr_count($html, 'line-clamp-4'))->toBe(3)
+        // Five lines for the headline since 2026-10-29 (French and English ran
+        // past four); still a utility, so the selector still reaches it.
+        ->and(substr_count($html, 'line-clamp-5'))->toBe(3)
         ->and(substr_count($html, 'line-clamp-3'))->toBeGreaterThanOrEqual(9);
 });

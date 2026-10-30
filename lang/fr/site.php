@@ -64,7 +64,7 @@ return [
         'main' => 'Navigation principale',
         'menu' => 'Menu',
         'mobile' => 'Navigation mobile',
-        'newsletter' => 'Newsletter',
+        'newsletter' => 'Lettre d’info',
         'open_menu' => 'Ouvrir le menu',
         'quick_links' => 'Liens rapides',
         'search' => 'Rechercher',

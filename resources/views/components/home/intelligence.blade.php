@@ -61,7 +61,9 @@
                                                     'bg-g-600' => ($row['change'] ?? 0) >= 0,
                                                     'bg-gold-ink' => ($row['change'] ?? 0) < 0,
                                                 ]) aria-hidden="true"></span>
-                                                <span class="truncate"><x-ui.bidi :text="\App\Support\MarketText::for($row['label'])" /></span>
+                                                {{-- Wraps rather than truncates: «Marché de démonstration B»
+                                                     was cut to «Marché de démo…», which the Arabic never was. --}}
+                                                <span class="min-w-0 break-words"><x-ui.bidi :text="\App\Support\MarketText::for($row['label'])" /></span>
                                             </span>
                                             <x-data.figure :value="$row['value']" :change="$row['change']" size="sm" />
                                         </li>
@@ -183,7 +185,10 @@
 
                 <span class="max-w-[22ch]">
                     <span class="block font-display text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-mint">{{ __('home.intelligence.week_opportunity') }}</span>
-                    <h3 class="mt-3 font-display text-[1.75rem] font-semibold leading-[1.22]">{{ $opportunity->title }}</h3>
+                    {{-- Sized by length, not by edition: a French title runs about
+                         twice the Arabic one and, at 1.75rem, spread from the dark
+                         panel onto the photograph. Same design, fewer lines. --}}
+                    <h3 @class(['mt-3 line-clamp-5 font-display font-semibold leading-[1.22]', 'text-[1.75rem]' => mb_strlen($opportunity->title) <= 60, 'text-[1.35rem]' => mb_strlen($opportunity->title) > 60])>{{ $opportunity->title }}</h3>
                     <p class="mt-3 text-[0.9rem] leading-[1.7] text-cream/75">{{ Str::limit($opportunity->summary, 120) }}</p>
                 </span>
 

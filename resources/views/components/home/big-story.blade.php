@@ -186,8 +186,12 @@
                                  dots under the last line and the tops of the
                                  first. The padding gives the ink room inside the
                                  clamp; the matching negative margin keeps the
-                                 block where it was. --}}
-                            class="-my-[0.15em] line-clamp-4 py-[0.15em] lg:max-w-[14ch] font-display text-[2.1rem] font-semibold leading-[1.2] sm:text-[2.6rem] lg:text-[clamp(2rem,3.33vw,3rem)]">
+                                 block where it was. Five lines, not four:
+                                 French and English run longer than Arabic,
+                                 and at 14ch four cut «…réglementaires» short
+                                 (2026-10-29); no Arabic headline uses a fifth,
+                                 and the scrim's height follows the block. --}}
+                            class="big-story-headline -my-[0.15em] line-clamp-5 py-[0.15em] lg:max-w-[14ch] font-display text-[2.1rem] font-semibold leading-[1.2] sm:text-[2.6rem] lg:text-[clamp(2rem,3.33vw,3rem)]">
                             <a href="{{ $slide['url'] }}" class="transition hover:text-cream/85">
                                 {{ $slide['lead'] }}@if ($slide['emphasis']) <span class="text-mint">{{ $slide['emphasis'] }}</span>@endif
                             </a>

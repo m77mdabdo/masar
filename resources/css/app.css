@@ -635,3 +635,29 @@
     .prose-masar > ol { list-style: decimal; }
     .prose-masar li { margin-block: 0.5em; }
 }
+
+/*
+ * Nastaliq headings keep their leading over any utility. The base rule above
+ * gives Urdu headings 1.9, but a heading that sets its own leading — the big
+ * story's `leading-[1.2]`, set for the Arabic display face — is a utility,
+ * and utilities win over base: at 375 the Urdu hero's lines overlapped.
+ * Unlayered, so it outranks every layer. Arabic-marked text inside the Urdu
+ * edition (the «مسار» lockup, a fallback name) keeps its own metrics.
+ */
+html[data-script='nastaliq'] :is(h1, h2, h3, h4, .font-display):not([lang='ar'], [lang='ar'] *) {
+    line-height: 1.9;
+}
+
+/* Latin headlines are longer than Arabic ones in characters and in words;
+   on a phone the big story's French headline needed six lines at 2.1rem. */
+@media (max-width: 639px) {
+    html[data-script='latin'] .big-story-headline {
+        font-size: 1.9rem;
+    }
+}
+
+@media (max-width: 359px) {
+    html[data-script='latin'] .big-story-headline {
+        font-size: 1.75rem;
+    }
+}
