@@ -1,3 +1,32 @@
+# MASAR — homepage parity: the hero in all six editions
+
+Date: 2026-10-30. Detail: `LOCALIZATION_AUDIT.md`, "Homepage and structural parity".
+
+- **Root cause:** the big story is a `manual` section pinned to three story ids, and those ids are the Arabic rows. The homepage composer looked the ids up *within* each edition, matched nothing outside Arabic, and drew an empty hero. The magazine issue vanished the same way, and the leads and video sections lost their picks.
+- **The fix:** a pin now resolves to the same story's published translation in each edition, through the translation group, in the editor's order. A missing translation leaves the pin empty and never shows another edition's text.
+- **Comparing every public page's structure against Arabic found and fixed more:**
+  - tie-breaking that ordered same-time stories differently per edition;
+  - an opportunity of the week taken from any edition;
+  - translated stories missing their inline images and video;
+  - entity pages missing translated opportunities;
+  - Hindi search matching nearly everything;
+  - truncated French headlines;
+  - overlapping Urdu headline lines;
+  - a French opportunity title over the photograph, and truncated market labels;
+  - topbar links wrapping at tablet width;
+  - admin avatars loaded from ui-avatars.com with staff names.
+- **Verified on the final code in a real browser, in all six editions:**
+  - hero, slideshow and section structure, at 13 widths;
+  - the public responsive audit, 2,346 checks;
+  - the 825-page leak crawl;
+  - the 810-page structure comparison;
+  - homepage slices at 1440, 768 and 375, inspected by eye;
+  - the admin re-audit.
+- **Regression tests:** `HomepageParityTest` (the hero tests fail on the old code), `StructureParityTest`, and the local-avatar test.
+- **Owner publication approval** re-recorded for 247 files. **Native review: none.** **Not deployed.**
+
+---
+
 # MASAR — release readiness: Chinese amounts, names, auth flows, backup safety
 
 Date: 2026-10-29. Baseline `28a0499`. Detail and tables: `LOCALIZATION_AUDIT.md`, "Release-readiness pass".

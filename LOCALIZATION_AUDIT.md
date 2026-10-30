@@ -212,3 +212,79 @@ Each behaviour was exercised against a scratch destination:
 | retention | aged sets and their unreferenced archive removed; a still-referenced archive kept |
 
 No existing backup was touched.
+
+## Homepage and structural parity (2026-10-30, release-blocking fix)
+
+### Why the hero was missing outside Arabic
+
+The big story (the cinematic hero) is a homepage section of type `big_story` with `source: manual`. An editor pinned three stories by id: `config.article_ids = [198, 197, 137]`. **Those ids are the Arabic rows.** `ComposeHomepage::buildPool()` fetched the pinned ids *within the requested edition* (`forLocale($locale)->whereIn('id', …)`).
+- In English, French, Hindi, Urdu and Chinese the three ids are not rows of that edition, so nothing matched.
+- A `manual` section stops when its pins are exhausted ("an editor who picked three stories meant three"), so the section resolved empty and the template drew nothing.
+- The page began at Explore MASAR.
+- The `issue` section (also `manual`) vanished the same way.
+- The `leads` and `video` sections (`mixed`) silently lost the editor's picks and were filled automatically. In some editions that put sponsored stories in the leads row that the Arabic page does not show.
+
+No test caught it. Every string that did render was translated, so the translation checks passed. Nothing asserted that the hero existed.
+
+### The fix
+
+- **Pins resolve to the same story in each edition.** `ComposeHomepage::pinnedIn()` resolves each pinned id to its translation group, then to that edition's published row, in the editor's order. An edition without a published translation leaves that pin empty, never another edition's text.
+- **A stable tie-break.** `PublishedArticlesQuery::latest()` and new `newestFirst()` scopes on `Article` and `Opportunity` break equal publication times on the original story's id (`COALESCE(source_article_id, id)`). Breaking on a row's own id had ordered same-moment stories differently per edition, so automatic sections drew different stories, and `reports` had 5 items in Arabic and 4 elsewhere.
+- **Opportunity of the week** now picks this edition's published, open opportunity. It had taken the newest row of any edition, closed or draft.
+
+### Further structural defects found by comparing 810 pages against Arabic, all fixed
+
+| defect | cause | fix |
+|---|---|---|
+| Translated stories lost their inline images and video, and the video page had no player outside Arabic | Blocks keep their `media_id`, but the media is attached to the original row; translations looked in their own collections | `Article::mediaOwner()`: translations read the original's media |
+| Entity pages outside Arabic lacked opportunities and ordered items differently | Opportunity translations were imported without mentions; translated mentions kept the import time instead of `published_at` | Seeder `mentions()` stage, idempotent; `masar:recount` |
+| Hindi search matched nearly every story | The normaliser split words on combining marks, so «ज़ैज़फ़ून» became four single letters | `\p{M}` stays inside words |
+| French and English hero headlines cut at four lines | `line-clamp-4` at `14ch` | five lines, a smaller Latin size on phones; the scrim follows the block |
+| Urdu hero lines overlapped | Tailwind's `leading-[1.2]` overrode the Nastaliq base leading | an unlayered Nastaliq heading rule |
+| The French opportunity title ran over the photograph; French market labels truncated | 1.75rem at `22ch`; `truncate` | sized by length with a five-line clamp; labels wrap |
+| Topbar links wrapped at tablet width in all six (Arabic too) | no `nowrap` | `whitespace-nowrap`; no overflow from 640 to 1280 |
+| «Newsletter» on French pages | my earlier shortening of the label | «Lettre d'info» |
+| **Admin avatars were loaded from ui-avatars.com with each staff name** | Filament's default avatar provider | local `InitialsAvatarProvider` (inline SVG). Admin pages now make no third-party requests |
+
+### Section matrix (browser, final code)
+
+| Homepage section | AR | EN | FR | HI | UR | ZH |
+|---|---|---|---|---|---|---|
+| Cinematic hero, above Explore MASAR, 720px tall at 1440 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Featured story, localized, linking into its own edition | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Three editorial questions per slide | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Slideshow: auto-advance, pause/play, previous, next, keyboard, thumbnail | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Reduced motion: still, with no pause control | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Market ticker | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Explore MASAR | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| News sections (3), same stories, same order | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Sponsored content | none on the homepage in any edition (the pinned leads are not sponsored), identical | | | | | |
+| Footer | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Same 15 sections in the same order | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| No defect at 13 widths (320–2560 and landscape) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+
+Composition: all 18 sections are identical to Arabic in type, item count and stories, in every edition.
+
+### Verification on the final code
+
+- **Public responsive audit:** 2,346 checks, 0 defects.
+- **Leak crawl:** 825 pages, 0 Arabic.
+- **`<head>` crawl:** 133 pages × 4 editions, 0.
+- **Structure crawl:** 810 pages against Arabic; the only differences are the four searches for the Latin letter "a", which legitimately match different text.
+- **Same-name search:** 4 results in every edition.
+- **Truncation:** no hero headline truncated at 16 widths in any edition; no opportunity title clipped and no pulse label overflowing at 5 widths.
+- **Screenshots:** viewport slices at 1440, 768 and 375 of all six homepages (12–16 slices each) were inspected; full-page capture blanks `content-visibility` sections. All were deleted after inspection.
+- **Admin:** dashboard, articles, homepage composer and preview, pipeline, settings and users re-audited in six languages at 17 viewports on an isolated copy.
+
+### Regression tests
+
+- **`tests/Feature/Public/HomepageParityTest.php`:**
+  - pins resolve per edition, in the editor's order;
+  - a missing translation leaves a pin empty, with no fallback;
+  - every edition draws the hero, with the same section sequence as Arabic;
+  - equal-time stories order identically;
+  - the opportunity of the week is per edition.
+
+  With the old pin lookup restored, the three hero tests fail.
+- **`tests/Feature/Public/StructureParityTest.php`:** translated stories show the original's inline images; translated opportunities carry their mentions; Hindi search folds whole words.
+- **`AdminLocalizationTest`:** avatars are drawn locally.
